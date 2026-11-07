@@ -11,9 +11,11 @@
 
   /* ---------- durum ---------- */
   const KEY = 'ekonometri-patikasi-v1';
-  const blank = () => ({ v: 1, xp: 0, days: {}, les: {}, q: {}, mist: {}, hist: {}, exams: [], run: null, set: { sound: true, tr: true, goal: 100 } });
+  const blank = () => ({ v: 1, xp: 0, days: {}, les: {}, q: {}, mist: {}, hist: {}, exams: [], run: null, set: { sound: true, tr: true, goal: 100, size: 'l' } });
   let S = blank();
   try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); S.set = Object.assign(blank().set, S.set); } catch (e) { /* depolama yok */ }
+  const applySize = () => { document.documentElement.dataset.size = S.set.size || 'l'; };
+  applySize();
   let saveT = 0;
   function save() { S.t = Date.now(); clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }, 150); }
   window.addEventListener('pagehide', () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } });
@@ -269,6 +271,7 @@
   function viewSettings() {
     return `<div class="view"><section class="hero"><div class="eyebrow">Ayarlar</div><h1>Ayarlar ve yedek</h1><p>İlerlemen bu cihazın tarayıcısında saklanır.</p></section>
       <section class="panel"><h3>Tercihler</h3>
+        <label class="switch" for="s-size"><span>Yazı boyutu</span><select id="s-size" style="min-height:44px;border-radius:10px;border:2px solid var(--line);background:var(--surface);padding:0 10px">${[['m', 'Normal'], ['l', 'Büyük'], ['xl', 'Çok büyük']].map(o => `<option value="${o[0]}" ${S.set.size === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></label>
         <label class="switch" for="s-sound"><span>Doğru/yanlış sesi</span><input type="checkbox" id="s-sound" ${S.set.sound ? 'checked' : ''}></label>
         <label class="switch" for="s-tr"><span>Türkçe çeviriyi otomatik göster</span><input type="checkbox" id="s-tr" ${S.set.tr ? 'checked' : ''}></label>
         <label class="switch" for="s-goal"><span>Günlük XP hedefi</span><select id="s-goal" style="min-height:40px;border-radius:10px;border:2px solid var(--line);background:var(--surface);padding:0 8px">${[50, 100, 150, 250].map(v => `<option ${S.set.goal === v ? 'selected' : ''}>${v}</option>`).join('')}</select></label></section>
@@ -297,12 +300,13 @@
       $('#ztbl').addEventListener('click', (e) => { const td = e.target.closest('td'); if (!td) return; main.querySelectorAll('.ztbl td.hl').forEach(x => x.classList.remove('hl')); if (td.cellIndex > 0) td.classList.add('hl'); });
     }
     if (r === 'ayarlar') {
+      $('#s-size').onchange = (e) => { S.set.size = e.target.value; applySize(); save(); };
       $('#s-sound').onchange = (e) => { S.set.sound = e.target.checked; save(); };
       $('#s-tr').onchange = (e) => { S.set.tr = e.target.checked; save(); };
       $('#s-goal').onchange = (e) => { S.set.goal = +e.target.value; save(); renderAside(); };
       $('#b-exp').onclick = async () => { const s = JSON.stringify(S); try { await navigator.clipboard.writeText(s); toast('Yedek kodu kopyalandı'); } catch (e) { $('#t-imp').value = s; $('#t-imp').select(); toast('Kod kutuya yazıldı, elle kopyala'); } };
-      $('#b-imp').onclick = () => { try { const o = JSON.parse($('#t-imp').value); if (o.v !== 1 || typeof o.xp !== 'number') throw 0; S = Object.assign(blank(), o); save(); toast('Yedek yüklendi'); route(); } catch (e) { toast('Bu bir yedek kodu değil. Kodun tamamını yapıştır.'); } };
-      $('#b-reset').onclick = async () => { if (await confirmBox('İlerleme silinsin mi?', 'XP, tamamlanan dersler, hata listesi ve deneme sonuçları silinecek.', 'Evet, sıfırla', 'Vazgeç', true)) { S = blank(); save(); toast('İlerleme sıfırlandı'); route(); } };
+      $('#b-imp').onclick = () => { try { const o = JSON.parse($('#t-imp').value); if (o.v !== 1 || typeof o.xp !== 'number') throw 0; S = Object.assign(blank(), o); S.set = Object.assign(blank().set, S.set); applySize(); save(); toast('Yedek yüklendi'); route(); } catch (e) { toast('Bu bir yedek kodu değil. Kodun tamamını yapıştır.'); } };
+      $('#b-reset').onclick = async () => { if (await confirmBox('İlerleme silinsin mi?', 'XP, tamamlanan dersler, hata listesi ve deneme sonuçları silinecek.', 'Evet, sıfırla', 'Vazgeç', true)) { S = blank(); applySize(); save(); toast('İlerleme sıfırlandı'); route(); } };
     }
   }
 

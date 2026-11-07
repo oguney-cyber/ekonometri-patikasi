@@ -1,5 +1,5 @@
 /* Çevrimdışı çalışma: uygulama dosyaları önbelleğe alınır. Sürüm değişince eski önbellek silinir. */
-const VERSION = 'ekp-2026-11-07a';
+const VERSION = 'ekp-2026-11-07b';
 const CORE = [
   './', 'index.html', 'styles.css', 'manifest.webmanifest',
   'js/stats.js', 'js/gen.js', 'js/parse.js', 'js/app.js', 'js/formulas.js',
