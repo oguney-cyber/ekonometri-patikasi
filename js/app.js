@@ -77,9 +77,12 @@
       notes.forEach(([fr, d]) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = ok ? 'sine' : 'triangle'; o.frequency.value = fr; g.gain.setValueAtTime(0.0001, t + d); g.gain.exponentialRampToValueAtTime(0.16, t + d + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.2); o.connect(g); g.connect(AC.destination); o.start(t + d); o.stop(t + d + 0.22); });
     } catch (e) { }
   }
+  const Ink = window.Ink || { init() { }, bind() { }, unbind() { }, off() { }, isOn: () => false, clearPrefix: () => Promise.resolve(), clearAll: () => Promise.resolve(), count: () => Promise.resolve(0) };
+  Ink.init({ toast });
   const fmtTime = (ms) => { const s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
 
   const I = {
+    pen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-4.7L15.8 4.8a2.2 2.2 0 0 1 3.1 3.1L8.4 18.4z"/><path d="M13.9 6.7l3.1 3.1"/></svg>',
     path: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8.2 19H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.8"/></svg>',
     exam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5V3h6v1.5"/><path d="m9 13 2 2 4-4.5"/></svg>',
     mist: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>',
@@ -153,6 +156,7 @@
     bindView(main, r);
     renderAside();
     window.scrollTo(0, 0);
+    if (!$('#player')) { if (r === 'formuller' || r === 'tablolar') Ink.bind({ key: 'v:' + r, mode: 'main', scroller: window, anchor: $('.view', main) }); else Ink.unbind(); }
   }
   window.addEventListener('hashchange', route);
   function refresh() { const y = window.scrollY; route(); window.scrollTo(0, y); }
@@ -280,6 +284,7 @@
         <div class="btnrow"><button class="btn sm" id="b-exp">Yedek kodunu kopyala</button></div>
         <label class="field" for="t-imp">Yedek kodu yapıştır<textarea id="t-imp" placeholder='{"v":1, ...}'></textarea></label>
         <div class="btnrow"><button class="btn sm ghost" id="b-imp">Yedeği yükle</button></div></section>
+      <section class="panel"><h3>Kalem notları</h3><p>Konu kartlarına, formül kağıdına ve tablolara yazdıkların bu cihazda saklanır, yedek koduna girmez. Soru karalamaları sonraki soruya geçince, deneme sınavındakiler sınav bitince silinir.</p><p class="num" id="ink-n">Notlar sayılıyor…</p><div class="btnrow"><button class="btn sm bad" id="b-ink">Tüm notları sil</button></div></section>
       <section class="panel"><h3>Sıfırla</h3><p>Tüm ilerleme, XP ve hata listesi silinir. Geri alınamaz.</p><div class="btnrow"><button class="btn sm bad" id="b-reset">İlerlemeyi sıfırla</button></div></section></div>`;
   }
 
@@ -306,6 +311,8 @@
       $('#s-goal').onchange = (e) => { S.set.goal = +e.target.value; save(); renderAside(); };
       $('#b-exp').onclick = async () => { const s = JSON.stringify(S); try { await navigator.clipboard.writeText(s); toast('Yedek kodu kopyalandı'); } catch (e) { $('#t-imp').value = s; $('#t-imp').select(); toast('Kod kutuya yazıldı, elle kopyala'); } };
       $('#b-imp').onclick = () => { try { const o = JSON.parse($('#t-imp').value); if (o.v !== 1 || typeof o.xp !== 'number') throw 0; S = Object.assign(blank(), o); S.set = Object.assign(blank().set, S.set); applySize(); save(); toast('Yedek yüklendi'); route(); } catch (e) { toast('Bu bir yedek kodu değil. Kodun tamamını yapıştır.'); } };
+      Ink.count().then(n => { const x = $('#ink-n'); if (x) x.textContent = n ? n + ' sayfada not var.' : 'Henüz not yok.'; });
+      $('#b-ink').onclick = async () => { if (await confirmBox('Tüm notlar silinsin mi?', 'Konu kartlarına, formül kağıdına ve tablolara yazdığın her şey silinecek. Geri alınamaz.', 'Evet, sil', 'Vazgeç', true)) { await Ink.clearAll(); const x = $('#ink-n'); if (x) x.textContent = 'Henüz not yok.'; toast('Notlar silindi'); } };
       $('#b-reset').onclick = async () => { if (await confirmBox('İlerleme silinsin mi?', 'XP, tamamlanan dersler, hata listesi ve deneme sonuçları silinecek.', 'Evet, sıfırla', 'Vazgeç', true)) { S = blank(); applySize(); save(); toast('İlerleme sıfırlandı'); route(); } };
     }
   }
@@ -324,6 +331,7 @@
     const L = LESSON[id];
     if (!lessonDone(id)) return startLesson(id, false);
     const el = playerShell();
+    Ink.unbind();
     el.innerHTML = `<div class="p-top"><button class="iconbtn" id="p-x" aria-label="Kapat">${I.x}</button><div style="flex:1"></div></div>
       <div class="p-body"><div class="p-inner"><div class="cardhead"><div class="eyebrow">${esc(UNIT[L.unit].week)} · tekrar</div><h2>${esc(L.title)}</h2></div>
       <p>Bu dersi ${lessonDone(id)} kez bitirdin. Sorular her seferinde karışık gelir, sayısal olanlar yeni sayılarla üretilir.</p>
@@ -356,7 +364,7 @@
 
   function topBar(progress, count) {
     return `<div class="p-top"><button class="iconbtn" id="p-x" aria-label="Dersten çık">${I.x}</button>
-      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress * 100)}"><i style="width:${Math.max(3, progress * 100)}%"></i></div><span class="p-count num">${count}</span></div>`;
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress * 100)}"><i style="width:${Math.max(3, progress * 100)}%"></i></div><span class="p-count num">${count}</span><button class="iconbtn" data-ink-toggle aria-pressed="false" aria-label="Kalemle yaz" title="Kalemle yaz">${I.pen}</button></div>`;
   }
   async function askQuit() {
     if (P && P.mode !== 'exam' && P.i > 0 && P.i < P.items.length) {
@@ -389,6 +397,7 @@
       $('#b-next').onclick = () => { P.i++; renderStep(); };
       const bb = $('#b-back'); if (bb) bb.onclick = () => { P.i--; renderStep(); };
       $('.p-body', el).scrollTop = 0;
+      Ink.bind({ key: 'c:' + P.id + ':' + it.n, mode: 'player', scroller: $('.p-body', el), anchor: $('.p-inner', el) });
       return;
     }
     const q = it.q; let sel = null, checked = false;
@@ -398,6 +407,7 @@
     typeset(el); bindTR(el);
     $('#p-x').onclick = askQuit;
     $('.p-body', el).scrollTop = 0;
+    Ink.bind({ key: null, mode: 'player', scroller: $('.p-body', el), anchor: $('.p-inner', el) });
     const optEls = [...el.querySelectorAll('.opt')];
     const choose = (k) => { if (checked) return; sel = k; optEls.forEach((b, j) => { b.classList.toggle('sel', j === k); b.setAttribute('aria-checked', j === k); }); $('#b-check').disabled = false; };
     optEls.forEach(b => b.onclick = () => choose(+b.dataset.k));
@@ -432,6 +442,7 @@
 
   function renderFinish() {
     const el = $('#player');
+    Ink.unbind();
     const acc = P.nq ? P.firstRight / P.nq : 0;
     let bonus = 0;
     if (P.mode === 'lesson') { const s = S.les[P.id] || { n: 0, best: 0 }; s.n++; s.best = Math.max(s.best || 0, acc); S.les[P.id] = s; bonus = 20; }
@@ -471,7 +482,7 @@
     return out;
   }
   function startExam() {
-    if (!S.run) { S.run = { qs: buildExam(), ans: Array(40).fill(null), flag: [], i: 0, prior: 0 }; save(); }
+    if (!S.run) { Ink.clearPrefix('x:'); S.run = { qs: buildExam(), ans: Array(40).fill(null), flag: [], i: 0, prior: 0 }; save(); }
     S.run.start = Date.now();
     P = { mode: 'exam' }; playerShell(); renderExamQ();
     clearInterval(timerI); timerI = setInterval(() => { const t = $('#ex-t'); if (t && S.run) t.textContent = fmtTime(S.run.prior + Date.now() - S.run.start); }, 1000);
@@ -481,7 +492,7 @@
     const el = $('#player'), R = S.run, q = R.qs[R.i];
     const answered = R.ans.filter(a => a != null).length;
     el.innerHTML = `<div class="p-top"><button class="iconbtn" id="p-x" aria-label="Sınavı duraklat ve çık">${I.x}</button>
-        <div class="bar"><i style="width:${Math.max(3, answered / 40 * 100)}%"></i></div><span class="p-count num" id="ex-t">${fmtTime(R.prior + Date.now() - R.start)}</span></div>
+        <div class="bar"><i style="width:${Math.max(3, answered / 40 * 100)}%"></i></div><span class="p-count num" id="ex-t">${fmtTime(R.prior + Date.now() - R.start)}</span><button class="iconbtn" data-ink-toggle aria-pressed="false" aria-label="Kalemle yaz" title="Kalemle yaz">${I.pen}</button></div>
       <div class="p-body"><div class="p-inner"><div class="qmeta"><span class="pill">Soru ${R.i + 1} / 40</span><span class="pill ${answered === 40 ? 'ok' : ''}">${answered} cevaplandı</span><button class="trbtn" id="fl" aria-pressed="${R.flag.includes(R.i)}">İşaretle</button></div>${qHTML(q)}
         <details id="map"><summary>Soru haritası</summary><div class="ex-grid" style="margin-top:12px">${R.qs.map((_, k) => `<button class="ex-cell ${R.ans[k] != null ? 'ans' : ''} ${k === R.i ? 'cur' : ''} ${R.flag.includes(k) ? 'flag' : ''}" data-j="${k}">${k + 1}</button>`).join('')}</div></details></div></div>
       <div class="p-foot"><div class="p-foot-in"><div class="btnrow" style="justify-content:space-between"><button class="btn ghost" id="e-prev" ${R.i ? '' : 'disabled'}>Önceki</button>
@@ -501,6 +512,7 @@
     $('#p-x').onclick = () => { pauseExam(); toast('Sınav duraklatıldı, kaldığın yerden devam edebilirsin'); closePlayer(); };
     P.key = (e) => { const k = e.key.toLowerCase(), m = { '1': 0, '2': 1, '3': 2, '4': 3, a: 0, b: 1, c: 2, d: 3 }; if (m[k] != null && optEls[m[k]]) optEls[m[k]].click(); else if (k === 'arrowright' && R.i < 39) go(R.i + 1); else if (k === 'arrowleft' && R.i > 0) go(R.i - 1); };
     $('.p-body', el).scrollTop = 0;
+    Ink.bind({ key: 'x:' + R.i, mode: 'player', scroller: $('.p-body', el), anchor: $('.p-inner', el) });
   }
   async function finishExam() {
     const R = S.run, empty = R.ans.filter(a => a == null).length;
@@ -512,10 +524,12 @@
     addXP(c * 3 + 20);
     S.exams.push({ at: Date.now(), score, c, dur, byU });
     const done = R; S.run = null; save();
+    Ink.unbind(); Ink.clearPrefix('x:');
     renderExamResult(done, score, c, byU, dur);
   }
   function renderExamResult(R, score, c, byU, dur) {
     const el = $('#player');
+    Ink.unbind();
     const rows = Object.keys(EXAM_W).map(u => { const v = byU[u] || [0, 0]; return `<tr><td>${esc(SHORT[u])} · ${esc(UNIT[u].title)}</td><td class="num">${v[0]}/${v[1]}</td><td class="num">%${v[1] ? Math.round(v[0] / v[1] * 100) : 0}</td></tr>`; }).join('');
     el.innerHTML = `<div class="p-top"><button class="iconbtn" id="p-x" aria-label="Kapat">${I.x}</button><div class="bar"><i style="width:100%"></i></div><span class="p-count num">${fmtTime(dur)}</span></div>
       <div class="p-body"><div class="p-inner">

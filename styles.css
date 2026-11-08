@@ -14,6 +14,7 @@
   --pen-soft: #E4E9FB;
   --mark: #FFE36A;
   --mark-ink: #142033;
+  --hl: #FFD43B;
   --ok: #17905A;
   --ok-soft: #DCF2E6;
   --bad: #CC3737;
@@ -33,7 +34,7 @@
     --paper: #0E141C; --grid: #17202B; --surface: #161F2B; --surface-2: #1B2634;
     --ink: #E6ECF3; --ink-2: #B6C2D0; --ink-3: #8B9AAD; --line: #2A3747;
     --pen: #8EA2FF; --pen-ink: #0E1530; --pen-soft: #232F55;
-    --mark: #6B5A12; --mark-ink: #FFF3C4;
+    --mark: #6B5A12; --mark-ink: #FFF3C4; --hl: #E9C24A;
     --ok: #4FCB8E; --ok-soft: #153325; --bad: #FF7B76; --bad-soft: #3B1D1F; --warn: #F0B94B;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
   }
@@ -43,7 +44,7 @@
   --paper: #0E141C; --grid: #17202B; --surface: #161F2B; --surface-2: #1B2634;
   --ink: #E6ECF3; --ink-2: #B6C2D0; --ink-3: #8B9AAD; --line: #2A3747;
   --pen: #8EA2FF; --pen-ink: #0E1530; --pen-soft: #232F55;
-  --mark: #6B5A12; --mark-ink: #FFF3C4;
+  --mark: #6B5A12; --mark-ink: #FFF3C4; --hl: #E9C24A;
   --ok: #4FCB8E; --ok-soft: #153325; --bad: #FF7B76; --bad-soft: #3B1D1F; --warn: #F0B94B;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
 }
@@ -352,3 +353,51 @@ textarea { min-height: 110px; font-size: 16px; resize: vertical; }
 :root { --amp: 1px; }
 .node-row { padding-left: calc(var(--k, 0) * var(--amp)); }
 @media (max-width: 420px) { :root { --amp: .55px; } }
+
+/* ---------- kalem notları ---------- */
+.ink-zoom { margin: 0 auto; }
+.ink-anchor { position: relative; }
+.ink-cv { position: absolute; z-index: 6; pointer-events: none; }
+/* uzatılan alan kartın kendi zemini: ayrı renk, çizgi ya da yazı yok */
+.ink-pad { background: transparent; }
+.ink-pad.empty { display: none; }
+.ink-pad span { display: none; }
+.inking .ink-anchor, .inking .ink-anchor * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+
+.ink-bar {
+  position: fixed; z-index: 58; transform: translateX(-50%); width: max-content;
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px 0;
+  padding: 5px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line);
+  box-shadow: 0 2px 4px rgba(20, 32, 51, .08), 0 10px 28px rgba(20, 32, 51, .16);
+}
+.ink-grp { display: flex; gap: 2px; }
+.ink-bar button {
+  min-width: 44px; height: 44px; padding: 0; display: grid; place-items: center;
+  border: 0; border-radius: 12px; background: none; color: var(--ink-2);
+}
+.ink-bar button svg { width: 24px; height: 24px; }
+.ink-bar button[aria-pressed="true"] { background: var(--pen-soft); color: var(--pen); }
+.ink-bar .sw { width: 22px; height: 22px; border-radius: 50%; background: var(--c); }
+.ink-bar [aria-pressed="true"] .sw { box-shadow: 0 0 0 3px var(--pen-soft), 0 0 0 5px var(--c); }
+.ink-bar .dot { width: var(--s); height: var(--s); border-radius: 50%; background: var(--cur, var(--pen)); }
+.ink-sep { width: 1px; align-self: stretch; margin: 6px 5px; background: var(--line); }
+.ink-bar .ink-z { min-width: 58px; font: 700 .74rem/1 var(--f-mono); }
+.ink-bar .ink-txt { grid-auto-flow: column; gap: 6px; padding: 0 10px; font: 700 .74rem/1 var(--f-body); }
+.ink-bar .ink-done { padding: 0 16px; margin-left: 2px; background: var(--pen); color: var(--pen-ink); font: 800 .85rem/1 var(--f-display); }
+.ink-fab {
+  position: fixed; z-index: 45; right: calc(var(--gutter-r) + 4px); bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  display: inline-flex; align-items: center; gap: 8px; min-height: 54px; padding: 0 20px; border: 0; border-radius: 99px;
+  background: var(--pen); color: var(--pen-ink); font: 800 .9rem/1 var(--f-display);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--pen) 70%, #000), 0 8px 22px rgba(20, 32, 51, .18);
+}
+.ink-fab svg { width: 22px; height: 22px; }
+.ink-fab:active { transform: translateY(2px); }
+@media (min-width: 720px) { .ink-fab { bottom: calc(24px + env(safe-area-inset-bottom, 0px)); } }
+.iconbtn[aria-pressed="true"] { background: var(--pen-soft); color: var(--pen); }
+@media (max-width: 899px) {
+  .ink-bar button { min-width: 40px; }
+  .ink-sep { margin: 6px 3px; }
+  .ink-bar .ink-z { min-width: 50px; }
+  .ink-bar [data-act="finger"] { padding: 0; }
+  .ink-bar [data-act="finger"] span { display: none; }
+}
