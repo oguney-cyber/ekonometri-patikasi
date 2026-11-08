@@ -6,12 +6,18 @@
   const UNIT = {}, LESSON = {}, QBY = {}, GENMETA = {};
   UNITS.forEach(u => { UNIT[u.id] = u; u.lessons.forEach(l => { LESSON[l.id] = l; l.qs.forEach(q => { QBY[q.id] = q; }); l.gens.forEach(g => { if (!GENMETA[g]) GENMETA[g] = { unit: u.id, lesson: l.id }; }); }); });
   const ORDER = UNITS.flatMap(u => u.lessons.map(l => l.id));
+  // öğrenme yardımları (js/aids.js): ders formülleri ve soru ipuçları
+  const AID = { fx: {}, hint: {} };
+  { let cur = null; (window.AIDS || '').split('\n').forEach(line => { let m;
+    if ((m = /^# (\S+)/.exec(line))) cur = m[1];
+    else if ((m = /^F (.+)$/.exec(line)) && cur) { const p = m[1].split(' :: '); (AID.fx[cur] = AID.fx[cur] || []).push({ f: p[0].trim(), c: (p[1] || '').trim() }); }
+    else if ((m = /^H (\S+) (.+)$/.exec(line))) AID.hint[m[1]] = m[2].trim(); }); }
   const EXAM_W = { u0: 4, u1: 4, u2: 8, u3: 7, u4: 7, u5: 6, u6: 4 };
   const SHORT = { u0: 'Matematik', u1: 'Hafta 1', u2: 'Hafta 2', u3: 'Hafta 3', u4: 'Hafta 4', u5: 'Hafta 5', u6: 'Hafta 6' };
 
   /* ---------- durum ---------- */
   const KEY = 'ekonometri-patikasi-v1';
-  const blank = () => ({ v: 1, xp: 0, days: {}, les: {}, q: {}, mist: {}, hist: {}, exams: [], run: null, set: { sound: true, tr: true, goal: 100, size: 'l' } });
+  const blank = () => ({ v: 1, xp: 0, days: {}, les: {}, q: {}, mist: {}, hist: {}, exams: [], run: null, set: { sound: true, tr: true, goal: 100, size: 'l', aidfx: true } });
   let S = blank();
   try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); S.set = Object.assign(blank().set, S.set); } catch (e) { /* depolama yok */ }
   const applySize = () => { document.documentElement.dataset.size = S.set.size || 'l'; };
@@ -83,6 +89,9 @@
   const fmtTime = (ms) => { const s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
 
   const I = {
+    bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg>',
+    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg>',
+    eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
     calc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8.5 6.5h7"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></svg>',
     pen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-4.7L15.8 4.8a2.2 2.2 0 0 1 3.1 3.1L8.4 18.4z"/><path d="M13.9 6.7l3.1 3.1"/></svg>',
     path: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8.2 19H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.8"/></svg>',
@@ -103,10 +112,10 @@
   function inst(qid) {
     if (qid.startsWith('g:')) {
       const name = qid.slice(2), g = window.genQ(name), m = GENMETA[name];
-      return { qid, gen: true, unit: m.unit, lesson: m.lesson, en: g.en, tr: g.tr, ex: g.ex, src: '', opts: shuffle(g.opts.map((t, i) => ({ t, ok: i === 0 }))) };
+      return { qid, gen: true, unit: m.unit, lesson: m.lesson, en: g.en, tr: g.tr, ex: g.ex, hint: g.hint || '', src: '', opts: shuffle(g.opts.map((t, i) => ({ t, ok: i === 0 }))) };
     }
     const q = QBY[qid];
-    return { qid, gen: false, unit: q.unit, lesson: q.lesson, en: q.en, tr: q.tr, ex: q.ex, src: q.src, opts: shuffle(q.opts.map(o => ({ t: o.t, ok: o.ok }))) };
+    return { qid, gen: false, unit: q.unit, lesson: q.lesson, en: q.en, tr: q.tr, ex: q.ex, hint: AID.hint[qid] || '', src: q.src, opts: shuffle(q.opts.map(o => ({ t: o.t, ok: o.ok }))) };
   }
   function weightOf(id) { const s = S.q[id]; if (!s) return 2.5; return 1 + (s.w > s.c ? 3 : 0) + (S.mist[id] ? 2 : 0); }
   function wpick(ids, n) {
@@ -379,13 +388,83 @@
   function qHTML(q, opts) {
     opts = opts || {};
     const tr = S.set.tr;
-    return `<div class="qmeta">${q.gen ? '<span class="pill">Yeni üretilmiş soru</span>' : ''}${q.src ? `<span class="pill mark">${esc(q.src.replace(/^PS(\d)/, 'Problem Set $1').replace(/ Q(\d+)([a-z]?)/, ' · Soru $1$2'))} benzeri</span>` : ''}
+    const body = `<div class="qmeta">${q.gen ? '<span class="pill">Yeni üretilmiş soru</span>' : ''}${q.src ? `<span class="pill mark">${esc(q.src.replace(/^PS(\d)/, 'Problem Set $1').replace(/ Q(\d+)([a-z]?)/, ' · Soru $1$2'))} benzeri</span>` : ''}
         <span class="eyebrow">${esc(SHORT[q.unit])}</span><span style="flex:1"></span><button class="trbtn" id="trb" aria-pressed="${tr}">Türkçe</button></div>
       <div class="qstem prose">${md(q.en)}</div>
       <div class="qtr" id="qtr" ${tr ? '' : 'hidden'}>${md(q.tr)}</div>
       <div class="opts" role="radiogroup" aria-label="Şıklar">${q.opts.map((o, k) => `<button class="opt" role="radio" aria-checked="false" data-k="${k}"><span class="lt">${'ABCDE'[k]}</span><span class="opt-c">${inline(o.t)}</span></button>`).join('')}</div>`;
+      if (!opts.aids) return body;
+    return `<div class="q-main">${opts.pre || ''}${body}</div>${aidsHTML(q)}`;
   }
   function bindTR(el) { const b = $('#trb', el); if (b) b.onclick = () => { S.set.tr = !S.set.tr; save(); b.setAttribute('aria-pressed', S.set.tr); $('#qtr', el).hidden = !S.set.tr; }; }
+
+  /* ---------- öğrenme yardımları: formüller, ipucu, konu kartı, çözüm ---------- */
+  function cardFor(q) {
+    const L = LESSON[q.lesson]; if (!L || !L.cards.length) return -1;
+    const words = (s) => (String(s).toLowerCase().match(/[a-zçğıöşü]{4,}/g) || []);
+    const qw = new Set(words(q.en + ' ' + q.tr + ' ' + (q.hint || '')));
+    let best = 0, bs = -1;
+    L.cards.forEach((c, i) => { const seen = new Set(); let sc = 0; words(c.title + ' ' + c.body).forEach(w => { if (qw.has(w) && !seen.has(w)) { seen.add(w); sc++; } }); if (sc > bs) { bs = sc; best = i; } });
+    return best;
+  }
+  function aidsHTML(q) {
+    const fx = AID.fx[q.lesson] || [], open = S.set.aidfx !== false;
+    return `<div class="aids" id="aids">
+      <div class="aid-bar" role="group" aria-label="Öğrenme yardımları">
+        <button type="button" class="aid" id="aid-fx" aria-pressed="${open}">${I.sigma}<span>Formüller</span></button>
+        <button type="button" class="aid" id="aid-hint" aria-pressed="false">${I.bulb}<span>İpucu</span></button>
+        <button type="button" class="aid" id="aid-card">${I.book}<span>Konuyu aç</span></button>
+        <button type="button" class="aid" id="aid-sol" aria-pressed="false">${I.eye}<span>Çözümü göster</span></button>
+      </div>
+      <div class="aid-box fx-box" id="box-fx" ${open ? '' : 'hidden'}><div class="aid-t">Bu dersin formülleri</div>${fx.length ? fx.map(x => `<div class="fx"><div class="fx-f">${inline(x.f)}</div>${x.c ? `<div class="fx-c">${inline(x.c)}</div>` : ''}</div>`).join('') : '<p class="fx-c">Bu derste formül yok; kavram dersi. Konuyu aç ile kartı oku.</p>'}</div>
+      <div class="aid-box hint-box" id="box-hint" hidden></div>
+      <div class="aid-box sol-box" id="box-sol" hidden></div>
+    </div>`;
+  }
+  function bindAids(el, it, q) {
+    const fxb = $('#aid-fx', el); if (!fxb) return;
+    fxb.onclick = () => { const box = $('#box-fx', el); box.hidden = !box.hidden; S.set.aidfx = !box.hidden; fxb.setAttribute('aria-pressed', String(!box.hidden)); save(); };
+    $('#aid-hint', el).onclick = () => {
+      const box = $('#box-hint', el), b = $('#aid-hint', el);
+      if (!box.hidden) { box.hidden = true; b.setAttribute('aria-pressed', 'false'); return; }
+      const L = LESSON[q.lesson], ci = cardFor(q);
+      const text = q.hint || `Bu soru **${L && ci >= 0 ? L.cards[ci].title : 'bu ders'}** konusuyla ilgili. Konuyu aç'a bas, oradaki tanımı ya da formülü bul. Formüller kutusuna da bak.`;
+      box.innerHTML = `<div class="aid-t">İpucu</div><div class="prose">${md(text)}</div>`;
+      typeset(box); box.hidden = false; b.setAttribute('aria-pressed', 'true');
+      box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      it.aid = Math.max(it.aid || 0, 1);
+    };
+    $('#aid-card', el).onclick = () => openCardSheet(q);
+    $('#aid-sol', el).onclick = () => {
+      const box = $('#box-sol', el), b = $('#aid-sol', el);
+      if (!box.hidden) { box.hidden = true; b.setAttribute('aria-pressed', 'false'); return; }
+      box.innerHTML = `<div class="aid-t">Çözüm</div><div class="prose">${md(q.ex)}</div>${Calc.stepsHTML(q.ex, false)}<p class="fx-c">Çözüme baktığın için bu soru tur sonunda yardımsız bir kez daha gelecek.</p>`;
+      typeset(box); box.hidden = false; b.setAttribute('aria-pressed', 'true');
+      box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      it.aid = 2;
+    };
+  }
+  function openCardSheet(q) {
+    const L = LESSON[q.lesson]; if (!L || !L.cards.length) { toast('Bu soru için kart bulunamadı'); return; }
+    const old = $('.sheet-bg'); if (old) old.remove();
+    const sh = document.createElement('div'); sh.className = 'sheet-bg';
+    sh.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="Konu kartları"><div class="sheet-head"><b>${esc(L.title)}</b><button class="iconbtn" data-x aria-label="Kapat">${I.x}</button></div>
+      <div class="sheet-tabs">${L.cards.map((c, i) => `<button type="button" class="stab" data-i="${i}">${inline(c.title)}</button>`).join('')}</div><div class="sheet-body prose"></div></div>`;
+    document.body.appendChild(sh);
+    const body = sh.querySelector('.sheet-body');
+    const show = (i) => {
+      body.innerHTML = `<h3>${inline(L.cards[i].title)}</h3>` + md(L.cards[i].body);
+      typeset(body); body.scrollTop = 0;
+      sh.querySelectorAll('.stab').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.i === i)));
+      const t = sh.querySelector(`.stab[data-i="${i}"]`); if (t) t.scrollIntoView({ block: 'nearest', inline: 'center' });
+    };
+    show(Math.max(0, cardFor(q)));
+    sh.addEventListener('click', (e) => {
+      if (e.target === sh || e.target.closest('[data-x]')) { sh.remove(); return; }
+      const t = e.target.closest('.stab'); if (t) show(+t.dataset.i);
+    });
+  }
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const s = $('.sheet-bg'); if (s) s.remove(); } });
 
   function renderStep() {
     const el = $('#player'); if (!el || !P) return;
@@ -405,12 +484,13 @@
     }
     const q = it.q; let sel = null, checked = false;
     const qi = P.items.slice(0, P.i + 1).filter(x => x.type === 'q').length;
-    el.innerHTML = topBar(prog, `${qi}/${P.items.filter(x => x.type === 'q').length}`) + `<div class="p-body"><div class="p-inner">${it.first ? '' : '<span class="pill bad" style="justify-self:start">Tekrar soru</span>'}${qHTML(q)}</div></div>
+    el.innerHTML = topBar(prog, `${qi}/${P.items.filter(x => x.type === 'q').length}`) + `<div class="p-body"><div class="p-inner q-split">${qHTML(q, { aids: true, pre: it.first ? '' : '<span class="pill bad" style="justify-self:start">Tekrar soru</span>' })}</div></div>
       <div class="p-foot" id="foot"><div class="p-foot-in"><button class="btn block" id="b-check" disabled>Kontrol et</button></div></div>`;
     typeset(el); bindTR(el);
     $('#p-x').onclick = askQuit;
     $('.p-body', el).scrollTop = 0;
     Ink.bind({ key: null, mode: 'player', scroller: $('.p-body', el), anchor: $('.p-inner', el) });
+    bindAids(el, it, q);
     const optEls = [...el.querySelectorAll('.opt')];
     const choose = (k) => { if (checked) return; sel = k; optEls.forEach((b, j) => { b.classList.toggle('sel', j === k); b.setAttribute('aria-checked', j === k); }); $('#b-check').disabled = false; };
     optEls.forEach(b => b.onclick = () => choose(+b.dataset.k));
@@ -418,15 +498,18 @@
       if (sel == null || checked) return; checked = true;
       const ok = q.opts[sel].ok, ci = q.opts.findIndex(o => o.ok);
       optEls.forEach((b, j) => { b.disabled = true; if (j === ci) b.classList.add('right'); if (j === sel && !ok) b.classList.add('wrong', 'shake'); b.classList.remove('sel'); });
-      rec(q, ok, it.first, P.mode);
+      const aid = it.aid || 0; // 1: ipucu, 2: çözüme bakıldı
+      rec(q, aid === 2 ? false : ok, it.first, P.mode);
       let gain = 0;
-      if (ok) { P.right++; if (it.first) P.firstRight++; gain = it.first ? 10 : 5; P.xp += gain; addXP(gain); }
-      else { P.wrong++; if (it.first) P.items.push({ type: 'q', q: q.gen ? inst(q.qid) : Object.assign({}, q, { opts: shuffle(q.opts) }), first: false }); }
+      if (ok) { P.right++; if (it.first && aid < 2) P.firstRight++; gain = aid === 2 ? 2 : !it.first ? 5 : aid ? 6 : 10; P.xp += gain; addXP(gain); }
+      else P.wrong++;
+      if (it.first && (!ok || aid === 2)) P.items.push({ type: 'q', q: q.gen ? inst(q.qid) : Object.assign({}, q, { opts: shuffle(q.opts) }), first: false });
+      const sb = $('#aid-sol', el); if (sb) sb.disabled = true;
       save(); beep(ok);
       const foot = $('#foot');
       foot.className = 'p-foot slide-up ' + (ok ? 'ok' : 'bad');
       foot.innerHTML = `<div class="p-foot-in"><div class="fb-head">${ok ? I.ok : I.bad}<span>${ok ? pick(['Doğru!', 'Harika!', 'Aynen böyle.', 'Tam isabet.']) + (gain ? ` <span class="pill ok">+${gain} XP</span>` : '') : 'Doğru cevap: ' + 'ABCDE'[ci]}</span></div>
-        <div class="fb-ex prose">${md(q.ex)}${Calc.stepsHTML(q.ex, true)}${!ok && it.first ? '<p><small>Bu soru turun sonunda tekrar gelecek.</small></p>' : ''}</div>
+        <div class="fb-ex prose">${md(q.ex)}${Calc.stepsHTML(q.ex, true)}${it.first && (!ok || aid === 2) ? `<p><small>${aid === 2 ? 'Çözüme bakarak cevapladın. ' : ''}Bu soru turun sonunda yardımsız tekrar gelecek.</small></p>` : ''}</div>
         <button class="btn block ${ok ? 'ok' : 'bad'}" id="b-cont">Devam</button></div>`;
       typeset(foot);
       $('#b-cont').onclick = () => { P.i++; renderStep(); };

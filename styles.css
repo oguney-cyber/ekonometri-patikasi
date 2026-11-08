@@ -479,3 +479,52 @@ ol.steps, ul.steps { display: grid; gap: 8px; margin: 0; padding-left: 1.3em; co
 /* ızgara içindeki kartlar içerikleri yüzünden sütundan taşmasın; geniş tablolar kendi içinde kayar */
 .view > *, .panel > * { min-width: 0; }
 .tbl.wrap th, .tbl.wrap td { white-space: normal; }
+
+/* ---------- öğrenme yardımları ---------- */
+.aids { display: grid; gap: 8px; }
+.aid-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+.aid {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 6px 13px;
+  border-radius: 99px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink-2);
+  font: 700 .8rem/1 var(--f-body);
+}
+.aid svg { flex: none; width: 18px; height: 18px; }
+.aid[aria-pressed="true"] { background: var(--pen-soft); border-color: transparent; color: var(--pen); }
+.aid:disabled { opacity: .45; }
+.aid-box { display: grid; gap: 6px; padding: 12px 14px; border-radius: 12px; }
+.aid-t { font: 700 .66rem/1.2 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.fx-box { background: var(--surface-2); border: 1px solid var(--line); }
+.fx { display: grid; gap: 2px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.fx-f { font-size: 1rem; line-height: 1.6; overflow-x: auto; overflow-y: hidden; }
+.fx-c { margin: 0; font-size: .8rem; color: var(--ink-3); }
+.hint-box { background: color-mix(in srgb, var(--mark) 30%, var(--surface)); }
+.sol-box { background: var(--pen-soft); }
+.sheet-bg { position: fixed; inset: 0; z-index: 75; display: flex; justify-content: flex-end; background: rgba(10, 16, 26, .42); }
+.sheet {
+  width: min(640px, 100%); height: 100%; display: grid; grid-template-rows: auto auto 1fr;
+  background: var(--surface); padding-top: env(safe-area-inset-top, 0px); box-shadow: -10px 0 30px rgba(0, 0, 0, .2);
+}
+.sheet-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px 8px 18px; border-bottom: 1px solid var(--line); }
+.sheet-head b { flex: 1; font: 800 1rem/1.2 var(--f-display); }
+.sheet-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.stab { flex: none; padding: 8px 13px; border-radius: 99px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink-2); font: 700 .78rem/1 var(--f-body); white-space: nowrap; }
+.stab[aria-pressed="true"] { background: var(--pen); border-color: transparent; color: var(--pen-ink); }
+.sheet-body { overflow-y: auto; align-content: start; padding: 16px 18px calc(28px + env(safe-area-inset-bottom, 0px)); }
+.sheet-body h3 { font-size: 1.2rem; }
+@media (max-width: 600px) { .sheet-bg { align-items: flex-end; } .sheet { height: 88vh; border-radius: 18px 18px 0 0; } }
+
+/* soru + yardım yerleşimi: dar ekranda yardımlar soru ile şıklar arasında, genişte sağ sütunda */
+.q-main { display: contents; }
+.q-main > .pill { order: 0; }
+.q-main > .qmeta { order: 1; }
+.q-main > .qstem { order: 2; }
+.q-main > .qtr { order: 3; }
+.q-split > .aids { order: 4; }
+.q-main > .opts { order: 5; }
+.q-split > .ink-pad { order: 99; }
+@media (min-width: 1000px) {
+  .p-inner.q-split { max-width: 1180px; grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); align-items: start; }
+  .q-split > .q-main { display: grid; gap: 18px; grid-column: 1; grid-row: 1; }
+  .q-split > .aids { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: 0; max-height: calc(100dvh - 230px); overflow-y: auto; overscroll-behavior: contain; }
+  .q-split > .ink-pad { grid-column: 1; }
+}

@@ -364,7 +364,7 @@
   function inArea(x, y) { if (!B || !B.an.isConnected) return false; const v = vis(); return x >= v.l && x <= v.r && y >= v.t && y <= v.b; }
   function blocked(target) {
     if (document.querySelector('.modal-bg')) return true;
-    return !!(target && target.closest && target.closest('.ink-bar, .ink-fab, .calc-panel, .tabbar, .rail, .p-top, .p-foot'));
+    return !!(target && target.closest && target.closest('.ink-bar, .ink-fab, .calc-panel, .sheet-bg, .tabbar, .rail, .p-top, .p-foot'));
   }
   function findT(list, id) { for (let i = 0; i < list.length; i++) if (list[i].identifier === id) return list[i]; return null; }
   function direct(list) { const out = []; for (let i = 0; i < list.length; i++) if (list[i].touchType !== 'stylus') out.push(list[i]); return out; }

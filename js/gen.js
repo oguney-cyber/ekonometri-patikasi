@@ -856,6 +856,7 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
       if (r.tip) ex += '\n\n:::ipucu Sınavda\n' + r.tip + '\n:::';
     }
     q.ex = ex;
+    q.hint = r && r.how ? r.how : '';
     return q;
   }
   root.GEN_GUIDE = G;
