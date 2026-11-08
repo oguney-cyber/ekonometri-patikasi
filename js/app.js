@@ -79,9 +79,11 @@
   }
   const Ink = window.Ink || { init() { }, bind() { }, unbind() { }, off() { }, isOn: () => false, clearPrefix: () => Promise.resolve(), clearAll: () => Promise.resolve(), count: () => Promise.resolve(0) };
   Ink.init({ toast });
+  const Calc = window.Calc || { stepsHTML: () => '', close() { }, mountPage() { }, pageHTML: () => '<div class="view"><p>Hesap makinesi yüklenemedi.</p></div>' };
   const fmtTime = (ms) => { const s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
 
   const I = {
+    calc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8.5 6.5h7"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></svg>',
     pen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-4.7L15.8 4.8a2.2 2.2 0 0 1 3.1 3.1L8.4 18.4z"/><path d="M13.9 6.7l3.1 3.1"/></svg>',
     path: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8.2 19H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.8"/></svg>',
     exam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4.5V3h6v1.5"/><path d="m9 13 2 2 4-4.5"/></svg>',
@@ -132,7 +134,7 @@
   }
 
   /* ---------- kabuk ---------- */
-  const TABS = [['yol', 'Patika', I.path], ['sinav', 'Deneme', I.exam], ['hatalar', 'Hatalarım', I.mist], ['formuller', 'Formüller', I.sigma], ['tablolar', 'Tablolar', I.table]];
+  const TABS = [['yol', 'Patika', I.path], ['sinav', 'Deneme', I.exam], ['hatalar', 'Hatalarım', I.mist], ['formuller', 'Formüller', I.sigma], ['tablolar', 'Tablolar', I.table], ['hesap', 'Hesap', I.calc]];
   const app = $('#app');
   app.innerHTML = `
     <nav class="rail" aria-label="Ana menü">
@@ -150,7 +152,7 @@
     const r = (location.hash.replace(/^#\/?/, '') || 'yol').split('/')[0];
     document.querySelectorAll('[data-go]').forEach(b => b.setAttribute('aria-current', b.dataset.go === r ? 'page' : 'false'));
     const main = $('#main');
-    const V = { yol: viewPath, sinav: viewExam, hatalar: viewMist, formuller: viewFormulas, tablolar: viewTables, ayarlar: viewSettings }[r] || viewPath;
+    const V = { yol: viewPath, sinav: viewExam, hatalar: viewMist, formuller: viewFormulas, tablolar: viewTables, hesap: () => Calc.pageHTML(), ayarlar: viewSettings }[r] || viewPath;
     main.innerHTML = V();
     typeset(main);
     bindView(main, r);
@@ -292,6 +294,7 @@
     bindActs(main);
     main.querySelectorAll('[data-lesson]').forEach(b => b.addEventListener('click', () => openLessonIntro(b.dataset.lesson)));
     main.querySelectorAll('[data-practice]').forEach(b => b.addEventListener('click', () => startPractice(b.dataset.practice)));
+    if (r === 'hesap') Calc.mountPage(main);
     if (r === 'tablolar') {
       const calc = () => {
         const g = (id) => { const v = $('#' + id).value.trim().replace(',', '.'); return v === '' ? null : Number(v); };
@@ -325,7 +328,7 @@
     document.body.style.overflow = 'hidden';
     return el;
   }
-  function closePlayer() { const el = $('#player'); if (el) el.remove(); document.body.style.overflow = ''; P = null; clearInterval(timerI); refresh(); }
+  function closePlayer() { Calc.close(); const el = $('#player'); if (el) el.remove(); document.body.style.overflow = ''; P = null; clearInterval(timerI); refresh(); }
 
   function openLessonIntro(id) {
     const L = LESSON[id];
@@ -364,7 +367,7 @@
 
   function topBar(progress, count) {
     return `<div class="p-top"><button class="iconbtn" id="p-x" aria-label="Dersten çık">${I.x}</button>
-      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress * 100)}"><i style="width:${Math.max(3, progress * 100)}%"></i></div><span class="p-count num">${count}</span><button class="iconbtn" data-ink-toggle aria-pressed="false" aria-label="Kalemle yaz" title="Kalemle yaz">${I.pen}</button></div>`;
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress * 100)}"><i style="width:${Math.max(3, progress * 100)}%"></i></div><span class="p-count num">${count}</span><button class="iconbtn" data-calc-toggle aria-pressed="false" aria-label="Hesap makinesi" title="Hesap makinesi">${I.calc}</button><button class="iconbtn" data-ink-toggle aria-pressed="false" aria-label="Kalemle yaz" title="Kalemle yaz">${I.pen}</button></div>`;
   }
   async function askQuit() {
     if (P && P.mode !== 'exam' && P.i > 0 && P.i < P.items.length) {
@@ -423,7 +426,7 @@
       const foot = $('#foot');
       foot.className = 'p-foot slide-up ' + (ok ? 'ok' : 'bad');
       foot.innerHTML = `<div class="p-foot-in"><div class="fb-head">${ok ? I.ok : I.bad}<span>${ok ? pick(['Doğru!', 'Harika!', 'Aynen böyle.', 'Tam isabet.']) + (gain ? ` <span class="pill ok">+${gain} XP</span>` : '') : 'Doğru cevap: ' + 'ABCDE'[ci]}</span></div>
-        <div class="fb-ex prose">${md(q.ex)}${!ok && it.first ? '<p><small>Bu soru turun sonunda tekrar gelecek.</small></p>' : ''}</div>
+        <div class="fb-ex prose">${md(q.ex)}${Calc.stepsHTML(q.ex, true)}${!ok && it.first ? '<p><small>Bu soru turun sonunda tekrar gelecek.</small></p>' : ''}</div>
         <button class="btn block ${ok ? 'ok' : 'bad'}" id="b-cont">Devam</button></div>`;
       typeset(foot);
       $('#b-cont').onclick = () => { P.i++; renderStep(); };
@@ -492,7 +495,7 @@
     const el = $('#player'), R = S.run, q = R.qs[R.i];
     const answered = R.ans.filter(a => a != null).length;
     el.innerHTML = `<div class="p-top"><button class="iconbtn" id="p-x" aria-label="Sınavı duraklat ve çık">${I.x}</button>
-        <div class="bar"><i style="width:${Math.max(3, answered / 40 * 100)}%"></i></div><span class="p-count num" id="ex-t">${fmtTime(R.prior + Date.now() - R.start)}</span><button class="iconbtn" data-ink-toggle aria-pressed="false" aria-label="Kalemle yaz" title="Kalemle yaz">${I.pen}</button></div>
+        <div class="bar"><i style="width:${Math.max(3, answered / 40 * 100)}%"></i></div><span class="p-count num" id="ex-t">${fmtTime(R.prior + Date.now() - R.start)}</span><button class="iconbtn" data-calc-toggle aria-pressed="false" aria-label="Hesap makinesi" title="Hesap makinesi">${I.calc}</button><button class="iconbtn" data-ink-toggle aria-pressed="false" aria-label="Kalemle yaz" title="Kalemle yaz">${I.pen}</button></div>
       <div class="p-body"><div class="p-inner"><div class="qmeta"><span class="pill">Soru ${R.i + 1} / 40</span><span class="pill ${answered === 40 ? 'ok' : ''}">${answered} cevaplandı</span><button class="trbtn" id="fl" aria-pressed="${R.flag.includes(R.i)}">İşaretle</button></div>${qHTML(q)}
         <details id="map"><summary>Soru haritası</summary><div class="ex-grid" style="margin-top:12px">${R.qs.map((_, k) => `<button class="ex-cell ${R.ans[k] != null ? 'ans' : ''} ${k === R.i ? 'cur' : ''} ${R.flag.includes(k) ? 'flag' : ''}" data-j="${k}">${k + 1}</button>`).join('')}</div></details></div></div>
       <div class="p-foot"><div class="p-foot-in"><div class="btnrow" style="justify-content:space-between"><button class="btn ghost" id="e-prev" ${R.i ? '' : 'disabled'}>Önceki</button>
@@ -539,7 +542,7 @@
         <div class="review">${R.qs.map((q, k) => { const a = R.ans[k], ci = q.opts.findIndex(o => o.ok), ok = a === ci; return `<div class="rev ${ok ? 'r' : 'w'}"><div class="qmeta"><span class="pill ${ok ? 'ok' : 'bad'}">${k + 1}. ${ok ? 'doğru' : a == null ? 'boş' : 'yanlış'}</span><span class="eyebrow">${esc(SHORT[q.unit])}</span></div>
           <div class="prose">${md(q.en)}</div>
           <div class="prose"><p>${a != null && !ok ? `Senin cevabın: <b>${'ABCDE'[a]})</b> ${inline(q.opts[a].t)}<br>` : ''}Doğru cevap: <b>${'ABCDE'[ci]})</b> ${inline(q.opts[ci].t)}</p></div>
-          <details ${ok ? '' : 'open'}><summary>Çözümü göster</summary><div class="prose" style="margin-top:8px">${md(q.ex)}</div></details></div>`; }).join('')}</div>
+          <details ${ok ? '' : 'open'}><summary>Çözümü göster</summary><div class="prose" style="margin-top:8px">${md(q.ex)}</div>${Calc.stepsHTML(q.ex, false)}</details></div>`; }).join('')}</div>
       </div></div>
       <div class="p-foot"><div class="p-foot-in"><div class="btnrow" style="justify-content:center"><button class="btn" id="r-mist">Yanlışları çalış</button><button class="btn ghost" id="r-home">Patikaya dön</button></div></div></div>`;
     typeset(el);

@@ -224,9 +224,9 @@
     const h = `$X$ is Bernoulli with $P(X=1) = ${p}$.`, th = `$X$ Bernoulli, $P(X=1)=${p}$.`;
     if (t === 0) return { en: h + ' What is $\\text{var}(X)$?', tr: th + ' $\\text{var}(X)$?', opts: popts(v, [p * p, p, 1 - p, Math.sqrt(v)], 4), ex: `$\\text{var}(X) = p(1-p) = ${p}\\times${f(1 - p, 2)} = ${f(v, 4)}$.` };
     if (t === 1) { const k = R(2, 6); return { en: h + ` What is $E(X^${k})$?`, tr: th + ` $E(X^${k})$?`, opts: popts(p, [Math.pow(p, k), v, k * p > 1 ? null : k * p], 4), ex: `$E(X^${k}) = 1^${k}\\cdot p + 0^${k}(1-p) = p = ${p}$. Üs, değere uygulanır, olasılığa değil.` }; }
-    if (t === 2) return { en: h + ' The skewness of $X$ is:', tr: th + ' Çarpıklığı nedir?', opts: [p > 0.5 ? 'negative' : 'positive', p > 0.5 ? 'positive' : 'negative', 'zero', 'equal to 3'], ex: `Çarpıklık $= (1-2p)/\\sqrt{p(1-p)} = ${f(sk, 3)}$. $p${p > 0.5 ? '>' : '<'}0.5$ olduğu için uzun kuyruk ${p > 0.5 ? 'solda (0 tarafında), çarpıklık negatif' : 'sağda (1 tarafında), çarpıklık pozitif'}.` };
-    if (t === 3) return { en: h + ' Compute the skewness of $X$.', tr: th + ' Çarpıklığı hesapla.', opts: nopts(sk, [-sk, (1 - 2 * p) / v, (1 - 2 * p), sk * sk], 3), ex: `$E(X-p)^3 = p(1-p)^3 + (1-p)(-p)^3 = ${f(p * Math.pow(1 - p, 3) - (1 - p) * Math.pow(p, 3), 4)}$, $\\sigma^3 = ${f(Math.pow(v, 1.5), 4)}$. Çarpıklık $= ${f(sk, 3)}$. Kısayol: $(1-2p)/\\sqrt{p(1-p)}$.` };
-    return { en: h + ' Compute the kurtosis of $X$.', tr: th + ' Basıklığı hesapla.', opts: nopts(ku, [ku + 3, 1 / v, 3, v], 3), ex: `$E(X-p)^4 = p(1-p)^4 + (1-p)p^4 = ${f(p * Math.pow(1 - p, 4) + (1 - p) * Math.pow(p, 4), 4)}$, $\\sigma^4 = ${f(v * v, 4)}$. Basıklık $= ${f(ku, 3)}$. Kısayol: $\\frac{1}{p(1-p)} - 3$.` };
+    if (t === 2) return { en: h + ' The skewness of $X$ is:', tr: th + ' Çarpıklığı nedir?', opts: [p > 0.5 ? 'negative' : 'positive', p > 0.5 ? 'positive' : 'negative', 'zero', 'equal to 3'], ex: `Çarpıklık $= (1-2p)/\\sqrt{p(1-p)} = (1-2\\times${p})/\\sqrt{${p}\\times${f(1 - p, 2)}} = ${f(sk, 3)}$. $p${p > 0.5 ? '>' : '<'}0.5$ olduğu için uzun kuyruk ${p > 0.5 ? 'solda (0 tarafında), çarpıklık negatif' : 'sağda (1 tarafında), çarpıklık pozitif'}.` };
+    if (t === 3) return { en: h + ' Compute the skewness of $X$.', tr: th + ' Çarpıklığı hesapla.', opts: nopts(sk, [-sk, (1 - 2 * p) / v, (1 - 2 * p), sk * sk], 3), ex: `$E(X-p)^3 = p(1-p)^3 + (1-p)(-p)^3 = ${f(p * Math.pow(1 - p, 3) - (1 - p) * Math.pow(p, 3), 4)}$, $\\sigma^3 = ${f(Math.pow(v, 1.5), 4)}$. Çarpıklık $= ${f(sk, 3)}$. Kısayol: $(1-2p)/\\sqrt{p(1-p)} = (1-2\\times${p})/\\sqrt{${p}\\times${f(1 - p, 2)}} = ${f(sk, 3)}$.` };
+    return { en: h + ' Compute the kurtosis of $X$.', tr: th + ' Basıklığı hesapla.', opts: nopts(ku, [ku + 3, 1 / v, 3, v], 3), ex: `$E(X-p)^4 = p(1-p)^4 + (1-p)p^4 = ${f(p * Math.pow(1 - p, 4) + (1 - p) * Math.pow(p, 4), 4)}$, $\\sigma^4 = ${f(v * v, 4)}$. Basıklık $= ${f(ku, 3)}$. Kısayol: $\\frac{1}{p(1-p)} - 3 = 1/(${p}\\times${f(1 - p, 2)}) - 3 = ${f(ku, 3)}$.` };
   };
 
   const CTX = [
@@ -584,7 +584,7 @@
   G.regCIdx = () => {
     const se = RF(0.2, 1.5, 0.01), b = +RF(-4, 4, 0.01).toFixed(2) || -2.28, dx = pick([-3, -2, 2, 3, 5, -5]);
     const lo = (b - 1.96 * se) * dx, hi = (b + 1.96 * se) * dx, A = Math.min(lo, hi), B = Math.max(lo, hi);
-    return { en: `$\\hat\\beta_1 = ${b}$, $SE(\\hat\\beta_1) = ${se}$. What is the 95% confidence interval for the effect on $Y$ of changing $X$ by $\\Delta x = ${dx}$?`, tr: `$\\Delta x = ${dx}$ etkisi için %95 GA?`, opts: [ivm(A, B, 3), ivm(b - 1.96 * se, b + 1.96 * se, 3), ivm(b * dx - 1.96 * se, b * dx + 1.96 * se, 3), ivm(-B, -A, 3)], ex: `$\\beta_1$ için GA: $${iv(b - 1.96 * se, b + 1.96 * se, 3)}$. Uçları $${dx}$ ile çarp: $${iv(lo, hi, 3)}$.${dx < 0 ? ' Negatif sayıyla çarpınca uçlar yer değiştirir: ' : ' '}$${iv(A, B, 3)}$.` };
+    return { en: `$\\hat\\beta_1 = ${b}$, $SE(\\hat\\beta_1) = ${se}$. What is the 95% confidence interval for the effect on $Y$ of changing $X$ by $\\Delta x = ${dx}$?`, tr: `$\\Delta x = ${dx}$ etkisi için %95 GA?`, opts: [ivm(A, B, 3), ivm(b - 1.96 * se, b + 1.96 * se, 3), ivm(b * dx - 1.96 * se, b * dx + 1.96 * se, 3), ivm(-B, -A, 3)], ex: `$\\beta_1$ için GA: $${iv(b - 1.96 * se, b + 1.96 * se, 3)}$. Uçları $${dx}$ ile çarp: $(${b}-1.96\\times${se})\\times(${dx}) = ${f(lo, 3)}$ ve $(${b}+1.96\\times${se})\\times(${dx}) = ${f(hi, 3)}$.${dx < 0 ? ' Negatif sayıyla çarpınca uçlar yer değiştirir: ' : ' '}$${iv(A, B, 3)}$.` };
   };
   G.dummyReg = () => {
     const ctx = pick([['Earnings', 'Female', 'female', 'kadın'], ['TestScore', 'SmallClass', 'a small class', 'küçük sınıf'], ['Wage', 'Union', 'a union member', 'sendikalı'], ['Price', 'Garage', 'a house with a garage', 'garajlı ev']]);
@@ -598,7 +598,7 @@
     const su = pick([4, 9, 16, 25, 100]), sx = pick([1, 2, 4, 5, 10]), n = pick([100, 200, 400, 500]);
     const v = su / (n * sx), t = R(0, 1);
     if (t === 0) return { en: `Under homoskedasticity, $\\sigma^2_u = ${su}$, $\\sigma^2_X = ${sx}$ and $n = ${n}$. What is $\\text{var}(\\hat\\beta_1)$?`, tr: 'Homoskedastisite altında $\\text{var}(\\hat\\beta_1)$?', opts: nopts(v, [sx / (n * su), su / sx, su / (n * sx * sx), Math.sqrt(v)], 5, { min: 0 }), ex: `$\\sigma^2_{\\hat\\beta_1} = \\sigma^2_u/(n\\sigma^2_X) = ${su}/(${n}\\times${sx}) = ${f(v, 5)}$.` };
-    return { en: `Under homoskedasticity, $\\sigma^2_u = ${su}$, $\\sigma^2_X = ${sx}$ and $n = ${n}$. What is the standard deviation of $\\hat\\beta_1$?`, tr: '$\\hat\\beta_1$\'in standart sapması?', opts: nopts(Math.sqrt(v), [v, Math.sqrt(su / sx), Math.sqrt(sx / (n * su))], 4, { min: 0 }), ex: `$\\text{var} = ${su}/(${n}\\times${sx}) = ${f(v, 5)}$, karekökü $${f(Math.sqrt(v), 4)}$.` };
+    return { en: `Under homoskedasticity, $\\sigma^2_u = ${su}$, $\\sigma^2_X = ${sx}$ and $n = ${n}$. What is the standard deviation of $\\hat\\beta_1$?`, tr: '$\\hat\\beta_1$\'in standart sapması?', opts: nopts(Math.sqrt(v), [v, Math.sqrt(su / sx), Math.sqrt(sx / (n * su))], 4, { min: 0 }), ex: `$\\text{var} = ${su}/(${n}\\times${sx}) = ${f(v, 5)}$, karekökü $\\sqrt{${su}/(${n}\\times${sx})} = ${f(Math.sqrt(v), 4)}$.` };
   };
 
   root.GENS = G;

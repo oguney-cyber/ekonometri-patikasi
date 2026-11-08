@@ -8,13 +8,14 @@
   const TOUCH = 'ontouchstart' in window;
   const PKEY = 'ekonometri-patikasi-ink';
   const COLORS = ['ink', 'pen', 'red', 'green', 'hl'];
-  const prefs = { tool: 'draw', color: 'pen', size: 1, finger: 1, pen: 0, help: 0 };
+  const prefs = { tool: 'draw', color: 'pen', size: 1, esize: 1, finger: 1, pen: 0, help: 0 };
   try { Object.assign(prefs, JSON.parse(localStorage.getItem(PKEY) || '{}')); } catch (e) { }
   if (!COLORS.includes(prefs.color)) prefs.color = 'pen';
   if (prefs.tool !== 'er') prefs.tool = 'draw';
   if (![0, 1, 2].includes(prefs.size)) prefs.size = 1;
+  if (![0, 1, 2].includes(prefs.esize)) prefs.esize = 1;
   const savePrefs = () => { try { localStorage.setItem(PKEY, JSON.stringify(prefs)); } catch (e) { } };
-  const PEN_W = [1.6, 2.8, 4.6], HL_W = [12, 20, 30], ZMIN = 0.5, ZMAX = 2.5;
+  const PEN_W = [1.6, 2.8, 4.6], HL_W = [12, 20, 30], ER_W = [14, 30, 56], ZMIN = 0.5, ZMAX = 2.5;
   const CVAR = { ink: '--ink', pen: '--pen', red: '--bad', green: '--ok', hl: '--hl' };
   let toast = () => { };
 
@@ -83,7 +84,7 @@
     </div>
     <span class="ink-sep" aria-hidden="true"></span>
     <div class="ink-grp">
-      <button type="button" data-act="er" aria-label="Silgi" title="Silgi: üstünden geçtiğin çizgiyi siler">${IC.er}</button>
+      <button type="button" data-act="er" aria-label="Silgi" title="Silgi: üstünden geçtiğin yeri siler">${IC.er}</button>
       <button type="button" data-act="undo" aria-label="Geri al" title="Geri al">${IC.undo}</button>
       <button type="button" class="ink-txt" data-act="ext" title="Kartı uzat: altına boş yazı yeri ekler">${IC.ext}<span>Uzat</span></button>
     </div>
@@ -195,7 +196,7 @@
   function sizePad() {
     if (!B || !B.an.isConnected) return;
     const top = padTop();
-    let maxY = -Infinity; for (const s of B.strokes) if (s.b[3] > maxY) maxY = s.b[3];
+    let maxY = -Infinity; for (const s of B.strokes) if (s.t !== 'er' && s.b[3] > maxY) maxY = s.b[3];
     const v = vis(), fill = Math.round((v.b - v.t) / zoom - top - 12);
     const need = Math.max(on ? Math.max(Math.round(window.innerHeight * 0.55 / zoom), fill) : 0, maxY > top ? Math.ceil(maxY - top + 56) : 0, Math.round(B.ext));
     B.pad.style.height = need + 'px';
@@ -238,7 +239,8 @@
   // kenara yazılmış notlar ekrana sığmıyorsa uzaklaştır
   function fitStrokes() {
     if (!B || !B.strokes.length || !B.an.isConnected) return;
-    let a = Infinity, c = -Infinity; for (const s of B.strokes) { if (s.b[0] < a) a = s.b[0]; if (s.b[2] > c) c = s.b[2]; }
+    let a = Infinity, c = -Infinity; for (const s of B.strokes) { if (s.t === 'er') continue; if (s.b[0] < a) a = s.b[0]; if (s.b[2] > c) c = s.b[2]; }
+    if (a === Infinity) return;
     const v = vis(), o = origin(), L = (v.l - o.x) / zoom, R = (v.r - o.x) / zoom;
     if (a >= L - 2 && c <= R + 2) return;
     const w = baseWidth(), half = Math.max(0, -a, c - w);
@@ -281,12 +283,19 @@
     const y0 = t.y - 30, y1 = t.y + t.h + 30;
     for (const s of B.strokes) if (s.b[3] >= y0 && s.b[1] <= y1) path(ctx, s);
     if (cur && cur.s) path(ctx, cur.s);
-    if (cur && cur.er) { ctx.globalAlpha = 0.5; ctx.lineWidth = 1.5 / zoom; ctx.strokeStyle = col.ink; ctx.beginPath(); ctx.arc(cur.lx, cur.ly, 12 / zoom, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; }
+    // silgi halkası: silginin nereye değdiğini göster
+    if (cur && cur.s && cur.s.t === 'er') {
+      const p = cur.s.p, n = p.length;
+      ctx.globalAlpha = 0.55; ctx.lineWidth = 1.5 / zoom; ctx.strokeStyle = col.ink;
+      ctx.beginPath(); ctx.arc(p[n - 2], p[n - 1], cur.s.w / 2, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+    }
   }
+  // silgi de bir çizgidir: altındaki mürekkebi yalnızca kendi genişliği kadar siler (destination-out)
   function path(ctx, s) {
-    const p = s.p, n = p.length >> 1;
+    const p = s.p, n = p.length >> 1, er = s.t === 'er';
+    ctx.globalCompositeOperation = er ? 'destination-out' : 'source-over';
     ctx.globalAlpha = s.t === 'hl' ? 0.38 : 1;
-    ctx.strokeStyle = col[s.t] || col.pen; ctx.lineWidth = s.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = er ? '#000' : (col[s.t] || col.pen); ctx.lineWidth = s.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     ctx.beginPath(); ctx.moveTo(p[0], p[1]);
     if (n === 1) ctx.lineTo(p[0] + 0.01, p[1]);
     else if (n === 2) ctx.lineTo(p[2], p[3]);
@@ -294,26 +303,20 @@
       for (let i = 1; i < n - 1; i++) { const x = p[2 * i], y = p[2 * i + 1]; ctx.quadraticCurveTo(x, y, (x + p[2 * i + 2]) / 2, (y + p[2 * i + 3]) / 2); }
       ctx.lineTo(p[2 * n - 2], p[2 * n - 1]);
     }
-    ctx.stroke(); ctx.globalAlpha = 1;
+    ctx.stroke(); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
   }
 
   /* ---------- düzenleme ---------- */
   function pt(x, y) { const o = origin(); return [Math.round((x - o.x) / zoom * 2) / 2, Math.round((y - o.y) / zoom * 2) / 2]; }
   function pushUndo() { B.undo.push({ s: B.strokes.slice(), e: B.ext }); if (B.undo.length > 60) B.undo.shift(); }
   function begin(id, x, y, st) {
-    const [px, py] = pt(x, y);
-    if (prefs.tool === 'er') { pushUndo(); cur = { id, st, er: true, changed: false, lx: px, ly: py }; erase(px, py); schedule(); return; }
-    const hl = prefs.color === 'hl';
-    cur = { id, st, s: { t: prefs.color, w: Math.round((hl ? HL_W : PEN_W)[prefs.size] / zoom * 100) / 100, p: [px, py] } };
+    const [px, py] = pt(x, y), er = prefs.tool === 'er', hl = prefs.color === 'hl';
+    const w = er ? ER_W[prefs.esize] : (hl ? HL_W : PEN_W)[prefs.size];
+    cur = { id, st, s: { t: er ? 'er' : prefs.color, w: Math.round(w / zoom * 100) / 100, p: [px, py] } };
     schedule();
   }
   function move(x, y) {
     const [px, py] = pt(x, y);
-    if (cur.er) {
-      const dx = px - cur.lx, dy = py - cur.ly, n = Math.max(1, Math.ceil(Math.hypot(dx, dy) * zoom / 8));
-      for (let k = 1; k <= n; k++) erase(cur.lx + dx * k / n, cur.ly + dy * k / n);
-      cur.lx = px; cur.ly = py; schedule(); return;
-    }
     const p = cur.s.p, m = p.length, dx = px - p[m - 2], dy = py - p[m - 1];
     if ((dx * dx + dy * dy) * zoom * zoom < 0.8) return;
     p.push(px, py); schedule();
@@ -322,30 +325,12 @@
     const c = cur; cur = null;
     if (c && c.id === 'm') lastStroke = Date.now();
     if (!B || !c) return;
-    if (c.er) { if (!c.changed) B.undo.pop(); else changed(); schedule(); return; }
-    pushUndo(); B.strokes.push(prep(c.s)); changed(); schedule();
+    const s = prep(c.s);
+    // silgi hiçbir yazıya değmediyse kaydetme
+    if (s.t === 'er' && !B.strokes.some(o => o.t !== 'er' && o.b[0] <= s.b[2] && o.b[2] >= s.b[0] && o.b[1] <= s.b[3] && o.b[3] >= s.b[1])) { schedule(); return; }
+    pushUndo(); B.strokes.push(s); changed(); schedule();
   }
-  function cancelStroke() { if (cur && cur.er && !cur.changed && B) B.undo.pop(); cur = null; schedule(); }
-  function erase(x, y) {
-    const R = 12 / zoom; let hit = false;
-    const keep = B.strokes.filter(s => {
-      if (x < s.b[0] - R || x > s.b[2] + R || y < s.b[1] - R || y > s.b[3] + R) return true;
-      if (near(s.p, x, y, R + s.w / 2)) { hit = true; return false; }
-      return true;
-    });
-    if (hit) { B.strokes = keep; cur.changed = true; }
-  }
-  function near(p, x, y, r) {
-    const r2 = r * r;
-    if (p.length <= 2) return (p[0] - x) ** 2 + (p[1] - y) ** 2 <= r2;
-    for (let i = 0; i + 3 < p.length; i += 2) {
-      const ax = p[i], ay = p[i + 1], dx = p[i + 2] - ax, dy = p[i + 3] - ay, L = dx * dx + dy * dy;
-      let t = L ? ((x - ax) * dx + (y - ay) * dy) / L : 0; t = Math.max(0, Math.min(1, t));
-      const qx = ax + t * dx - x, qy = ay + t * dy - y;
-      if (qx * qx + qy * qy <= r2) return true;
-    }
-    return false;
-  }
+  function cancelStroke() { cur = null; schedule(); }
   function changed() {
     if (!B) return;
     if (B.key) {
@@ -379,7 +364,7 @@
   function inArea(x, y) { if (!B || !B.an.isConnected) return false; const v = vis(); return x >= v.l && x <= v.r && y >= v.t && y <= v.b; }
   function blocked(target) {
     if (document.querySelector('.modal-bg')) return true;
-    return !!(target && target.closest && target.closest('.ink-bar, .ink-fab, .tabbar, .rail, .p-top, .p-foot'));
+    return !!(target && target.closest && target.closest('.ink-bar, .ink-fab, .calc-panel, .tabbar, .rail, .p-top, .p-foot'));
   }
   function findT(list, id) { for (let i = 0; i < list.length; i++) if (list[i].identifier === id) return list[i]; return null; }
   function direct(list) { const out = []; for (let i = 0; i < list.length; i++) if (list[i].touchType !== 'stylus') out.push(list[i]); return out; }
@@ -499,7 +484,8 @@
     document.documentElement.classList.toggle('inking', on && !!B);
     document.querySelectorAll('[data-ink-toggle]').forEach(b => b.setAttribute('aria-pressed', String(on && !!B)));
     bar.querySelectorAll('[data-color]').forEach(b => b.setAttribute('aria-pressed', String(prefs.tool === 'draw' && b.dataset.color === prefs.color)));
-    bar.querySelectorAll('[data-size]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.size === prefs.size)));
+    bar.querySelectorAll('[data-size]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.size === (prefs.tool === 'er' ? prefs.esize : prefs.size))));
+    bar.classList.toggle('er-mode', prefs.tool === 'er');
     bar.querySelector('[data-act="er"]').setAttribute('aria-pressed', String(prefs.tool === 'er'));
     bar.querySelector('[data-act="finger"]').setAttribute('aria-pressed', String(!!prefs.finger));
     bar.style.setProperty('--cur', 'var(' + CVAR[prefs.color] + ')');
@@ -518,7 +504,7 @@
   bar.addEventListener('click', (e) => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.color) { prefs.color = b.dataset.color; prefs.tool = 'draw'; savePrefs(); updateUI(); return; }
-    if (b.dataset.size) { prefs.size = +b.dataset.size; if (prefs.tool === 'er') prefs.tool = 'draw'; savePrefs(); updateUI(); return; }
+    if (b.dataset.size) { if (prefs.tool === 'er') prefs.esize = +b.dataset.size; else prefs.size = +b.dataset.size; savePrefs(); updateUI(); return; }
     const a = b.dataset.act;
     if (a === 'er') { prefs.tool = prefs.tool === 'er' ? 'draw' : 'er'; savePrefs(); updateUI(); }
     else if (a === 'undo') undo();
