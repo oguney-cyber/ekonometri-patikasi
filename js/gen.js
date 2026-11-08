@@ -573,7 +573,7 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
   };
 
   G.regOutput = () => {
-    const o = regCtx(), sb1 = +Math.abs(o.b1 * RF(0.15, 0.8, 0.01)).toFixed(3), sb0 = +Math.abs(o.b0 * RF(0.02, 0.2, 0.01) + 0.5).toFixed(3);
+    const o = regCtx(), sb1 = +Math.abs(o.b1 * RF(0.15, 0.8, 0.01)).toFixed(3), sb0 = +(Math.abs(o.b0) * RF(0.02, 0.2, 0.01) + 0.5).toFixed(3);
     const t1 = o.b1 / sb1, t0 = o.b0 / sb0, p1 = 2 * Phi(-Math.abs(t1)), n = R(60, 500), r2 = RF(0.01, 0.4, 0.001), ser = RF(1, 40, 0.01);
     const fp = (p) => p < 2e-16 ? '< 2e-16' : p < 0.001 ? p.toExponential(2) : f(p, 4);
     const pad = (s, w) => (s + '').padStart(w);
@@ -612,15 +612,262 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
   root.GENS = G;
 })(typeof window !== 'undefined' ? window : globalThis);
 
-/* Tekrar eden şıkları ayıkla; 3'ten az kalırsa yeniden üret. */
+/* Üretilen soruların açıklamalarını zenginleştir: doğru cevap + yöntem + sık hatalar.
+   Sayısal ara adımlar üreticinin kendi açıklamasında; burada soru türüne özel yöntem ve tuzaklar eklenir. */
 (function (root) {
+  const T = String.raw;
+  const has = (q, re) => re.test(q.en);
+  const G = {
+    sumLinear: (q) => ({
+      how: T`Toplamı terimlere dağıt. Sabitin toplamı $n$ ile çarpılır ($\sum a = na$), sabit çarpan dışarı çıkar ($\sum bX_i = b\sum X_i$). Ortalama verilmişse önce $\sum X_i = n\bar X$ yaz.`,
+      traps: [T`Sabitin toplamını $n$ ile çarpmamak: $\sum a$'yı $a$ sanmak.`, T`Ortalama verilince $\sum X_i = n\bar X$ dönüşümünü unutmak.`, T`Katsayıları birbiriyle çarpmak ya da toplamak; her terim ayrı ayrı toplanır.`]
+    }),
+    sumSquares: (q) => has(q, /bar X/) ? ({
+      how: T`Önce $\bar X = \sum X_i/n$. Sonra ya her sapmanın karesini alıp topla, ya da kısayolu kullan: $\sum (X_i-\bar X)^2 = \sum X_i^2 - n\bar X^2$.`,
+      traps: [T`Sapmaların toplamı 0'dır ama karelerinin toplamı 0 değildir.`, T`$n-1$'e bölmek: bu örneklem varyansını verir, soru sadece toplamı istiyor.`, T`Kısayolda $n\bar X^2$ yerine sadece $\bar X^2$ çıkarmak.`]
+    }) : ({
+      how: has(q, /left\(/) ? T`$\left(\sum X_i\right)^2$: önce bütün sayıları topla, sonra sonucun karesini al.` : T`$\sum X_i^2$: önce her sayının karesini al, sonra topla.`,
+      traps: [T`$\sum X_i^2$ ile $\left(\sum X_i\right)^2$'yi karıştırmak: işlem sırası farklı, sonuçlar farklı.`, T`Negatif sayının karesinde işaret: (−3)² = 9, −9 değil. Hesap makinesinde parantez kullan.`]
+    }),
+    dotProduct: () => ({
+      how: T`$a'b = a_1b_1 + a_2b_2 + a_3b_3$: aynı sıradaki elemanları çarp, çarpımları topla. Boyut $(1\times 3)(3\times 1) = 1\times 1$, sonuç tek bir sayı.`,
+      traps: [T`Negatif elemanlarda işaret hatası: (−2)·(−3) = +6.`, T`$a'a$ (kendi karelerinin toplamı) ile $a'b$'yi karıştırmak.`, T`Bütün elemanları toplamak: iç çarpım, çarpımların toplamıdır.`]
+    }),
+    matDim: () => ({
+      how: T`Boyutları yan yana yaz: $(m\times n)(n\times p)$. İçteki iki sayı eşitse çarpım tanımlı, sonuç dıştaki iki sayı: $m\times p$. Transpoz boyutu ters çevirir: $m\times n \to n\times m$.`,
+      traps: [T`İçteki ve dıştaki sayıları karıştırmak.`, T`$A'A$ ile $AA'$'yı karıştırmak: $A$ $m\times n$ ise $A'A$ $n\times n$, $AA'$ $m\times m$.`, T`Uyumsuz boyutlarda (içtekiler farklı) çarpımı tanımlı sanmak.`]
+    }),
+    matEntry: () => ({
+      how: T`$(i,j)$ elemanı = $A$'nın $i$. satırı ile $B$'nin $j$. sütununun iç çarpımı. Bütün matrisi hesaplama, sadece o satır ve sütunu çarp.`,
+      traps: [T`$BA$'nın elemanını hesaplamak: matris çarpımında sıra önemli, $AB\ne BA$.`, T`Eleman eleman çarpmak ($a_{ij}b_{ij}$): matris çarpımı böyle yapılmaz.`, T`Satır ve sütun indekslerini karıştırmak.`]
+    }),
+    det2: () => ({
+      how: T`$2\times 2$ determinant: ana köşegen çarpımı eksi ters köşegen çarpımı, $a_{11}a_{22} - a_{12}a_{21}$.`,
+      traps: [T`Çıkarma yerine toplama.`, T`Sırayı ters çevirmek ($a_{12}a_{21} - a_{11}a_{22}$): sonucun işareti değişir.`, T`Negatif elemanlarda işaret: −(−2)·3 = +6.`],
+      tip: T`Determinant 0 çıkarsa matris tekildir, tersi yoktur.`
+    }),
+    inv2: () => ({
+      how: T`1. Determinantı bul. 2. Köşegendeki iki elemanın yerini değiştir. 3. Köşegen dışındaki iki elemanın işaretini çevir. 4. Hepsini determinanta böl.`,
+      traps: [T`İşaret çevirmeyi unutmak.`, T`Determinanta bölmek yerine çarpmak.`, T`Köşegenleri değiştirmeyi unutup orijinal elemanı determinanta bölmek.`]
+    }),
+    olsSums: () => ({
+      how: T`Toplamlarla eğim: $\hat\beta_1 = \dfrac{n\sum X_iY_i - \sum X_i\sum Y_i}{n\sum X_i^2 - (\sum X_i)^2}$. Pay ve paydadaki $n$ çarpanlarına dikkat.`,
+      traps: [T`$\sum X_iY_i/\sum X_i^2$ kullanmak: ortalamadan sapma alınmamış, yanlış.`, T`Paydada $(\sum X_i)^2$ yerine $\sum X_i^2$ yazmak.`, T`Paydaki ya da paydadaki $n$'yi unutmak.`]
+    }),
+    dataType: () => ({ tip: T`Sadece iki soru: kaç birim, kaç dönem? İkisi de çoksa panel.` }),
+    cdfTable: (q) => ({
+      how: has(q, /\\ge/) ? T`$P(Y\ge k) = 1 - P(Y\le k-1)$: $k$ dahil, bu yüzden $k-1$'e kadar olanları 1'den çıkar.` : has(q, /\\le/) ? T`$P(Y\le k)$: $Y=0$'dan $Y=k$'ye kadar (dahil) olasılıkları topla.` : T`$P(Y>k) = 1 - P(Y\le k)$: $k$ dahil değil, $k$'ye kadar olanları 1'den çıkar.`,
+      traps: [T`$<$ ile $\le$'yi karıştırmak: kesikli değişkende sınır değerin dahil olup olmadığı sonucu değiştirir.`, T`Tümleyeni yanlış almak: $P(Y\ge k) = 1-P(Y\le k-1)$, $1-P(Y\le k)$ değil.`, T`Sadece $P(Y=k)$'yi almak.`]
+    }),
+    twoCoins: (q) => ({
+      how: T`Atışlar bağımsız, olasılıklar çarpılır. Bir tura iki farklı sırayla gelir (HT ve TH), bu yüzden $P(Y=1) = 2p(1-p)$. Kısayol (binom, $n=2$): $E(Y) = np$, $\text{var}(Y) = np(1-p)$.`,
+      traps: [T`$P(Y=1)$'de 2 ile çarpmayı unutmak.`, T`Tek paranın değerlerini ($p$ ya da $p(1-p)$) iki para için cevap vermek.`, T`$P(Y=0)$ için $1-p$ yazmak; iki yazı gerekir: $(1-p)^2$.`]
+    }),
+    meanVar: (q) => ({
+      how: T`$E(Y) = \sum y\,P(Y=y)$: her değeri olasılığıyla çarp, topla. $E(Y^2) = \sum y^2P(Y=y)$. Varyans: $E(Y^2) - [E(Y)]^2$.`,
+      traps: [T`Değerlerin düz ortalamasını almak; olasılıklar hesaba katılmalı.`, T`$E(Y^2)$ ile $[E(Y)]^2$'yi karıştırmak.`, T`Varyans istenirken $E(Y^2)$'yi ya da standart sapmayı vermek.`]
+    }),
+    bernoulli: (q) => has(q, /kurtosis/) ? ({
+      how: T`Bernoulli basıklığı kısayolu: $\dfrac{1}{p(1-p)} - 3$.`,
+      traps: [T`3'ü çıkarmayı unutmak, yani sadece $\frac{1}{p(1-p)}$ vermek.`, T`Normalin basıklığı 3'ü cevap sanmak.`]
+    }) : has(q, /skewness/) ? ({
+      how: T`Bernoulli çarpıklığı: $\dfrac{1-2p}{\sqrt{p(1-p)}}$. $p > 0.5$ ise 1'ler çoğunlukta, az sayıdaki 0 sol kuyruk oluşturur, çarpıklık negatif. $p < 0.5$ ise pozitif.`,
+      traps: [T`İşareti ters almak: kuyruk hangi taraftaysa işaret o.`, T`Paydada karekök almamak, yani $p(1-p)$'ye bölmek.`]
+    }) : has(q, /E\(X\^/) ? ({
+      how: T`$X$ sadece 0 ve 1 alır; $1^k = 1$ ve $0^k = 0$. Bu yüzden her $k\ge 1$ için $E(X^k) = 1\cdot p + 0\cdot(1-p) = p$.`,
+      traps: [T`Üssü olasılığa uygulamak: $E(X^k) = p^k$ değil.`, T`Varyansla karıştırmak.`]
+    }) : ({
+      how: T`Bernoulli varyansı: $\text{var}(X) = p(1-p)$. Çünkü $E(X^2) = p$ ve $\text{var} = p - p^2$.`,
+      traps: [T`$p^2$ vermek; varyans $p - p^2$.`, T`Ortalamayı ($p$) ya da $1-p$'yi vermek.`, T`Karekök almak (bu standart sapma).`]
+    }),
+    joint: (q) => has(q, /independent/) ? ({
+      how: T`Bağımsızlık: her hücrede ortak olasılık = iki marjinalin çarpımı. Bir hücrede bile tutmazsa bağımlıdır.`,
+      traps: [T`Olasılıkların pozitif olmasını ya da birinin diğerinden büyük olmasını bağımsızlık kanıtı sanmak.`, T`Marjinali yanlış toplamak (satır yerine sütun).`]
+    }) : has(q, /mid|Given/) ? ({
+      how: T`Koşullu olasılık = ortak hücre ÷ koşulun marjinali. "|" işaretinin sağındaki (verilen) değişken koşuldur; payda onun satır ya da sütun toplamı.`,
+      traps: [T`Bölmeyi unutup ortak olasılıkla yetinmek.`, T`Yanlış marjinale bölmek: koşulun yönünü karıştırmak.`, T`Marjinal olasılığı koşullu sanmak.`]
+    }) : ({
+      how: T`Marjinal olasılık = istenen değerin satırındaki (ya da sütunundaki) bütün hücrelerin toplamı.`,
+      traps: [T`Tek bir hücreyi (ortak olasılığı) marjinal sanmak.`, T`Satır yerine sütun toplamını almak.`]
+    }),
+    condExp: (q) => has(q, /iterated/) ? ({
+      how: T`LIE: $E(Y) = E(Y\mid X=0)P(X=0) + E(Y\mid X=1)P(X=1)$. Koşullu ortalamalar $X$'in olasılıklarıyla ağırlıklandırılır.`,
+      traps: [T`Koşullu ortalamaların düz ortalamasını almak (ağırlıksız).`, T`Tek bir koşullu ortalamayı genel ortalama sanmak.`]
+    }) : has(q, /text\{var\}/) ? ({
+      how: T`$Y$ 0/1 olduğu için koşullu dağılım Bernoulli: önce $p = P(Y=1\mid X=x)$, sonra $\text{var} = p(1-p)$.`,
+      traps: [T`Koşulsuz $P(Y=1)$'i kullanmak.`, T`$p(1-p)$ yerine $p$ ya da $p^2$ vermek.`]
+    }) : ({
+      how: T`$Y$ 0/1 ise $E(Y\mid X=x) = P(Y=1\mid X=x)$ = ortak hücre ÷ $P(X=x)$.`,
+      traps: [T`Ortak olasılığı koşullu beklenti sanmak (bölmeyi unutmak).`, T`Diğer $X$ değerinin koşullu ortalamasını vermek.`]
+    }),
+    linComb: () => ({
+      how: T`Beklenti doğrusal: $E(a+bX+cY) = a + bE(X) + cE(Y)$. Varyansta sabit kaybolur, katsayılar karesiyle çıkar ve $2bc\,\text{cov}$ eklenir. Kovaryansta sabit kaybolur, katsayı karesiz çıkar.`,
+      traps: [T`Varyansa ya da kovaryansa sabiti eklemek.`, T`Varyansta katsayının karesini almamak.`, T`$2bc\,\text{cov}(X,Y)$ terimini unutmak ya da negatif katsayılarda işaretini yanlış almak.`]
+    }),
+    corrCalc: () => ({
+      how: T`$\text{corr} = \text{cov}/(\sigma_X\sigma_Y)$; standart sapma = varyansın karekökü.`,
+      traps: [T`Varyansların çarpımına bölmek.`, T`Sadece bir standart sapmaya bölmek.`, T`Sonuç $[-1, 1]$ dışında çıktıysa bir hata yaptın.`]
+    }),
+    normalProb: (q) => ({
+      how: T`1. $\sigma = \sqrt{\text{varyans}}$. 2. $z = (c-\mu)/\sigma$. 3. $\le$ için $\Phi(z)$, $>$ için $1-\Phi(z)$, aralık için $\Phi(z_2)-\Phi(z_1)$. Negatif $z$: $\Phi(-z) = 1-\Phi(z)$.`,
+      traps: [T`$N(\mu, \sigma^2)$'deki ikinci sayıyı (varyansı) standart sapma gibi kullanmak.`, T`Sağ kuyrukta $1-\Phi$ almayı unutmak.`, T`Aralıkta iki $\Phi$'yi toplamak ya da sadece birini almak.`],
+      tip: T`Küçük bir çan çiz ve istenen alanı tara; işaret hatalarını önler.`
+    }),
+    chiF: (q) => has(q, /chi\^2_1/) && !has(q, /F_/) && has(q, /\\le/) ? ({
+      how: T`$\chi^2_1 = Z^2$. $P(Z^2\le c^2) = P(-c\le Z\le c) = 2\Phi(c) - 1$.`,
+      traps: [T`Sadece $\Phi(c)$ almak: $Z^2\le c^2$ hem pozitif hem negatif tarafı kapsar.`, T`Tümleyeni ($1 - $ olasılık) vermek.`]
+    }) : ({
+      how: T`Ki-kare ve F tabloları **üst kuyruk** verir: serbestlik derecesi satırında kritik değeri bul, sütun başlığı $P(W > c)$'dir. $F_{m,\infty} = \chi^2_m/m$, yani $P(F > c) = P(\chi^2_m > mc)$.`,
+      traps: [T`Üst kuyrukla alt kuyruğu karıştırmak (0.05 yerine 0.95).`, T`F'de $m$ ile çarpmayı unutmak.`]
+    }),
+    chiMoments: () => ({
+      how: T`$\chi^2_m$ = $m$ bağımsız standart normalin karelerinin toplamı. $E = m$, $\text{var} = 2m$. Sabitle bölmek varyansı karesiyle böler: $\text{var}(W/m) = 2m/m^2$.`,
+      traps: [T`Ortalama ile varyansı yer değiştirmek.`, T`Karesiz toplamı ($N(0,m)$) ki-kare sanmak.`, T`$\text{var}(W/m)$'de $m^2$ yerine $m$'ye bölmek.`]
+    }),
+    ybarVar: () => ({
+      how: T`$\text{var}(\bar Y) = \sigma^2/n$ ve $\text{sd}(\bar Y) = \sigma/\sqrt n = \sqrt{\sigma^2/n}$.`,
+      traps: [T`Varyans istenirken standart sapma vermek (ya da tersi).`, T`Varyansta $n$ yerine $\sqrt n$'ye bölmek.`, T`Tek gözlemin varyansını ($\sigma^2$) vermek.`]
+    }),
+    ybarProb: () => ({
+      how: T`$\bar Y\sim N(\mu, \sigma^2/n)$. 1. sd$(\bar Y) = \sqrt{\sigma^2/n}$. 2. Sınırı standartlaştır. 3. Simetrik aralık: $2\Phi(z) - 1$.`,
+      traps: [T`$\sqrt n$'ye bölmeyi unutup tek gözlemin sd'sini kullanmak.`, T`$\sigma^2/n$'yi (varyansı) sd sanmak.`, T`Simetrik aralıkta sadece $\Phi(z)$ almak.`]
+    }),
+    cltProb: () => ({
+      how: T`MLT: $Y$ normal olmasa bile $\bar Y\approx N(\mu, \sigma^2/n)$. sd$(\bar Y) = \sqrt{\sigma^2/n}$; sonra standartlaştır ve $\Phi$ kullan.`,
+      traps: [T`$\sigma$'yı $\sqrt n$'ye bölmeden kullanmak.`, T`$\sigma^2/n$'nin karekökünü almamak.`, T`Yön: $\bar Y < c$ için $\Phi(z)$, $\bar Y > c$ için $1-\Phi(z)$.`]
+    }),
+    cltBern: () => ({
+      how: T`Bernoulli: $\mu = p$, $\sigma^2 = p(1-p)$. MLT: sd$(\bar Y) = \sqrt{p(1-p)/n}$. Sonra $z = (c - p)/\text{sd}$.`,
+      traps: [T`$n$'ye bölmeyi unutmak (tek gözlemin sd'si).`, T`$p(1-p)/n$'nin karekökünü almamak.`, T`$\ge$ için $1-\Phi$, $\le$ için $\Phi$.`]
+    }),
+    cltCount: () => ({
+      how: T`Sayım $S$ (başarı sayısı): $E(S) = np$, $\text{var}(S) = np(1-p)$, sd = karekök. MLT ile $S$ yaklaşık normal; standartlaştır.`,
+      traps: [T`Varyansı ($np(1-p)$) sd gibi kullanmak.`, T`Tek denemenin sd'sini ($\sqrt{p(1-p)}$) kullanmak.`, T`$P(S > k)$ için $1-\Phi$ almayı unutmak.`]
+    }),
+    sampleCorr: () => ({
+      how: T`$r_{XY} = s_{XY}/(s_Xs_Y)$. Varyanslar verilmişse önce karekök al.`,
+      traps: [T`Varyanslara bölmek.`, T`Sadece bir standart sapmaya bölmek.`]
+    }),
+    estimator: (q) => ({
+      how: T`$\hat\mu = w_1Y_1 + w_2Y_2$ için: $E(\hat\mu) = (w_1+w_2)\mu$ ve $\text{var}(\hat\mu) = (w_1^2+w_2^2)\sigma^2$. Ağırlıkların toplamı 1 ise yansız.`,
+      traps: [T`Yansızlık için eşit ağırlık şart sanmak; sadece toplam 1 olmalı.`, T`Varyansta ağırlıkların karesini almamak.`, T`Ağırlık toplamının karesini almak.`]
+    }),
+    hypSetup: () => ({
+      how: T`Eşitlik her zaman $H_0$'da. "Farklı mı" → $\ne$ (iki yönlü). "Büyük mü, aşıyor mu, artırıyor mu" → $>$. "Küçük mü, düşmüş mü" → $<$.`,
+      traps: [T`Eşitliği $H_1$'e koymak.`, T`Tek yönlü soruda $\ne$ seçmek ya da yönü ters almak.`]
+    }),
+    tMean: (q) => ({
+      how: T`1. $SE = s_Y/\sqrt n$. 2. $t = (\bar Y - \mu_0)/SE$. 3. İki yönlü: $p = 2\Phi(-|t|)$; karar için $|t|$'yi kritik değerle (%10: 1.645, %5: 1.96, %1: 2.576) karşılaştır.`,
+      traps: [T`SE yerine $s_Y$'ye bölmek.`, T`$\sqrt n$ yerine $n$'ye bölmek.`, T`İki yönlü p'yi 2 ile çarpmamak.`]
+    }),
+    pValue: () => ({
+      how: T`İki yönlü ($\ne$): $2\Phi(-|t|)$. Sağ ($>$): $1-\Phi(t)$. Sol ($<$): $\Phi(t)$.`,
+      traps: [T`Yönü karıştırmak.`, T`İki yönlüde 2 ile çarpmayı unutmak.`, T`Tek yönlüde $t$'nin işaretini yok saymak: yanlış yönde bir $t$ büyük p verir.`]
+    }),
+    ciMean: () => ({
+      how: T`1. $SE = s_Y/\sqrt n$. 2. Kritik değer: %90 1.645, %95 1.96, %99 2.576. 3. $\bar Y \pm$ kritik değer $\times SE$.`,
+      traps: [T`SE yerine $s_Y$ kullanmak: çok geniş aralık.`, T`$\sqrt n$ yerine $n$'ye bölmek: çok dar aralık.`, T`Yanlış güven düzeyinin kritik değerini kullanmak.`]
+    }),
+    ciProp: () => ({
+      how: T`$\hat p = k/n$, $SE = \sqrt{\hat p(1-\hat p)/n}$, %95 GA: $\hat p \pm 1.96\,SE$.`,
+      traps: [T`Karekök almamak (varyansla aralık kurmak).`, T`$n$'ye bölmeyi unutmak.`, T`%95 yerine %99 kritik değerini (2.576) kullanmak.`]
+    }),
+    ciTest: () => ({
+      how: T`%95 GA = %5 düzeyinde iki yönlü testte reddedilemeyen değerlerin kümesi. $H_0$ değeri içerideyse reddetme, dışarıdaysa reddet.`,
+      traps: [T`Kararı ters vermek.`, T`$H_0$ değeri yerine 0'ın aralıkta olup olmadığına bakmak.`]
+    }),
+    diffMeans: () => ({
+      how: T`Bağımsız örneklemlerde varyanslar toplanır: $SE = \sqrt{s_m^2/n_m + s_w^2/n_w}$. $t = \text{fark}/SE$, %95 GA: fark $\pm 1.96\,SE$.`,
+      traps: [T`Standart hataları toplamak ($s_m/\sqrt{n_m} + s_w/\sqrt{n_w}$).`, T`$s^2$ yerine $s$ kullanmak.`, T`Farkta varyansları çıkarmak; farkta bile toplanır.`]
+    }),
+    olsSmall: (q) => ({
+      how: has(q, /residual/) ? T`Önce tahmini değer: $\hat Y = \hat\beta_0 + \hat\beta_1X$. Kalıntı = gerçek − tahmin = $Y - \hat Y$.` : T`5 adım: ortalamalar → sapmalar → $\sum(X-\bar X)(Y-\bar Y)$ → $\sum(X-\bar X)^2$ → $\hat\beta_1$ = birincisi ÷ ikincisi, $\hat\beta_0 = \bar Y - \hat\beta_1\bar X$. Hesap makinesinde STAT (A+BX): B eğim, A sabit.`,
+      traps: has(q, /residual/) ? [T`Kalıntıyı ters almak ($\hat Y - Y$).`, T`Tahmini değeri kalıntı sanmak.`] : [T`Kesri ters çevirmek: $\sum(X-\bar X)^2/\sum(X-\bar X)(Y-\bar Y)$.`, T`$\hat\beta_0$'da işaret: $\bar Y - \hat\beta_1\bar X$, artı değil.`, T`Casio'da A ile B'yi karıştırmak: A sabit, B eğim.`]
+    }),
+    olsMoments: () => ({
+      how: T`$\hat\beta_1 = s_{XY}/s_X^2 = r_{XY}\,s_Y/s_X$. $\hat\beta_0 = \bar Y - \hat\beta_1\bar X$.`,
+      traps: [T`Varyans yerine standart sapmaya bölmek ($s_{XY}/s_X$).`, T`Korelasyondan eğimde oranı ters almak ($r\,s_X/s_Y$).`, T`$\hat\beta_0$'da artı işareti kullanmak.`]
+    }),
+    regPredict: () => ({
+      how: T`$X$'in değerini denklemde yerine koy: $\hat Y = \hat\beta_0 + \hat\beta_1X$.`,
+      traps: [T`Negatif eğimde işaret hatası.`, T`Sabit terimi eklemeyi unutmak.`, T`Sabit ile eğimi yer değiştirmek.`]
+    }),
+    regChange: () => ({
+      how: T`Değişim sorusu: $\Delta\hat Y = \hat\beta_1\,\Delta X$. Sabit terim fark alınınca düşer; başlangıç değeri önemsiz.`,
+      traps: [T`Sabit terimi eklemek.`, T`$\Delta X$ ile çarpmayı unutmak (sadece eğimi vermek).`, T`İşaret: negatif eğim ya da negatif $\Delta X$.`]
+    }),
+    regMean: () => ({
+      how: T`OLS doğrusu her zaman $(\bar X, \bar Y)$'den geçer: $\bar Y = \hat\beta_0 + \hat\beta_1\bar X$.`,
+      traps: [T`Sabit terimi ortalama sanmak.`, T`İşaret hatası (eğimi çıkarmak).`]
+    }),
+    r2Calc: () => ({
+      how: T`$R^2 = ESS/TSS = 1 - SSR/TSS$: açıklanan oran. Tek regresörde $R^2 = r^2$.`,
+      traps: [T`$SSR/TSS$ vermek: bu açıklanamayan oran.`, T`Korelasyonun karesini almamak.`, T`$R^2$ negatif olamaz; negatif çıktıysa hata var.`]
+    }),
+    serCalc: () => ({
+      how: T`$SER = \sqrt{SSR/(n-2)}$: iki katsayı tahmin edildiği için $n-2$.`,
+      traps: [T`$n$ ya da $n-1$'e bölmek.`, T`Karekök almamak.`, T`$\sqrt{SSR}$'yi $(n-2)$'ye bölmek.`]
+    }),
+    sdYfromR2: () => ({
+      how: T`Geri hesap: $SSR = (n-2)SER^2$, $TSS = SSR/(1-R^2)$, $s_Y = \sqrt{TSS/(n-1)}$.`,
+      traps: [T`SER'i $s_Y$ sanmak.`, T`$1-R^2$'ye bölmek yerine çarpmak.`, T`Karekök almayı unutmak.`]
+    }),
+    seScale: () => ({
+      how: T`Varyans $1/n$ ile, SE ise $1/\sqrt n$ ile orantılı. $n$ $k$ katına çıkarsa SE $1/\sqrt k$ katına iner.`,
+      traps: [T`SE'yi $k$'ye bölmek (bu varyansın kuralı).`, T`SE'nin değişmeyeceğini ya da artacağını sanmak.`]
+    }),
+    regT: (q) => ({
+      how: T`$t = (\hat\beta_1 - c)/SE(\hat\beta_1)$. İki yönlü testte $|t|$'yi kritik değerle karşılaştır; p-değeri $2\Phi(-|t|)$.`,
+      traps: [T`$c\ne 0$ iken $\hat\beta_1/SE$ kullanmak: önce $c$'yi çıkar.`, T`Varyansa ($SE^2$) bölmek.`, T`İki yönlü testte $t$'nin işaretine bakarak karar vermek; mutlak değer önemli.`]
+    }),
+    regOutput: (q) => has(q, /fraction/) ? ({
+      how: T`Açıklanan varyans oranı = Multiple R-squared ($R^2$). Yüzdeye çevirmek için 100 ile çarp.`,
+      traps: [T`$\sqrt{R^2}$ (korelasyon) vermek.`, T`Residual standard error'u (SER) oran sanmak.`, T`$1 - R^2$ (açıklanamayan oran) vermek.`]
+    }) : has(q, /significant/) ? ({
+      how: T`Eğim satırında t value (= Estimate / Std. Error) ve Pr(>|t|) var. %5'te anlamlı ⇔ $|t| > 1.96$ ⇔ p $< 0.05$.`,
+      traps: [T`$R^2$ küçük diye katsayıyı anlamsız saymak.`, T`Sabitin (Intercept) anlamlılığına bakmak.`]
+    }) : ({
+      how: T`Eğimin %95 GA'sı: Estimate $\pm 1.96\times$ Std. Error (eğim satırından).`,
+      traps: [T`Sabitin Std. Error'unu kullanmak.`, T`1.96 yerine 1.645 (bu %90).`]
+    }),
+    regCI: () => ({
+      how: T`$\hat\beta_1 \pm$ kritik değer $\times SE$. %90: 1.645, %95: 1.96, %99: 2.576. 0 aralıkta değilse o düzeyde anlamlı.`,
+      traps: [T`Yanlış güven düzeyinin kritik değerini kullanmak.`, T`SE'nin karesini kullanmak.`]
+    }),
+    regCIdx: () => ({
+      how: T`1. $\beta_1$'in %95 GA'sı. 2. Uçları $\Delta x$ ile çarp. 3. $\Delta x$ negatifse uçlar yer değiştirir; küçüğü başa yaz.`,
+      traps: [T`Sadece $\hat\beta_1$'i $\Delta x$ ile çarpıp SE'yi çarpmamak.`, T`Negatif $\Delta x$'te sıralamayı düzeltmemek.`, T`$\beta_1$'in GA'sını $\Delta x$ ile çarpmadan vermek.`]
+    }),
+    dummyReg: (q) => ({
+      how: T`$D=0$ grubunun ortalaması $\hat\beta_0$; $D=1$ grubunun ortalaması $\hat\beta_0 + \hat\beta_1$; $\hat\beta_1$ iki grubun ortalama farkı.`,
+      traps: [T`$D=1$ grubunun ortalamasına sadece $\hat\beta_1$ demek.`, T`Negatif katsayıyı eklerken işaret hatası.`, T`$\hat\beta_1$'i sürekli bir eğim gibi yorumlamak.`]
+    }),
+    homoVar: () => ({
+      how: T`Homoskedastisite altında $\text{var}(\hat\beta_1) = \sigma^2_u/(n\sigma^2_X)$; standart sapma bunun karekökü.`,
+      traps: [T`Kesri ters çevirmek ($\sigma^2_X$ payda).`, T`Varyans ile standart sapmayı karıştırmak.`, T`$n$'yi unutmak.`]
+    })
+  };
+  function enrich(name, q) {
+    const g = G[name], r = g ? g(q) : null;
+    let ex = /^\*\*Doğru cevap/.test(q.ex) ? q.ex : '**Doğru cevap: ' + q.opts[0] + '.**\n' + q.ex;
+    if (r) {
+      if (r.how) ex += '\n\n**Yöntem:** ' + r.how;
+      if (r.traps && r.traps.length) ex += '\n\n**Sık hatalar:**\n' + r.traps.map(t => '• ' + t).join('\n');
+      if (r.tip) ex += '\n\n:::ipucu Sınavda\n' + r.tip + '\n:::';
+    }
+    q.ex = ex;
+    return q;
+  }
+  root.GEN_GUIDE = G;
+
+  /* Tekrar eden şıkları ayıkla; 3'ten az kalırsa yeniden üret. */
   root.genQ = function (name) {
     let q = null;
     for (let k = 0; k < 10; k++) {
       q = root.GENS[name]();
       const o = q.opts.filter((x, i, a) => a.indexOf(x) === i);
-      if (o.length >= 3) { q.opts = o.slice(0, 4); return q; }
+      if (o.length >= 3) { q.opts = o.slice(0, 4); return enrich(name, q); }
     }
-    return q;
+    return enrich(name, q);
   };
 })(typeof window !== 'undefined' ? window : globalThis);
