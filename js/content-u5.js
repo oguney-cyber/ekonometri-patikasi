@@ -127,6 +127,52 @@ Not: $X = 0$ veri aralığının çok dışındaysa (sıfır öğrencili sınıf
 • "Average value of $X$": $\bar X$, bir katsayı değil.
 • "Error term": $u$.
 
+## Q
+SRC: TB 4.20
+EN: In the linear regression model $Y_i = \beta_0 + \beta_1 X_i + u_i$, the expression $\beta_0 + \beta_1 X_i$ is:
+TR: Doğrusal regresyon modeli $Y_i = \beta_0 + \beta_1 X_i + u_i$'de $\beta_0 + \beta_1 X_i$ ifadesi nedir?
++ the population regression function
+- the sample regression function
+- the error term
+- the regressor
+EX: **Doğru cevap: the population regression function (population regression line).**
+$\beta_0 + \beta_1 X$ popülasyondaki gerçek ortalama ilişkidir: $E(Y\mid X) = \beta_0 + \beta_1 X$. Katsayılar bilinmez; işimiz onları tahmin etmek.
+**Diğer şıklar neden yanlış?**
+• sample regression function: bu tahmin edilen doğru, $\hat\beta_0 + \hat\beta_1 X$ (şapkalı).
+• error term: hata terimi $u_i$; $Y$'yi etkileyen diğer tüm faktörler.
+• regressor: regresör (açıklayıcı değişken) sadece $X_i$.
+
+## Q
+SRC: TB 4.28
+EN: The OLS residuals $\hat u_i$ are the sample counterparts of the population:
+TR: OLS kalıntıları $\hat u_i$ popülasyondaki neyin örneklem karşılığıdır?
++ errors $u_i$
+- regression slope
+- predicted values
+- regression intercept
+EX: **Doğru cevap: errors.**
+• Popülasyon: $u_i = Y_i - (\beta_0 + \beta_1 X_i)$, gerçek doğrudan sapma; gözlenemez.
+• Örneklem: $\hat u_i = Y_i - (\hat\beta_0 + \hat\beta_1 X_i)$, tahmin edilen doğrudan sapma; hesaplanabilir.
+Şapka = örneklem karşılığı.
+**Diğer şıklar neden yanlış?**
+• slope ve intercept: bunların örneklem karşılığı $\hat\beta_1$ ve $\hat\beta_0$.
+• predicted values: bunların karşılığı $\hat Y_i$.
+
+## Q
+SRC: TB 4.32
+EN: In the population regression of district test scores on the student–teacher ratio, a district has a negative error term $u_i$. This means that:
+TR: Okul bölgelerinin test puanlarının öğrenci-öğretmen oranı üzerine popülasyon regresyonunda bir bölgenin hata terimi $u_i$ negatif. Bu ne anlama gelir?
++ the district did worse than predicted by the regression line
+- the district did better than predicted by the regression line
+- the regression is useless for predicting test scores
+- the district's student–teacher ratio must be measured incorrectly
+EX: **Doğru cevap: did worse than predicted.**
+$u_i < 0$ ⇒ $Y_i < \beta_0 + \beta_1 X_i$. Bölgenin gerçek test puanı, o öğrenci-öğretmen oranına sahip bir bölgeden beklenenin **altında**. Sebep, modele girmeyen diğer faktörler olabilir (örneğin gelir, İngilizce öğrenen öğrenci oranı).
+**Diğer şıklar neden yanlış?**
+• did better: bu pozitif hata ($u_i>0$).
+• useless: tek bir negatif hata normaldir; hataların bir kısmı negatif, bir kısmı pozitif olur.
+• measured incorrectly: hata terimi diğer faktörleri yansıtır, ölçüm hatası anlamına gelmez.
+
 --- LESSON u5b | β̂ | OLS tahmincisi
 
 ## CARD En küçük kareler fikri
@@ -265,6 +311,111 @@ Tahmin edilen değer, **tahmin edilmiş** (şapkalı katsayılı) doğrunun $X$'
 
 ## GEN olsSmall
 ## GEN olsMoments
+
+## Q
+SRC: TB 4.9
+EN: The OLS estimator is derived by:
+TR: OLS tahmincisi nasıl elde edilir?
++ minimizing the sum of squared residuals
+- minimizing the sum of absolute residuals
+- connecting the observation with the lowest $X$ to the observation with the highest $X$
+- making the standard error of the regression equal to the standard error of the slope
+EX: **Doğru cevap: minimizing the sum of squared residuals.**
+OLS, $\sum_{i=1}^{n}(Y_i - b_0 - b_1X_i)^2$ ifadesini en küçük yapan $b_0$ ve $b_1$'i seçer. Türev alıp sıfıra eşitlemek $\hat\beta_1 = s_{XY}/s_X^2$ ve $\hat\beta_0 = \bar Y - \hat\beta_1\bar X$ formüllerini verir.
+**Diğer şıklar neden yanlış?**
+• absolute residuals: bu LAD (en küçük mutlak sapmalar) yöntemi; farklı bir tahminci.
+• iki uç noktayı birleştirmek: sadece iki gözlemi kullanır, diğer tüm bilgiyi atar.
+• SER = SE: anlamsız bir koşul.
+
+## Q
+SRC: TB 4.13
+EN: The OLS residual $\hat u_i$ is defined as:
+TR: OLS kalıntısı $\hat u_i$ nasıl tanımlanır?
++ $Y_i - \hat Y_i$
+- $Y_i - \beta_0 - \beta_1 X_i$
+- $\hat Y_i - \hat\beta_0 - \hat\beta_1 X_i$
+- $(Y_i - \bar Y)^2$
+EX: **Doğru cevap: $Y_i - \hat Y_i$.**
+$\hat Y_i = \hat\beta_0 + \hat\beta_1 X_i$ tahmin edilen değerdir. Kalıntı, gerçek $Y_i$'nin tahminden ne kadar saptığıdır.
+**Diğer şıklar neden yanlış?**
+• $Y_i - \beta_0 - \beta_1X_i$: bu **hata terimi** $u_i$ (popülasyon katsayılarıyla); gözlenemez.
+• $\hat Y_i - \hat\beta_0 - \hat\beta_1X_i$: tanım gereği her zaman 0.
+• $(Y_i - \bar Y)^2$: TSS'nin bir terimi; regresyon doğrusunu hiç kullanmıyor.
+
+## Q
+SRC: TB 4.17
+EN: The OLS residuals:
+TR: OLS kalıntıları:
++ can be calculated by subtracting the fitted values from the actual values
+- can be calculated from the errors of the population regression function
+- are unknown, because we do not know the population regression function
+- should not be used, because they show that the regression line does not pass through all the observations
+EX: **Doğru cevap: actual minus fitted.**
+$\hat u_i = Y_i - \hat Y_i$. Hem $Y_i$ hem $\hat Y_i$ elimizde olduğu için kalıntılar her zaman hesaplanabilir.
+**Diğer şıklar neden yanlış?**
+• "from the population errors" ve "unknown": bunlar **hatalarla** (u) karışmış. Popülasyon hataları bilinmez çünkü $\beta$'lar bilinmez; kalıntılar ise bilinir.
+• "should not be used": kalıntılar çok kullanışlıdır: SER, $R^2$ ve standart hatalar onlardan hesaplanır. Doğrunun her noktadan geçmemesi normaldir.
+
+## Q
+SRC: TB 4.21
+EN: Using the least squares principle, the OLS slope estimator is obtained by dividing the:
+TR: En küçük kareler ilkesine göre OLS eğim tahmincisi neyin neye bölünmesiyle elde edilir?
++ sample covariance of $X$ and $Y$ by the sample variance of $X$
+- sample covariance of $X$ and $Y$ by the sample variance of $Y$
+- sample variance of $X$ by the sample variance of $Y$
+- sample variance of $X$ by the sample covariance of $X$ and $Y$
+EX: **Doğru cevap: $s_{XY}/s_X^2$.**
+$$\hat\beta_1 = \frac{s_{XY}}{s_X^2} = \frac{\sum (X_i - \bar X)(Y_i - \bar Y)}{\sum (X_i - \bar X)^2}$$
+Birim kontrolü: $s_{XY}$ ($X$·$Y$ birimi) ÷ $s_X^2$ ($X^2$ birimi) = $Y$ birimi / $X$ birimi. Eğimin birimi tam olarak bu.
+**Diğer şıklar neden yanlış?**
+• $s_Y^2$'ye bölmek: bu, $X$'in $Y$ üzerine regresyonunun eğimi (ters regresyon).
+• varyanslar oranı: kovaryans yok; $X$ ile $Y$'nin birlikte hareketini ölçmüyor.
+• ters oran: birim ters çıkar.
+
+## Q
+SRC: TB 4.31
+EN: The OLS estimator of the slope in the simple regression model is:
+TR: Basit regresyon modelinde eğimin OLS tahmincisi nedir?
++ $\hat\beta_1 = \dfrac{\sum_{i=1}^{n}(X_i - \bar X)(Y_i - \bar Y)}{\sum_{i=1}^{n}(X_i - \bar X)^2}$
+- $\hat\beta_1 = \dfrac{\sum_{i=1}^{n}(X_i - \bar X)(Y_i - \bar Y)}{\sum_{i=1}^{n}(Y_i - \bar Y)^2}$
+- $\hat\beta_1 = \dfrac{\sum_{i=1}^{n}(X_i - \bar X)^2}{\sum_{i=1}^{n}(X_i - \bar X)(Y_i - \bar Y)}$
+- $\hat\beta_1 = \bar Y - \hat\beta_0 \bar X$
+EX: **Doğru cevap: $\sum (X_i-\bar X)(Y_i-\bar Y) / \sum (X_i-\bar X)^2$.**
+Bu, $s_{XY}/s_X^2$'nin açık yazılışıdır; $1/(n-1)$ çarpanları pay ve paydada birbirini götürür.
+**Diğer şıklar neden yanlış?**
+• paydada $Y$ sapmaları: ters regresyonun eğimi.
+• ters kesir: birimler ters.
+• $\bar Y - \dots$: bu **sabit terim** formülüne benziyor: $\hat\beta_0 = \bar Y - \hat\beta_1 \bar X$. Burada harfler de karışmış.
+
+## Q
+SRC: TB 4.12
+EN: The sample average of the OLS residuals is:
+TR: OLS kalıntılarının örneklem ortalaması nedir?
++ zero
+- positive, because OLS uses squares
+- unobservable, because the population regression function is unknown
+- positive or negative, depending on whether $X$ is mostly positive or negative
+EX: **Doğru cevap: zero.**
+OLS'yi $\hat\beta_0$'a göre minimize etmenin birinci sıra koşulu $\sum \hat u_i = 0$'dır. Bu yüzden kalıntıların ortalaması her zaman tam olarak 0 (modelde sabit terim varsa).
+**Diğer şıklar neden yanlış?**
+• "positive because squares": kareler **minimize edilen** ifadede; kalıntıların kendisi kare değil, pozitif ve negatif olabilir.
+• unobservable: kalıntılar veriyle hesaplanır.
+• "depends on X": sonuç her zaman 0, $X$'in işaretinden bağımsız.
+
+## Q
+SRC: TB 4.16
+EN: The sample regression line estimated by OLS:
+TR: OLS ile tahmin edilen örneklem regresyon doğrusu:
++ always passes through the point $(\bar X, \bar Y)$
+- always has a slope smaller than its intercept
+- is exactly the same as the population regression line
+- can never have a slope of zero
+EX: **Doğru cevap: passes through $(\bar X, \bar Y)$.**
+$\hat\beta_0 = \bar Y - \hat\beta_1\bar X$ olduğu için $X = \bar X$'te tahmin: $\hat\beta_0 + \hat\beta_1\bar X = \bar Y$. Doğru her zaman ortalamalar noktasından geçer.
+**Diğer şıklar neden yanlış?**
+• slope < intercept: ikisinin büyüklüğü arasında genel bir ilişki yok.
+• "same as population line": örneklem doğrusu bir tahmindir; örneklemden örnekleme değişir.
+• "never zero slope": $s_{XY} = 0$ ise eğim tam sıfır olur.
 
 --- LESSON u5c | ↗ | Yorumlama ve tahmin
 
@@ -416,6 +567,109 @@ Formül: $\hat Y(\text{STR}=0) = 698.93 - 2.28\cdot 0 = 698.93$. Ama öğretmen 
 ## GEN regChange
 ## GEN regMean
 
+## Q
+SRC: TB 4.8
+EN: In the simple linear regression model, the slope coefficient:
+TR: Basit doğrusal regresyon modelinde eğim katsayısı:
++ tells you by how many units $Y$ changes when $X$ increases by one unit
+- tells you by how many percent $Y$ changes when $X$ increases by one percent
+- gives you the predicted $Y$ when multiplied by the regressor
+- is the elasticity of $Y$ with respect to $X$
+EX: **Doğru cevap: units change in $Y$ per one-unit increase in $X$.**
+$\beta_1 = \Delta Y/\Delta X$. Örnek: test puanı $= 698.9 - 2.28 \times STR$ ise, STR 1 öğrenci artınca puan ortalamada 2.28 **puan** düşer.
+**Diğer şıklar neden yanlış?**
+• percent / elasticity: yüzde yorumu ancak log-log modelde olur ($\ln Y$ ile $\ln X$); doğrusal modelde değil.
+• "multiplied by the regressor": tahmin için sabit terim de gerekir: $\hat Y = \hat\beta_0 + \hat\beta_1 X$.
+
+## Q
+SRC: TB 4.10
+EN: Interpreting the intercept of an estimated regression line is:
+TR: Tahmin edilen bir regresyon doğrusunun sabit terimini yorumlamak:
++ reasonable if your sample contains values of $X_i$ near zero
+- never reasonable, because you never observe values of the regressor near zero
+- reasonable because, under certain conditions, the estimator is BLUE
+- not reasonable, because economists only care about changes
+EX: **Doğru cevap: reasonable if the sample has $X$ near zero.**
+$\hat\beta_0$ = $X = 0$'daki tahmin. Verinde $X$ sıfıra yakın değerler varsa bu tahmin anlamlıdır. Yoksa veri aralığının çok dışına çıkarsın (extrapolation) ve yorum güvenilmez olur. Örnek: STR = 0 (öğretmen var, öğrenci yok) anlamsız; bu yüzden 698.9'u yorumlamayız.
+**Diğer şıklar neden yanlış?**
+• "never": bazı uygulamalarda $X = 0$ gözlenir; o zaman yorumlanabilir.
+• BLUE: istatistiksel bir özellik; yorumun anlamlı olup olmadığını belirlemez.
+• "only care about changes": sabit terim de bazen ilgi çekicidir; "asla" demek yanlış.
+
+## Q
+SRC: TB 4.11
+EN: The estimated regression is $\widehat{TestScore} = 698.9 - 2.28 \times STR$. If the student–teacher ratio falls by 2, the regression predicts that test scores will:
+TR: Tahmin edilen regresyon $\widehat{TestScore} = 698.9 - 2.28 \times STR$. Öğrenci-öğretmen oranı 2 azalırsa regresyon test puanlarının ne olacağını tahmin eder?
++ rise by 4.56 points, on average
+- fall by 4.56 points, on average
+- rise by 2.28 points, on average
+- rise by exactly 4.56 points in every district
+EX: **Doğru cevap: rise by 4.56 points on average.**
+$$\Delta\widehat{TestScore} = -2.28 \times (-2) = +4.56$$
+Eğim negatif, $X$ de azalıyor: eksi çarpı eksi = artış.
+==Not:== Test bankasındaki şıklar bozuk basılmış; doğru hesap +4.56.
+**Diğer şıklar neden yanlış?**
+• fall by 4.56: işaret hatası; azalan STR puanı **artırır**.
+• 2.28: sadece 1 birimlik değişim; $\Delta X = 2$ ile çarpmak gerekir.
+• "exactly in every district": regresyon **ortalama** etkiyi verir; her bölgede hata terimi farklıdır.
+
+## Q
+SRC: TB 4.22
+EN: To decide whether an estimated slope coefficient indicates a "large" effect of $X$ on $Y$, you should:
+TR: Tahmin edilen bir eğim katsayısının $X$'in $Y$ üzerinde "büyük" bir etkisi olduğunu gösterip göstermediğine karar vermek için ne yapmalısın?
++ judge the economic (real-world) importance of the effect of a realistic change in $X$
+- check whether the slope coefficient is larger than one
+- check whether the slope is statistically significant
+- rescale $X$ until the coefficient looks big enough
+EX: **Doğru cevap: economic importance.**
+"Büyük mü?" sorusu bağlama bağlıdır. Örnek: STR'yi 2 azaltmak puanı 4.56 artırır. Puanların standart sapması 19 civarında olduğu için bu yaklaşık 0.24 standart sapmalık, orta büyüklükte bir etkidir. Bu değerlendirme ekonomik/pratik önem değerlendirmesidir.
+**Diğer şıklar neden yanlış?**
+• "> 1": sayı, birim seçimine bağlıdır (dakika ya da saat); büyüklük ölçüsü değil.
+• statistical significance: anlamlılık etkinin **sıfırdan farklı** olduğunu söyler, **büyük** olduğunu değil. Büyük örneklemde küçücük etkiler bile anlamlı çıkar.
+• rescale: birimi değiştirmek etkinin gerçek büyüklüğünü değiştirmez.
+
+## Q
+SRC: TB 4.26
+EN: Using data on more than 100 households, you estimate $C_i = \beta_0 + \beta_1 Y_i + u_i$, where $C$ is consumption and $Y$ is disposable income. The estimate of $\beta_1$ tells you:
+TR: 100'den fazla hanenin verisiyle $C_i = \beta_0 + \beta_1 Y_i + u_i$ modelini tahmin ediyorsun; $C$ tüketim, $Y$ harcanabilir gelir. $\beta_1$'in tahmini sana ne söyler?
++ $\Delta C / \Delta Y$, the marginal propensity to consume
+- the amount a household must consume to survive
+- $C/Y$, the average propensity to consume
+- $\Delta Y / \Delta C$
+EX: **Doğru cevap: $\Delta C/\Delta Y$, the marginal propensity to consume.**
+Gelir 1 lira artınca tüketim ortalamada $\beta_1$ lira artar. Makroekonomideki adı **marjinal tüketim eğilimi** (MPC).
+**Diğer şıklar neden yanlış?**
+• survival consumption: bu yorum, gelir 0 iken tüketim olan sabit terime ($\beta_0$) daha yakın, eğime değil.
+• $C/Y$: ortalama tüketim eğilimi; sabit terim sıfır değilse eğimden farklıdır.
+• $\Delta Y/\Delta C$: ters oran.
+
+## Q
+SRC: TB 4.27
+EN: In which of the following regressions does the intercept have a real-world interpretation?
+TR: Aşağıdaki regresyonlardan hangisinde sabit terimin gerçek hayatta bir anlamı vardır?
++ weight of adults on height, with height measured in inches above 4 feet
+- the demand for coffee on its price
+- test scores on class size
+- earnings on age
+EX: **Doğru cevap: weight on height measured above 4 feet.**
+Boy "4 fitin üzerindeki inç" olarak ölçülünce $X = 0$, 4 fit (yaklaşık 122 cm) boyunda bir yetişkin demektir. Böyle yetişkinler var; sabit terim onların tahmini kilosu olarak yorumlanabilir.
+**Diğer şıklar neden yanlış?**
+• coffee price = 0: bedava kahve; veri aralığının çok dışında.
+• class size = 0: öğrencisiz sınıf; anlamsız.
+• age = 0: bebeklerin kazancı; veride yok ve anlamsız.
+
+## Q
+SRC: TB 4.29
+EN: Measuring test scores in hundreds of points instead of in points changes all of the following EXCEPT:
+TR: Test puanlarını puan yerine yüz puan biriminde ölçmek aşağıdakilerin hepsini değiştirir, BİRİ HARİÇ:
++ the economic interpretation of the effect of a change in $X$ on $Y$
+- the residuals
+- the numerical value of the slope estimate
+- the numerical value of the intercept estimate
+EX: **Doğru cevap: the interpretation does not change.**
+$Y$'yi 100'e bölünce $\hat\beta_0$, $\hat\beta_1$ ve kalıntıların hepsi 100'e bölünür: eğim $-2.28$ yerine $-0.0228$ olur. Ama anlamı aynı: "STR 1 artınca puan 0.0228 **yüz puan**, yani 2.28 puan düşer." Gerçek dünyadaki etki değişmez.
+**Diğer şıklar** sayısal olarak 100'e bölünür, yani değişir.
+
 --- LESSON u5d | R² | Uyum ölçüleri: R² ve SER
 
 ## CARD Kareler toplamları ve R²
@@ -558,6 +812,128 @@ Negatif korelasyonun karesi pozitiftir. İlişkinin yönü (işaret) $R^2$'de ka
 ## GEN r2Calc
 ## GEN serCalc
 ## GEN sdYfromR2
+
+## Q
+SRC: TB 4.1
+EN: In the simple regression model, the estimated slope coefficient $\hat\beta_1$ is exactly zero. Then:
+TR: Basit regresyon modelinde tahmin edilen eğim katsayısı $\hat\beta_1$ tam sıfır. O zaman:
++ $R^2 = 0$
+- $0 < R^2 < 1$
+- $R^2 = 1$
+- $R^2 > SSR/TSS$
+EX: **Doğru cevap: $R^2 = 0$.**
+1. $\hat\beta_1 = 0$ ⇒ $\hat\beta_0 = \bar Y - 0 = \bar Y$, yani her $\hat Y_i = \bar Y$.
+2. $ESS = \sum (\hat Y_i - \bar Y)^2 = 0$.
+3. $R^2 = ESS/TSS = 0$.
+Regresyon, $Y$'nin sadece ortalamasıyla tahmin edilmesinden daha iyi değil.
+**Diğer şıklar neden yanlış?**
+• $0<R^2<1$ veya $R^2 = 1$: açıklanan varyasyon yok.
+• $R^2 > SSR/TSS$: burada $SSR = TSS$, yani $SSR/TSS = 1 > R^2 = 0$.
+
+## Q
+SRC: TB 4.2
+EN: The regression $R^2$ is defined as:
+TR: Regresyon $R^2$'si nasıl tanımlanır?
++ $\dfrac{\sum_{i=1}^{n}(\hat Y_i - \bar Y)^2}{\sum_{i=1}^{n}(Y_i - \bar Y)^2}$
+- $\dfrac{\sum_{i=1}^{n}\hat u_i^2}{\sum_{i=1}^{n}(Y_i - \bar Y)^2}$
+- $\dfrac{\sum_{i=1}^{n}(Y_i - \bar Y)^2}{\sum_{i=1}^{n}(\hat Y_i - \bar Y)^2}$
+- $\dfrac{\sum_{i=1}^{n}(\hat Y_i - \bar Y)^2}{\sum_{i=1}^{n}\hat u_i^2}$
+EX: **Doğru cevap: $ESS/TSS$.**
+$R^2 = \dfrac{ESS}{TSS}$; $ESS = \sum(\hat Y_i - \bar Y)^2$ (açıklanan), $TSS = \sum(Y_i - \bar Y)^2$ (toplam). Değeri 0 ile 1 arasındadır.
+**Diğer şıklar neden yanlış?**
+• $SSR/TSS$: açıklanamayan oran; bu $1 - R^2$.
+• $TSS/ESS$: ters; 1'den büyük çıkar.
+• $ESS/SSR$: 0–1 aralığında olmak zorunda değil; $R^2$ değil.
+
+## Q
+SRC: TB 4.3
+EN: The standard error of the regression (SER) is:
+TR: Regresyonun standart hatası (SER) nedir?
++ $\sqrt{\dfrac{1}{n-2}\sum_{i=1}^{n}\hat u_i^2}$
+- $\sum_{i=1}^{n}\hat u_i^2$
+- $1 - R^2$
+- $\sqrt{\dfrac{1}{n-1}\sum_{i=1}^{n}(Y_i - \bar Y)^2}$
+EX: **Doğru cevap: $\sqrt{SSR/(n-2)}$.**
+SER, gözlemlerin regresyon doğrusu etrafındaki tipik sapmasını ölçer; $Y$'nin biriminde ifade edilir. $n-2$: iki katsayı ($\hat\beta_0$, $\hat\beta_1$) tahmin edildiği için iki serbestlik derecesi düşülür.
+**Diğer şıklar neden yanlış?**
+• $SSR$: kalıntı kareleri toplamı; bölme ve karekök eksik.
+• $1 - R^2$: açıklanamayan **oran**; birimsiz, standart hata değil.
+• $s_Y$: $Y$'nin kendi standart sapması; regresyonu hiç kullanmıyor.
+
+## Q
+SRC: TB 4.4
+EN: Which of the following statements is correct?
+TR: Aşağıdaki ifadelerden hangisi doğrudur?
++ $TSS = ESS + SSR$
+- $ESS = SSR + TSS$
+- $ESS > TSS$
+- $R^2 = 1 - ESS/TSS$
+EX: **Doğru cevap: $TSS = ESS + SSR$.**
+Toplam varyasyon = açıklanan ($ESS$) + açıklanamayan ($SSR$). Bu ayrıştırma OLS'de her zaman geçerlidir. Buradan $R^2 = ESS/TSS = 1 - SSR/TSS$.
+**Diğer şıklar neden yanlış?**
+• $ESS = SSR + TSS$: parça bütünden büyük olamaz.
+• $ESS > TSS$: aynı sebep; $ESS \le TSS$.
+• $1 - ESS/TSS$: bu $SSR/TSS$, yani $1 - R^2$. Doğru formülde $SSR$ olmalı: $R^2 = 1 - SSR/TSS$.
+
+## Q
+SRC: TB 4.15
+EN: The regression $R^2$ is a measure of:
+TR: Regresyon $R^2$'si neyin ölçüsüdür?
++ how well the regression line fits the data (goodness of fit)
+- whether or not $X$ causes $Y$
+- whether or not $ESS > TSS$
+- the square root of the correlation coefficient
+EX: **Doğru cevap: goodness of fit.**
+$R^2$, $Y$'deki varyasyonun ne kadarının $X$ ile açıklandığını gösterir; doğrunun veriye uyumunu ölçer.
+**Diğer şıklar neden yanlış?**
+• causality: yüksek $R^2$ nedenselliği kanıtlamaz; düşük $R^2$ da nedenselliği dışlamaz.
+• $ESS > TSS$: bu hiçbir zaman olmaz.
+• "square root of correlation": tersi; basit regresyonda $R^2$ korelasyonun **karesidir**: $R^2 = r_{XY}^2$.
+
+## Q
+SRC: TB 4.25
+EN: You multiply the dependent variable by 100 and the regressor by 100,000 and re-estimate the regression. Which of the following stays the same?
+TR: Bağımlı değişkeni 100 ile, açıklayıcı değişkeni 100.000 ile çarpıp regresyonu yeniden tahmin ediyorsun. Aşağıdakilerden hangisi aynı kalır?
++ the regression $R^2$
+- the OLS estimate of the slope
+- the OLS estimate of the intercept
+- the variance of the OLS estimators
+EX: **Doğru cevap: $R^2$.**
+$Y$'yi 100 ile çarpınca $ESS$ ve $TSS$ ikisi de $100^2$ ile çarpılır, oranları değişmez. $X$'in ölçeği ise uyumu hiç değiştirmez. $R^2$ **birimsizdir**.
+**Diğer şıklar neden yanlış?**
+• slope: $\hat\beta_1 = s_{XY}/s_X^2$, $100/100{,}000$ ile çarpılır, yani 1000'e bölünür.
+• intercept: $Y$'nin birimindedir, 100 ile çarpılır.
+• variances: katsayılar değişince varyansları da değişir.
+
+## Q
+SRC: TB 4.33
+EN: All of the following statements are true EXCEPT:
+TR: Aşağıdaki ifadelerin hepsi doğrudur, BİRİ HARİÇ:
++ $SSR = \sum_{i=1}^{n}(\hat Y_i - \bar Y)^2$
+- $R^2 = ESS/TSS$
+- $R^2 = 1 - SSR/TSS$
+- in the simple regression, $R^2 = r_{XY}^2$
+EX: **Doğru cevap (yanlış ifade): $SSR = \sum(\hat Y_i - \bar Y)^2$.**
+Bu formül **ESS**'nin (açıklanan kareler toplamı) formülüdür. Doğrusu $SSR = \sum \hat u_i^2 = \sum (Y_i - \hat Y_i)^2$.
+**Diğer ifadeler doğru:**
+• $R^2 = ESS/TSS$: tanım.
+• $R^2 = 1 - SSR/TSS$: $TSS = ESS + SSR$'den gelir.
+• basit regresyonda $R^2$, $X$ ile $Y$ arasındaki örneklem korelasyonunun karesine eşittir.
+
+## Q
+SRC: TB 4.34
+EN: A low regression $R^2$ means that:
+TR: Düşük bir regresyon $R^2$'si ne anlama gelir?
++ there are other important factors that influence the dependent variable
+- the regression is bad and should be thrown away
+- the regression tells you what the other factors influencing $Y$ are
+- the SSR is small relative to the total variation in $Y$
+EX: **Doğru cevap: other important factors influence $Y$.**
+Düşük $R^2$: $X$, $Y$'nin varyasyonunun sadece küçük bir kısmını açıklıyor; geri kalanı hata terimindeki diğer faktörlerden geliyor. Örnek: test puanı–STR regresyonunda $R^2 = 0.051$, yani gelir, aile yapısı gibi birçok faktör var.
+**Diğer şıklar neden yanlış?**
+• "bad regression": düşük $R^2$ ile de $\beta_1$ güvenilir ve nedensel olarak tahmin edilebilir. $R^2$ ve eğimin geçerliliği farklı sorular.
+• "tells you the other factors": regresyon onların **ne** olduğunu söylemez, sadece var olduklarını gösterir.
+• "SSR small": tersi; düşük $R^2$, $SSR$'nin $TSS$'ye göre **büyük** olduğu anlamına gelir.
 
 --- LESSON u5e | E(u|X) | En küçük kareler varsayımları
 
@@ -712,6 +1088,63 @@ Anakütleden rastgele seçilen her birim için hem $X$ hem $Y$ ölçülür. Seç
 • "$u_i$ normal": normallik varsayımı ayrı ve temel üç varsayım arasında değil.
 • "$X_i$ not random": rastgele örneklemede hem $X$ hem $Y$ rassaldır.
 
+## Q
+SRC: TB 4.6
+EN: The following are all least squares assumptions EXCEPT:
+TR: Aşağıdakilerin hepsi en küçük kareler varsayımlarıdır, BİRİ HARİÇ:
++ The regressor $X$ is normally distributed.
+- The conditional distribution of $u_i$ given $X_i$ has a mean of zero.
+- $(X_i, Y_i)$, $i = 1,\dots,n$, are independently and identically distributed.
+- Large outliers are unlikely.
+EX: **Doğru cevap (varsayım değil): $X$ normally distributed.**
+Üç en küçük kareler varsayımı:
+1. $E(u_i \mid X_i) = 0$,
+2. $(X_i, Y_i)$ i.i.d.,
+3. büyük aykırı değerler olası değil ($X$ ve $Y$'nin sonlu dördüncü momenti var).
+$X$'in herhangi bir dağılıma, normale bile uyması gerekmez.
+**Diğer üç şık** bu listenin kendisi.
+
+## Q
+SRC: TB 4.23
+EN: The assumption $E(u_i \mid X_i) = 0$ says that:
+TR: $E(u_i \mid X_i) = 0$ varsayımı ne der?
++ the conditional distribution of the error, given the regressor, has a mean of zero
+- dividing the error by the regressor gives zero on average
+- the sample residuals are unrelated to the regressor
+- the sample mean of the $X$s is much larger than the sample mean of the errors
+EX: **Doğru cevap: conditional mean of $u$ given $X$ is zero.**
+$X$'in hangi değerine bakarsan bak, o değerdeki hataların ortalaması sıfır. Yani diğer faktörler (hata terimi) $X$ ile sistematik olarak ilişkili değil. Bu varsayım $\hat\beta_1$'i yansız yapar.
+**Diğer şıklar neden yanlış?**
+• "dividing": "|" işareti bölme değil, koşul.
+• sample residuals: varsayım **popülasyon** hataları hakkındadır. Örneklem kalıntıları OLS'nin yapısı gereği her zaman $X$ ile ilişkisizdir.
+• "sample mean of Xs": alakasız.
+
+## Q
+SRC: TB 4.35
+EN: All of the following assumptions are required for the OLS slope estimate to represent a causal effect EXCEPT:
+TR: OLS eğim tahmininin nedensel bir etkiyi temsil etmesi için aşağıdaki varsayımların hepsi gereklidir, BİRİ HARİÇ:
++ the regression $R^2$ is high
+- $E(u_i \mid X_i) = 0$
+- $(X_i, Y_i)$, $i = 1,\dots,n$, are i.i.d.
+- $X$ and $Y$ have finite fourth moments (large outliers are unlikely)
+EX: **Doğru cevap (gerekli değil): high $R^2$.**
+Nedensellik için üç en küçük kareler varsayımı gerekir: $E(u\mid X)=0$, i.i.d., sonlu dördüncü moment. $R^2$'nin yüksek olması gerekmez. Düşük $R^2$ ile de $\beta_1$ tutarlı ve nedensel olabilir; yüksek $R^2$ da nedenselliği garanti etmez.
+**Diğer üç şık** gerekli varsayımlardır.
+
+## Q
+SRC: TB 5.33
+EN: In the California school data set, class size was:
+TR: California okul veri setinde sınıf büyüklüğü nasıl belirlenmişti?
++ not randomly assigned
+- most likely as if randomly assigned
+- assigned in such a way that $E(u \mid X) = 0$ holds
+- randomly assigned, since the data set is a random sample of districts
+EX: **Doğru cevap: not randomly assigned.**
+Sınıf büyüklüğünü bölgeler kendi kaynaklarına göre seçer. Zengin bölgeler hem daha küçük sınıflara sahip hem de diğer avantajları (aile geliri, kaynaklar) var. Bu faktörler hata teriminde olduğu için $E(u\mid X) = 0$ şüphelidir. Kitap bu yüzden çoklu regresyona geçer.
+**Diğer şıklar neden yanlış?**
+• "as if randomly assigned" / $E(u\mid X)=0$: yukarıdaki sebeplerle inandırıcı değil.
+• "random sample": bölgelerin rastgele örneklenmesi (i.i.d.) ile sınıf büyüklüğünün rastgele **atanması** farklı şeyler. İlki örnekleme yöntemidir, ikincisi deney tasarımı.
+
 --- LESSON u5f | ~ | OLS'nin örnekleme dağılımı
 
 ## CARD β̂ de rassal
@@ -808,4 +1241,66 @@ Kural (Hafta 4'ten): tahminci yansızsa ve varyansı $n\to\infty$ iken sıfıra 
 • "Equal to $\beta_1$": herhangi bir örneklemde tam eşitlik yok; sadece büyük örneklemde çok yakın.
 
 ## GEN seScale
+
+## Q
+SRC: TB 4.7
+EN: OLS estimators have a sampling distribution because:
+TR: OLS tahmincilerinin bir örnekleme dağılımı vardır, çünkü:
++ the values of the regressor and of the error term differ from one sample to the next
+- economics is not a precise science
+- individuals respond differently to incentives
+- in real life you usually get to draw many samples
+EX: **Doğru cevap: $X$ and $u$ differ across samples.**
+Her rastgele örneklemde farklı gözlemler (farklı $X_i$ ve $u_i$) gelir, bu yüzden $\hat\beta_0$ ve $\hat\beta_1$ örneklemden örnekleme değişir. Bu değişkenliğin dağılımına örnekleme dağılımı denir.
+**Diğer şıklar neden yanlış?**
+• "not precise science" ve "incentives": felsefi yorumlar; örnekleme dağılımının istatistiksel sebebi değil.
+• "many samples": tam tersi; pratikte genellikle **tek** örneklemimiz olur. Örnekleme dağılımı, çekebileceğimiz tüm olası örneklemler üzerinden tanımlanır.
+
+## Q
+SRC: TB 4.14
+EN: Other things equal, the slope estimator $\hat\beta_1$ has a smaller standard error if:
+TR: Diğer her şey sabitken, eğim tahmincisi $\hat\beta_1$'in standart hatası hangi durumda daha küçüktür?
++ there is more variation in the regressor $X$
+- the variance of the error term $u$ is larger
+- the sample size is smaller
+- the intercept $\beta_0$ is small
+EX: **Doğru cevap: more variation in $X$.**
+$\text{var}(\hat\beta_1) \approx \dfrac{\sigma_u^2}{n\,\sigma_X^2}$. $X$ ne kadar geniş bir aralıkta yayılırsa eğimi o kadar kesin tahmin edersin. Sezgi: birbirinden uzak noktalardan geçen bir doğrunun eğimini belirlemek, üst üste yığılmış noktalardan geçen doğrununkinden kolaydır.
+**Diğer şıklar neden yanlış?**
+• larger error variance: payda; SE'yi **artırır**.
+• smaller $n$: $n$ paydada; küçük $n$ SE'yi **artırır**.
+• intercept: $\beta_0$'ın büyüklüğü eğimin kesinliğini etkilemez.
+
+## Q
+SRC: TB 4.18
+EN: The large-sample normal approximation to the sampling distribution of $\hat\beta_1$ is powerful because:
+TR: $\hat\beta_1$'in örnekleme dağılımına büyük örneklem normal yaklaşımı neden güçlü bir araçtır?
++ it allows econometricians to develop methods for statistical inference (tests and confidence intervals)
+- many regressors in real life are normally distributed
+- many other distributions are not symmetric
+- it implies that OLS is BLUE
+EX: **Doğru cevap: it allows statistical inference.**
+$\hat\beta_1 \approx N(\beta_1, \sigma^2_{\hat\beta_1})$ bilgisi sayesinde $t$ istatistiği hesaplar, $|t| > 1.96$ ile test yapar ve $\hat\beta_1 \pm 1.96\,SE$ ile güven aralığı kurarız. Üstelik bu, $Y$ ve $X$'in dağılımı ne olursa olsun geçerlidir (MLT).
+**Diğer şıklar neden yanlış?**
+• "regressors are normal": $X$'in normal olması gerekmez; yaklaşımın gücü de buradan gelir.
+• "other distributions not symmetric": bir sebep değil.
+• BLUE: Gauss–Markov teoremi ek varsayımlar (homoskedastisite) ister; normallikle ilgisi yok.
+
+## Q
+SRC: TB 4.19
+EN: If the three least squares assumptions hold, then in large samples $\hat\beta_1$ is distributed as:
+TR: Üç en küçük kareler varsayımı sağlanıyorsa büyük örneklemde $\hat\beta_1$ nasıl dağılır?
++ $N\!\left(\beta_1,\ \dfrac{1}{n}\dfrac{\text{var}[(X_i - \mu_X)u_i]}{[\text{var}(X_i)]^2}\right)$
+- $N\!\left(0,\ \dfrac{1}{n}\dfrac{\text{var}[(X_i - \mu_X)u_i]}{[\text{var}(X_i)]^2}\right)$
+- $N\!\left(\beta_1,\ \dfrac{\text{var}[(X_i - \mu_X)u_i]}{[\text{var}(X_i)]^2}\right)$
+- $N\!\left(\beta_1,\ \dfrac{1}{n}\dfrac{\text{var}[(X_i - \mu_X)u_i]}{\text{var}(X_i)}\right)$
+EX: **Doğru cevap: ortalama $\beta_1$, varyans $\frac1n \frac{\text{var}[(X-\mu_X)u]}{[\text{var}(X)]^2}$.**
+• Ortalama $\beta_1$: OLS yansızdır.
+• $1/n$: $n$ büyüdükçe varyans 0'a gider (tutarlılık).
+• Payda $[\text{var}(X)]^2$: $X$'te yayılım arttıkça varyans hızla küçülür.
+**Diğer şıklar neden yanlış?**
+• ortalama 0: bu, $\hat\beta_1 - \beta_1$'in dağılımı olurdu.
+• $1/n$ yok: varyans örneklem büyüdükçe küçülmezdi; tutarlılık olmazdı.
+• paydada kare yok: birimler tutmaz.
+
 `);

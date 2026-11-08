@@ -175,6 +175,137 @@ Sonuç: $\text{var}(\hat p) = p(1-p)/n$.
 
 ## GEN estimator
 
+## Q
+SRC: TB 3.1
+EN: An estimator is:
+TR: Tahminci (estimator) nedir?
++ a random variable
+- an estimate
+- a formula that always gives the true population value
+- a nonrandom number
+EX: **Doğru cevap: a random variable.**
+Tahminci, örneklem verisinin bir fonksiyonudur (örneğin $\bar Y = \frac1n\sum Y_i$). Örneklem rastgele çekildiği için tahminci de **rassal değişkendir** ve bir örnekleme dağılımı vardır.
+**Diğer şıklar neden yanlış?**
+• "an estimate": tahmin (estimate), tahmincinin belirli bir örneklemde aldığı **sayısal değerdir**. İkisi farklı kavramlar.
+• "always gives the true value": hiçbir tahminci gerçek değeri her zaman tam vermez.
+• "nonrandom number": bu tahminin (estimate) tanımı.
+
+## Q
+SRC: TB 3.2
+EN: An estimate is:
+TR: Tahmin (estimate) nedir?
++ a nonrandom number
+- efficient if it has the smallest possible variance
+- unbiased if its expected value equals the population value
+- another word for estimator
+EX: **Doğru cevap: a nonrandom number.**
+Tahmin, tahmincinin **elindeki örneklemde** hesaplanan değeridir (örneğin $\bar y = 12.4$). Hesaplandıktan sonra sabit bir sayıdır.
+**Diğer şıklar neden yanlış?**
+• efficient / unbiased: yansızlık ve etkinlik **tahmincinin** (rassal değişken) özellikleridir; tek bir sayının beklenen değeri ya da varyansı olmaz.
+• "another word for estimator": tahminci = formül (rassal), tahmin = sayı (sabit).
+
+## Q
+SRC: TB 3.3
+EN: An estimator $\hat\mu_Y$ of the population mean $\mu_Y$ is unbiased if:
+TR: Popülasyon ortalaması $\mu_Y$'nin bir tahmincisi $\hat\mu_Y$ ne zaman yansızdır?
++ $E(\hat\mu_Y) = \mu_Y$
+- $\hat\mu_Y = \mu_Y$ in every sample
+- $\hat\mu_Y$ has the smallest variance of all estimators
+- $\hat\mu_Y \xrightarrow{p} \mu_Y$
+EX: **Doğru cevap: $E(\hat\mu_Y) = \mu_Y$.**
+Yansızlık: tahmincinin örnekleme dağılımının ortalaması gerçek değere eşittir. Tek tek örneklemlerde yukarı ya da aşağı sapabilir, ama ortalamada doğrudur.
+**Diğer şıklar neden yanlış?**
+• "every sample": bu imkânsız bir istek; rassal bir tahminci her örneklemde tam doğru çıkmaz.
+• smallest variance: bu **etkinlik**.
+• $\xrightarrow{p}$: bu **tutarlılık**.
+
+## Q
+SRC: TB 3.4
+EN: An estimator $\hat\mu_Y$ of $\mu_Y$ is consistent if:
+TR: $\mu_Y$'nin bir tahmincisi $\hat\mu_Y$ ne zaman tutarlıdır?
++ $\hat\mu_Y \xrightarrow{p} \mu_Y$
+- its mean squared error is the smallest possible
+- $\hat\mu_Y$ is normally distributed
+- $E(\hat\mu_Y) - \mu_Y = 0$
+EX: **Doğru cevap: $\hat\mu_Y \xrightarrow{p} \mu_Y$.**
+Tutarlılık: $n$ büyüdükçe tahmincinin gerçek değerin herhangi bir küçük komşuluğunda olma olasılığı 1'e gider (olasılıkta yakınsama).
+**Diğer şıklar neden yanlış?**
+• smallest MSE: bir verimlilik ölçüsü, tutarlılığın tanımı değil.
+• normally distributed: dağılımın şekli tutarlılıkla ilgisizdir.
+• $E(\hat\mu_Y) - \mu_Y = 0$: bu **yansızlık** (sapma = 0).
+
+## Q
+SRC: TB 3.5
+EN: Estimator $\hat\mu_Y$ is more efficient than estimator $\tilde\mu_Y$ if:
+TR: $\hat\mu_Y$ tahmincisi ne zaman $\tilde\mu_Y$ tahmincisinden daha etkindir?
++ both are unbiased and $\text{var}(\hat\mu_Y) < \text{var}(\tilde\mu_Y)$
+- $E(\hat\mu_Y) > E(\tilde\mu_Y)$
+- it has a smaller variance, whether or not it is unbiased
+- its c.d.f. is flatter than the c.d.f. of the other estimator
+EX: **Doğru cevap: both unbiased and smaller variance.**
+Etkinlik karşılaştırması **yansız tahminciler arasında** yapılır. İkisi de ortalamada doğruysa, daha az dağınık olan (küçük varyans) daha iyidir.
+**Diğer şıklar neden yanlış?**
+• $E(\hat\mu) > E(\tilde\mu)$: büyük beklenen değer iyi bir şey değil; önemli olan gerçek değere eşitlik.
+• "smaller variance regardless": "her zaman 5" tahmincisinin varyansı 0 ama yanlı. Yansızlık şartı olmadan varyans karşılaştırması anlamsız.
+• flatter c.d.f.: düz bir CDF daha **geniş** yayılım demektir, yani daha kötü.
+
+## Q
+SRC: TB 3.6
+EN: With i.i.d. sampling, each of the following is true EXCEPT:
+TR: i.i.d. örneklemede aşağıdakilerin hepsi doğrudur, BİRİ HARİÇ:
++ $E(\bar Y) < E(Y)$
+- $E(\bar Y) = \mu_Y$
+- $\text{var}(\bar Y) = \sigma_Y^2/n$
+- $\bar Y$ is a random variable
+EX: **Doğru cevap (yanlış ifade): $E(\bar Y) < E(Y)$.**
+$\bar Y$ yansızdır: $E(\bar Y) = \mu_Y = E(Y)$. Eşittir, küçük değil.
+**Diğer ifadeler doğru:**
+• $E(\bar Y) = \mu_Y$: yansızlık.
+• $\text{var}(\bar Y) = \sigma_Y^2/n$: bağımsızlıktan gelir.
+• $\bar Y$ rassal: her örneklemde farklı çıkar.
+
+## Q
+SRC: TB 3.15
+EN: The following types of statistical inference are used throughout econometrics, with the exception of:
+TR: Aşağıdaki istatistiksel çıkarım türlerinin hepsi ekonometride kullanılır, BİRİ HARİÇ:
++ calibration
+- confidence intervals
+- hypothesis testing
+- estimation
+EX: **Doğru cevap: calibration.**
+Kitaba göre istatistiksel çıkarımın üç aracı: **tahmin** (estimation), **hipotez testi** ve **güven aralığı**. Kalibrasyon, model parametrelerini veriden tahmin etmek yerine elle ayarlamaktır; istatistiksel çıkarım değildir.
+**Diğer üç şık** kitabın saydığı araçların kendisidir.
+
+## Q
+SRC: TB 3.16
+EN: Among all unbiased estimators of $\mu_Y$ that are weighted averages of $Y_1,\dots,Y_n$, the sample average $\bar Y$ is:
+TR: $Y_1,\dots,Y_n$'nin ağırlıklı ortalaması olan tüm yansız tahminciler arasında örneklem ortalaması $\bar Y$:
++ the most efficient estimator of $\mu_Y$
+- the only consistent estimator of $\mu_Y$
+- a number that, by definition, cannot have a variance
+- the "most unbiased" estimator of $\mu_Y$
+EX: **Doğru cevap: the most efficient.**
+$\bar Y$ **BLUE**'dur: doğrusal (ağırlıklı ortalama) ve yansız tahminciler arasında **en küçük varyanslı** olandır. En küçük varyans = en etkin.
+**Diğer şıklar neden yanlış?**
+• "only consistent": başka tutarlı tahminciler de vardır (örneğin medyan, simetrik dağılımlarda).
+• "cannot have a variance": $\bar Y$ rassaldır; varyansı $\sigma_Y^2/n$.
+• "most unbiased": yansızlık var/yok özelliğidir; derecesi olmaz.
+
+## Q
+SRC: TB 3.17
+EN: The least squares estimator of $\mu_Y$ is the value $m$ that minimizes:
+TR: $\mu_Y$'nin en küçük kareler tahmincisi, hangi ifadeyi en küçük yapan $m$ değeridir?
++ $\sum_{i=1}^{n} (Y_i - m)^2$
+- $\sum_{i=1}^{n} (Y_i - m)$
+- $\sum_{i=1}^{n} |Y_i - m|$
+- $\sum_{i=1}^{n} (Y_i - \bar Y)^2$
+EX: **Doğru cevap: $\sum (Y_i - m)^2$.**
+En küçük kareler, tahmin hatalarının **karelerinin toplamını** en küçük yapar. Türev alıp sıfıra eşitlersen $m = \bar Y$ çıkar. Yani $\bar Y$, $\mu_Y$'nin en küçük kareler tahmincisidir.
+**Diğer şıklar neden yanlış?**
+• kare olmadan: pozitif ve negatif hatalar birbirini götürür. $m$'yi sonsuz büyütürsen toplam $-\infty$'a gider; minimum yok.
+• mutlak değer: bu "en küçük mutlak sapmalar" ölçütü ve sonucu **medyan**.
+• $(Y_i - \bar Y)^2$: içinde $m$ yok; $m$'ye göre minimize edilemez.
+
 --- LESSON u4b | H₀ | Hipotez testinin mantığı
 
 ## CARD Sıfır ve alternatif hipotez
@@ -314,6 +445,126 @@ EX: **Doğru cevap:** iki yönlü test.
 • "Test of a Type II error": hata türleri test sonucu yapılan yanlışlardır, test türü değil.
 
 ## GEN hypSetup
+
+## Q
+SRC: TB 3.9
+EN: A type I error is:
+TR: Birinci tip hata nedir?
++ rejecting the null hypothesis when it is true
+- failing to reject the null hypothesis when it is false
+- rejecting the alternative hypothesis when it is true
+- always equal to 5%
+EX: **Doğru cevap: rejecting a true null.**
+Birinci tip hata: $H_0$ aslında doğruyken onu reddetmek. Mahkeme benzetmesi: masum birini mahkûm etmek. Olasılığı testin **anlamlılık düzeyi** (size) $\alpha$'dır.
+**Diğer şıklar neden yanlış?**
+• failing to reject a false null: bu **ikinci tip** hata.
+• "rejecting the alternative": testler $H_0$ üzerine kurulur; bu tanım değil.
+• "always 5%": $\alpha$'yı sen seçersin; %1, %5, %10 olabilir.
+
+## Q
+SRC: TB 3.10
+EN: A type II error is:
+TR: İkinci tip hata nedir?
++ failing to reject the null hypothesis when it is false
+- rejecting the null hypothesis when it is true
+- always smaller than the type I error
+- impossible to compute when the alternative hypothesis contains "="
+EX: **Doğru cevap: not rejecting a false null.**
+İkinci tip hata: $H_0$ yanlışken onu **reddetmemek**. Mahkeme benzetmesi: suçluyu serbest bırakmak. Olasılığı $\beta$; testin gücü $1-\beta$.
+**Diğer şıklar neden yanlış?**
+• rejecting a true null: **birinci tip** hata.
+• "always smaller": iki hata arasında ödünleşim vardır; $\alpha$'yı küçültürsen genelde $\beta$ büyür. Genel bir sıralama yok.
+• "=" in the alternative: alternatif hipotezde zaten eşitlik olmaz ($\ne$, $<$ veya $>$ olur).
+
+## Q
+SRC: TB 3.11
+EN: The size of a test is:
+TR: Bir testin büyüklüğü (size) nedir?
++ the probability of committing a type I error
+- the same as the sample size
+- always equal to one minus the power of the test
+- a number that can exceed 1 in extreme cases
+EX: **Doğru cevap: probability of a type I error.**
+Testin büyüklüğü (size) = anlamlılık düzeyi = $H_0$ doğruyken yanlışlıkla reddetme olasılığı. Örneğin %5'lik testin size'ı 0.05.
+**Diğer şıklar neden yanlış?**
+• sample size: "size" kelimesi benziyor ama örneklem büyüklüğü $n$ tamamen farklı.
+• $1 - \text{power}$: güç $= 1 - \Pr(\text{tip II})$. Size ile güç farklı durumlarda ($H_0$ doğru / yanlış) hesaplanır; böyle bir eşitlik yok.
+• "exceed 1": bir olasılık 1'i geçemez.
+
+## Q
+SRC: TB 3.12
+EN: The power of a test is:
+TR: Bir testin gücü (power) nedir?
++ one minus the probability of committing a type II error
+- one minus the probability of committing a type I error
+- a subjective choice made by the econometrician
+- different depending on whether you compute $t$ or $t^2$
+EX: **Doğru cevap: $1 - \Pr(\text{type II error})$.**
+Güç = $H_0$ yanlışken onu **doğru şekilde reddetme** olasılığı. İkinci tip hata tam tersi (reddetmeme) olduğu için güç $= 1 - \beta$.
+**Diğer şıklar neden yanlış?**
+• $1 - \Pr(\text{tip I})$: bu $H_0$ doğruyken reddetmeme olasılığı ($1-\alpha$); güç değil.
+• subjective: güç; $\alpha$, $n$ ve gerçek parametre değerinden hesaplanır.
+• $t$ veya $t^2$: iki taraflı testte $|t| > 1.96$ ile $t^2 > 3.84$ aynı kararı verir; güç değişmez.
+
+## Q
+SRC: TB 3.13
+EN: You test $H_0: E(Y) = \mu_{Y,0}$ against a two-sided alternative. The alternative is written as:
+TR: $H_0: E(Y) = \mu_{Y,0}$ hipotezini iki taraflı alternatife karşı test ediyorsun. Alternatif nasıl yazılır?
++ $H_1: E(Y) \ne \mu_{Y,0}$
+- $H_1: E(Y) > \mu_{Y,0}$
+- $H_1: E(Y) = \mu_{Y,0}$
+- $H_1: \bar Y \ne \mu_{Y,0}$
+EX: **Doğru cevap: $H_1: E(Y) \ne \mu_{Y,0}$.**
+İki taraflı alternatif, sıfır hipotezinden **her iki yönde** sapmayı kapsar: büyük de olabilir, küçük de. Bu yüzden "$\ne$" kullanılır.
+**Diğer şıklar neden yanlış?**
+• $>$: bu **tek taraflı** (sağ kuyruk) alternatif.
+• $=$: bu sıfır hipotezinin kendisi.
+• $\bar Y \ne \mu_{Y,0}$: tuzak! Hipotezler **popülasyon** parametresi $E(Y)$ hakkındadır. $\bar Y$ örneklemden hesaplanır ve neredeyse her zaman $\mu_{Y,0}$'dan farklı çıkar.
+
+## Q
+SRC: TB 3.24
+EN: The power of a test is the probability that the test:
+TR: Bir testin gücü, testin hangi olasılığıdır?
++ correctly rejects the null hypothesis when the alternative is true
+- incorrectly rejects the null hypothesis when the null is true
+- fails to reject the null hypothesis when the alternative is true
+- gives a p-value below 0.05
+EX: **Doğru cevap: correctly rejects the null when the alternative is true.**
+Güç, gerçek bir farkı **yakalama** yeteneğidir: $\Pr(H_0\text{'ı reddet} \mid H_1 \text{ doğru})$. Örneklem büyüdükçe güç artar.
+**Diğer şıklar neden yanlış?**
+• incorrectly rejects when null is true: bu **birinci tip hata** olasılığı (size).
+• fails to reject when alternative is true: bu **ikinci tip hata** olasılığı ($\beta = 1 - \text{güç}$).
+• p-value below 0.05: bu sadece reddetme kuralı; doğru olan hipotezden bahsetmiyor.
+
+## Q
+SRC: TB 3.36
+EN: How should you choose the size (significance level) of a test?
+TR: Bir testin büyüklüğünü (anlamlılık düzeyini) nasıl seçmelisin?
++ It requires judgment and depends on the application.
+- It should be 5%, because statisticians have always used 5%.
+- It should always be below 5%.
+- It should equal one minus the power of the test.
+EX: **Doğru cevap: it requires judgment.**
+Anlamlılık düzeyi, iki hatanın maliyetine göre seçilir. Yanlış reddetmenin maliyeti çok yüksekse (örneğin zararlı bir ilacı onaylamak) küçük bir $\alpha$ (%1) seçersin. %5 sadece yaygın bir **gelenektir**.
+**Diğer şıklar neden yanlış?**
+• "always 5%": gelenek bir kural değildir.
+• "always below 5%": bazen %10 da makul (örneğin küçük örneklemde güç düşükken).
+• $1 - \text{power}$: böyle bir kural yok.
+
+## Q
+SRC: TB 3.37
+EN: Among all rejections of null hypotheses, the fraction that are incorrect (the null was actually true) is called the:
+TR: Tüm $H_0$ reddetmeleri içinde yanlış olanların (aslında $H_0$ doğruydu) oranına ne denir?
++ false positive rate
+- power of the test
+- false negative rate
+- 5% significance level
+EX: **Doğru cevap: false positive rate.**
+Reddetme = "bir etki bulduk" (pozitif sonuç). $H_0$ aslında doğruysa bu sonuç **yanlış pozitiftir**. Kitap, birçok test yapıldığında reddedilenlerin içinde yanlış pozitiflerin oranının %5'ten çok daha yüksek olabileceği konusunda uyarır.
+**Diğer şıklar neden yanlış?**
+• power: doğru reddetme olasılığı.
+• false negative: yanlış $H_0$'ı reddetmemek (ikinci tip hata).
+• 5% level: bu, $H_0$ doğru olduğunda reddetme olasılığı; **reddedilenler içindeki** oran değil. İkisi farklı paydalara sahip.
 
 --- LESSON u4c | t | t istatistiği, kritik değer, p-değeri
 
@@ -488,6 +739,144 @@ EX: **Doğru cevap:** verilen anlamlılık düzeyinde testin $H_0$'ı **tam redd
 ## GEN tMean
 ## GEN pValue
 
+## Q
+SRC: TB 3.7
+EN: The standard error of $\bar Y$, $SE(\bar Y) = \hat\sigma_{\bar Y}$, is:
+TR: $\bar Y$'nin standart hatası $SE(\bar Y) = \hat\sigma_{\bar Y}$ nedir?
++ $s_Y / \sqrt{n}$
+- $s_Y^2 / n$
+- $\sigma_Y / \sqrt{n}$
+- $s_Y / n$
+EX: **Doğru cevap: $s_Y/\sqrt n$.**
+$\bar Y$'nin gerçek standart sapması $\sigma_Y/\sqrt n$, ama $\sigma_Y$'yi bilmeyiz. Yerine örneklem standart sapması $s_Y$ konur: $SE(\bar Y) = s_Y/\sqrt n$.
+**Diğer şıklar neden yanlış?**
+• $s_Y^2/n$: bu tahmini **varyans**; standart hata onun karekökü.
+• $\sigma_Y/\sqrt n$: gerçek standart sapma, ama $\sigma_Y$ bilinmediği için hesaplanamaz. Standart hata tanım gereği **tahmindir**.
+• $s_Y/n$: karekök unutulmuş.
+
+## Q
+SRC: TB 3.8
+EN: The critical value of a two-sided $t$-test computed from a large sample:
+TR: Büyük örneklemde hesaplanan iki taraflı bir $t$ testinin kritik değeri:
++ is 1.96 if the significance level is 5%
+- is 1.64 if the significance level is 5%
+- cannot be found unless you know the degrees of freedom
+- is the same as the p-value
+EX: **Doğru cevap: 1.96 at 5%.**
+Büyük örneklemde $t$ istatistiği yaklaşık $N(0,1)$. İki taraflı %5 testte her kuyrukta %2.5 kalır ve $\Phi(1.96) = 0.975$. Kural: $|t| > 1.96$ ise reddet.
+**Diğer şıklar neden yanlış?**
+• 1.64: bu **tek taraflı** %5 ya da iki taraflı %10 kritik değeri.
+• degrees of freedom: büyük örneklemde normal yaklaşımı kullanılır; serbestlik derecesi gerekmez.
+• p-value: kritik değer sabit bir eşik, p-değeri veriden hesaplanan bir olasılık.
+
+## Q
+SRC: TB 3.19
+EN: For the test of $H_0: E(Y) = \mu_{Y,0}$ against a two-sided alternative, the p-value is:
+TR: $H_0: E(Y) = \mu_{Y,0}$'ın iki taraflı alternatife karşı testinde p-değeri nedir?
++ $\Pr_{H_0}\left[\,|\bar Y - \mu_{Y,0}| > |\bar Y^{act} - \mu_{Y,0}|\,\right]$
+- $\Pr_{H_0}\left[\,|\bar Y - \mu_{Y,0}| < |\bar Y^{act} - \mu_{Y,0}|\,\right]$
+- always 0.05
+- $\Pr(Z > 1.96)$
+EX: **Doğru cevap: $\Pr_{H_0}[|\bar Y - \mu_{Y,0}| > |\bar Y^{act} - \mu_{Y,0}|]$.**
+$H_0$ doğru varsayılır; rastgele bir örneklemin $\mu_{Y,0}$'dan, **senin bulduğun değer kadar ya da daha fazla** uzaklaşma olasılığı hesaplanır. Mutlak değer iki tarafı birlikte sayar. Büyük örneklemde bu $2\Phi(-|t^{act}|)$'ye eşittir.
+**Diğer şıklar neden yanlış?**
+• "<": daha **az** uç sonuçların olasılığı; tam tersi ($1 - p$).
+• "always 0.05": 0.05 anlamlılık düzeyidir, p-değeri veriden hesaplanır.
+• $\Pr(Z > 1.96) = 0.025$: sabit bir sayı; verine bağlı değil.
+
+## Q
+SRC: TB 3.20
+EN: A large p-value implies that:
+TR: Büyük bir p-değeri ne anlama gelir?
++ the observed value $\bar Y^{act}$ is consistent with the null hypothesis
+- the null hypothesis is rejected
+- the $t$-statistic is large
+- the sample average $\bar Y^{act}$ is large
+EX: **Doğru cevap: consistent with the null.**
+Büyük p-değeri (örneğin 0.40), $H_0$ doğru olsaydı bile bu sonucun **sık sık** görüleceğini söyler. Veri $H_0$ ile uyumludur, yani reddetmek için sebep yok.
+**Diğer şıklar neden yanlış?**
+• rejection: küçük p (örneğin < 0.05) reddettirir; büyük p reddettirmez.
+• large $t$: $|t|$ büyüdükçe p **küçülür**. Büyük p, küçük $|t|$ demektir.
+• large $\bar Y$: önemli olan $\bar Y$'nin $\mu_{Y,0}$'a uzaklığı ve standart hata; $\bar Y$'nin kendi büyüklüğü değil.
+
+## Q
+SRC: TB 3.21
+EN: The sample variance is:
+TR: Örneklem varyansı nedir?
++ $s_Y^2 = \dfrac{1}{n-1}\sum_{i=1}^{n}(Y_i - \bar Y)^2$
+- $s_Y^2 = \dfrac{1}{n-1}\sum_{i=1}^{n}(Y_i - \bar Y)$
+- $s_Y^2 = \dfrac{1}{n}\sum_{i=1}^{n}(Y_i - \mu_Y)^2$
+- $s_Y^2 = \dfrac{1}{n-1}\sum_{i=1}^{n}(Y_i - \mu_Y)^2$
+EX: **Doğru cevap: $\frac{1}{n-1}\sum(Y_i - \bar Y)^2$.**
+• $\mu_Y$ bilinmediği için $\bar Y$ kullanılır.
+• $\bar Y$'yi tahmin etmek bir serbestlik derecesi harcar; $n-1$'e bölmek $s_Y^2$'yi **yansız** yapar.
+**Diğer şıklar neden yanlış?**
+• kare yok: $\sum(Y_i - \bar Y) = 0$, her zaman sıfır çıkar.
+• $\mu_Y$ ile ($1/n$ ya da $1/(n-1)$): $\mu_Y$ bilinmez, hesaplanamaz. (Bilinseydi $1/n$ ile yansız olurdu.)
+
+## Q
+SRC: TB 3.22
+EN: In the formula for the sample variance, "degrees of freedom" refers to the fact that:
+TR: Örneklem varyansı formülünde "serbestlik derecesi" neyi ifade eder?
++ estimating the mean uses up some of the information in the data
+- you have $n-2$ degrees of freedom when you replace the population mean by the sample mean
+- the sample variance always equals the population variance
+- you are free to choose any denominator you like
+EX: **Doğru cevap: estimating the mean uses up information.**
+Sapmaların toplamı her zaman sıfırdır: $\sum (Y_i - \bar Y) = 0$. İlk $n-1$ sapmayı bilirsen sonuncusu kendiliğinden belli olur. Yani $\bar Y$'yi tahmin etmek bir gözlemlik bilgi harcar, geriye $n-1$ serbest sapma kalır.
+**Diğer şıklar neden yanlış?**
+• $n-2$: tek ortalama tahmin edilince $n-1$ olur. $n-2$ **regresyonda** iki katsayı ($\beta_0$, $\beta_1$) tahmin edildiğinde çıkar (SER formülü).
+• "always equals": $s_Y^2$ bir tahmindir, örneklemden örnekleme değişir.
+• "any denominator": payda $n-1$ seçilir ki tahminci yansız olsun.
+
+## Q
+SRC: TB 3.23
+EN: The $t$-statistic for testing $H_0: E(Y) = \mu_{Y,0}$ is:
+TR: $H_0: E(Y) = \mu_{Y,0}$'ı test eden $t$ istatistiği nedir?
++ $t = \dfrac{\bar Y - \mu_{Y,0}}{SE(\bar Y)}$
+- $t = \dfrac{\bar Y - \mu_{Y,0}}{s_Y}$
+- $t = \dfrac{\mu_{Y,0} - SE(\bar Y)}{\bar Y}$
+- $t = 1.96$
+EX: **Doğru cevap: $(\bar Y - \mu_{Y,0})/SE(\bar Y)$.**
+$t$ istatistiği, tahminin hipotezdeki değerden **kaç standart hata** uzakta olduğunu ölçer. $SE(\bar Y) = s_Y/\sqrt n$.
+**Diğer şıklar neden yanlış?**
+• $s_Y$'ye bölmek: tek bir gözlemin yayılımına bölmüş olursun; $\bar Y$'nin yayılımı $s_Y/\sqrt n$. $n$ büyüdükçe test güçlenmez.
+• karışık formül: anlamsız.
+• 1.96: kritik değer, istatistik değil.
+
+## Q
+SRC: TB 3.28
+EN: The $t$-statistic for the mean, $t = (\bar Y - \mu_{Y,0})/SE(\bar Y)$, has:
+TR: Ortalama için $t$ istatistiği $t = (\bar Y - \mu_{Y,0})/SE(\bar Y)$ hangi dağılıma sahiptir?
++ a Student $t$ distribution with $n-1$ degrees of freedom if $Y$ is normally distributed
+- a Student $t$ distribution with $n-1$ degrees of freedom whatever the distribution of $Y$
+- a standard normal distribution when $n < 15$
+- a standard normal distribution if the sample standard deviation goes to zero
+EX: **Doğru cevap: Student $t_{n-1}$ if $Y$ is normal.**
+$Y_i$'ler i.i.d. **normal** ise $t$ istatistiği, her $n$ için tam olarak $t_{n-1}$ dağılır. $Y$ normal değilse kesin sonuç yoktur; ama $n$ büyükken MLT sayesinde yaklaşık $N(0,1)$ olur.
+**Diğer şıklar neden yanlış?**
+• "whatever the distribution": normallik şartı olmadan kesin $t$ sonucu yoktur.
+• $n<15$: tam tersi; normal yaklaşımı **büyük** $n$'de işe yarar.
+• "$s \to 0$": anlamsız bir koşul.
+
+## Q
+SRC: TB 3.38
+EN: Suppose the $t$-statistic lies on the side of the alternative hypothesis. Compared with the p-value for a two-sided alternative, the p-value for a one-sided alternative is:
+TR: $t$ istatistiğinin alternatif hipotezin tarafında olduğunu varsay. İki taraflı alternatifin p-değerine göre tek taraflı alternatifin p-değeri nedir?
++ half as large
+- twice as large
+- always 5%
+- always the same as the power of the test
+EX: **Doğru cevap: half as large.**
+• İki taraflı: $p = \Pr(|Z| > |t^{act}|) = 2\Phi(-|t^{act}|)$, yani iki kuyruk.
+• Tek taraflı (örneğin $H_1: \mu > \mu_0$, $t^{act} > 0$): $p = \Pr(Z > t^{act}) = \Phi(-t^{act})$, yani tek kuyruk.
+Tek taraflı p-değeri iki taraflının **yarısıdır**. Örnek: $t = 1.80$ için iki taraflı p ≈ 0.072, tek taraflı p ≈ 0.036.
+==Not:== Test bankasının cevap anahtarında "twice" (iki katı) işaretlenmiş; bu bir anahtar hatası. Kitapta iki taraflı p-değeri tek taraflının iki katıdır, tersi değil.
+**Diğer şıklar neden yanlış?**
+• twice: ilişki ters çevrilmiş.
+• 5%: p-değeri veriden hesaplanır.
+• power: güç ayrı bir kavram ($H_1$ doğruyken reddetme olasılığı).
+
 --- LESSON u4d | [ ] | Güven aralığı
 
 ## CARD %95 güven aralığı
@@ -620,6 +1009,21 @@ Oran için standart hata: $SE(\hat p) = \sqrt{\hat p(1-\hat p)/n}$
 ## GEN ciProp
 ## GEN ciTest
 
+## Q
+SRC: TB 3.26
+EN: When the sample size $n$ is large, the 90% confidence interval for $\mu_Y$ is:
+TR: Örneklem büyüklüğü $n$ büyükken $\mu_Y$ için %90 güven aralığı nedir?
++ $\bar Y \pm 1.64\,SE(\bar Y)$
+- $\bar Y \pm 1.96\,SE(\bar Y)$
+- $\bar Y \pm 1.64\,s_Y$
+- $\bar Y \pm 1.96$
+EX: **Doğru cevap: $\bar Y \pm 1.64\,SE(\bar Y)$.**
+Üç kritik değeri ezberle: %90 → 1.64, %95 → 1.96, %99 → 2.58. %90 aralıkta her kuyrukta %5 kalır ve $\Phi(1.64) \approx 0.95$.
+**Diğer şıklar neden yanlış?**
+• 1.96: bu **%95** aralık.
+• $s_Y$ ile: tek gözlemin yayılımı kullanılmış; ortalamanın belirsizliği $SE(\bar Y) = s_Y/\sqrt n$.
+• $\pm 1.96$: standart hata unutulmuş; aralığın genişliği verinin ölçeğinden bağımsız olamaz.
+
 --- LESSON u4e | Δ | İki ortalamanın farkı
 
 ## CARD Fark testi
@@ -703,4 +1107,50 @@ EX: **Doğru cevap: $\sqrt{s^2_m/n_m + s^2_w/n_w}$.**
 • $(s_m - s_w)/\dots$: standart sapmaların farkı anlamsız; iki grubun yayılımı aynıysa SE sıfır çıkardı.
 
 ## GEN diffMeans
+
+## Q
+SRC: TB 3.27
+EN: Two populations, men ($m$) and women ($w$), may have different variances. The standard error of $\bar Y_m - \bar Y_w$ is:
+TR: Erkekler ($m$) ve kadınlar ($w$) popülasyonlarının varyansları farklı olabilir. $\bar Y_m - \bar Y_w$'nin standart hatası nedir?
++ $\sqrt{\dfrac{s_m^2}{n_m} + \dfrac{s_w^2}{n_w}}$
+- $\dfrac{s_m^2}{n_m} + \dfrac{s_w^2}{n_w}$
+- $\sqrt{\dfrac{s_m^2}{n_m} - \dfrac{s_w^2}{n_w}}$
+- $\dfrac{s_m}{\sqrt{n_m}} + \dfrac{s_w}{\sqrt{n_w}}$
+EX: **Doğru cevap: $\sqrt{s_m^2/n_m + s_w^2/n_w}$.**
+İki örneklem bağımsız olduğu için $\text{var}(\bar Y_m - \bar Y_w) = \text{var}(\bar Y_m) + \text{var}(\bar Y_w) = \sigma_m^2/n_m + \sigma_w^2/n_w$. Varyanslar örneklem varyanslarıyla tahmin edilir ve karekök alınır.
+**Diğer şıklar neden yanlış?**
+• karekök yok: bu varyans, standart hata değil.
+• eksi işareti: farkın varyansında da varyanslar **toplanır** ($\text{var}(A - B) = \text{var}(A) + \text{var}(B)$, bağımsızsa).
+• standart hataları toplamak: standart sapmalar toplanmaz; varyanslar toplanır, sonra kök alınır.
+
+## Q
+SRC: TB 3.31
+EN: For the difference in means you compute $t = \dfrac{\bar Y_m - \bar Y_w}{SE(\bar Y_m - \bar Y_w)}$ with $SE(\bar Y_m - \bar Y_w) = \sqrt{s_m^2/n_m + s_w^2/n_w}$. This $t$-statistic has:
+TR: Ortalamalar farkı için $t = \dfrac{\bar Y_m - \bar Y_w}{SE(\bar Y_m - \bar Y_w)}$ hesaplıyorsun; burada $SE = \sqrt{s_m^2/n_m + s_w^2/n_w}$. Bu $t$ istatistiğinin dağılımı nedir?
++ approximately a standard normal distribution when both samples are large
+- an exact Student $t$ distribution whenever $Y$ is normally distributed in both groups
+- a normal distribution even in very small samples
+- no distribution, because it cannot be computed unless $n_m = n_w$
+EX: **Doğru cevap: approximately standard normal in large samples.**
+MLT sayesinde iki örneklem de büyükken bu $t$ istatistiği yaklaşık $N(0,1)$ dağılır; büyük örneklemde $|t| > 1.96$ kuralı geçerlidir.
+**Diğer şıklar neden yanlış?**
+• "exact Student $t$ whenever normal": kitap (Bölüm 3.6) açıkça uyarır: bu **havuzlanmamış** SE ile, popülasyonlar normal olsa bile $t$ istatistiği tam Student $t$ dağılmaz. Kesin $t$ için ayrıca **eşit varyans** ve **havuzlanmış (pooled)** SE gerekir. ==Not:== Test bankasının anahtarı bu şıkkı doğru sayıyor; kitabın metniyle çelişiyor.
+• "even in small samples": küçük örneklemde normal yaklaşımı garanti değil.
+• "$n_m = n_w$": formül farklı örneklem büyüklükleriyle de çalışır.
+
+## Q
+SRC: TB 3.32
+EN: When testing for a difference in means, you can base inference on the Student $t$ distribution:
+TR: Ortalamalar farkını test ederken çıkarımı Student $t$ dağılımına ne zaman dayandırabilirsin?
++ if $Y$ is normal in both groups, the two groups have the same variance, and you use the pooled standard error
+- in general, without any extra conditions
+- only if both samples are very large
+- if you use the $\chi^2$ distribution with $n_m + n_w - 2$ degrees of freedom
+EX: **Doğru cevap: normal + equal variances + pooled SE.**
+Bu üç şart sağlanırsa havuzlanmış $t$ istatistiği tam olarak $t_{n_m + n_w - 2}$ dağılır. Şartlar pratikte nadiren sağlandığı için kitap büyük örneklemde normal yaklaşımını ve havuzlanmamış SE'yi önerir.
+**Diğer şıklar neden yanlış?**
+• "in general": şartlar olmadan kesin $t$ yok.
+• "very large samples": büyük örneklemde zaten **normal** dağılımı kullanırız; $t$'ye gerek kalmaz.
+• $\chi^2$: farkın testi için değil; $n_m + n_w - 2$ serbestlik derecesi havuzlanmış $t$'nindir.
+
 `);

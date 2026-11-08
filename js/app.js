@@ -128,8 +128,8 @@
     return out;
   }
   function lessonQueue(L) {
-    const st = shuffle(L.qs.map(q => q.id)), gens = L.gens.map(g => 'g:' + g);
-    const target = 9, nSt = gens.length ? Math.min(st.length, 6) : st.length;
+    const st = wpick(L.qs.map(q => q.id), L.qs.length), gens = L.gens.map(g => 'g:' + g);
+    const target = 9, nSt = Math.min(st.length, gens.length ? 6 : 10);
     const picks = st.slice(0, nSt);
     for (let k = 0; picks.length < target && gens.length && k < gens.length * 2; k++) picks.push(gens[k % gens.length]);
     return shuffle(picks);
@@ -141,6 +141,9 @@
     const nG = Math.min(gens.length, Math.round(n * 0.4));
     return shuffle([...wpick(gens, nG), ...wpick(st, n - nG)]);
   }
+
+  const TB_IDS = Object.keys(QBY).filter(id => /^TB /.test(QBY[id].src));
+  const tbSeen = () => TB_IDS.filter(id => S.q[id]).length;
 
   /* ---------- kabuk ---------- */
   const TABS = [['yol', 'Patika', I.path], ['sinav', 'Deneme', I.exam], ['hatalar', 'Hatalarım', I.mist], ['formuller', 'Formüller', I.sigma], ['tablolar', 'Tablolar', I.table], ['hesap', 'Hesap', I.calc]];
@@ -190,7 +193,8 @@
     const mc = Object.keys(S.mist).length;
     $('#aside').innerHTML = readinessHTML() + goalHTML() +
       `<div class="panel"><h3>Deneme sınavı</h3><p>Gerçek sınav gibi 40 soru. Puanın 100 üzerinden hesaplanır.</p><button class="btn block" data-act="exam">${S.run ? 'Yarım kalan sınava dön' : 'Sınavı başlat'}</button></div>` +
-      `<div class="panel"><h3>Hatalarım</h3><p>${mc ? mc + ' soru tekrar bekliyor.' : 'Yanlış yaptığın sorular burada birikir.'}</p><button class="btn ghost block" data-act="mist" ${mc ? '' : 'disabled'}>Hataları çalış</button></div>`;
+      `<div class="panel"><h3>Hatalarım</h3><p>${mc ? mc + ' soru tekrar bekliyor.' : 'Yanlış yaptığın sorular burada birikir.'}</p><button class="btn ghost block" data-act="mist" ${mc ? '' : 'disabled'}>Hataları çalış</button></div>` +
+      `<div class="panel"><h3>Test bankası</h3><p>Stock & Watson test bankasının 1–5. bölümlerinden ${TB_IDS.length} soru. Görmediklerin ve yanlış yaptıkların önce gelir.</p><p class="num"><small>${tbSeen()} / ${TB_IDS.length} soru görüldü</small></p><button class="btn ghost block" data-act="tb">Test bankası çöz</button></div>`;
     bindActs($('#aside'));
   }
   function bindActs(el) {
@@ -198,6 +202,7 @@
       const a = b.dataset.act;
       if (a === 'exam') startExam();
       else if (a === 'mist') startMist();
+      else if (a === 'tb') startTB();
       else if (a === 'next') { const n = nextLesson(); n ? openLessonIntro(n) : startPractice(weakestUnit()); }
     }));
   }
@@ -239,6 +244,7 @@
       <div class="btnrow" style="margin-top:16px"><button class="btn" data-act="exam">${S.run ? 'Yarım kalan sınava dön' : 'Sınavı başlat'}</button></div></section>
       <div class="panel"><h3>Soru dağılımı</h3><div class="tbl"><table><thead><tr><th>Konu</th><th>Soru</th></tr></thead><tbody>${wt}</tbody></table></div>
       <p>Her denemede sorular değişir. Sayısal soruların yarısı her seferinde yeni sayılarla üretilir.</p></div>
+      ${`<div class="panel"><h3>Test bankası</h3><p>Stock & Watson test bankasının 1–5. bölümlerinden ${TB_IDS.length} soru. Görmediklerin ve yanlış yaptıkların önce gelir.</p><p class="num"><small>${tbSeen()} / ${TB_IDS.length} soru görüldü</small></p><button class="btn ghost block" data-act="tb">Test bankası çöz</button></div>`}
       <div class="panel"><h3>Geçmiş denemeler</h3>${ex.length ? '<div class="rows">' + ex.map(e => `<div class="row"><div><b class="num">${e.score} puan</b> <small>· ${e.c}/40 doğru · ${fmtTime(e.dur)}</small><br><small>${new Date(e.at).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })}</small></div><span class="pill ${e.score >= 60 ? 'ok' : 'bad'}">${e.score >= 60 ? 'hedefte' : 'hedef altı'}</span></div>`).join('') + '</div>' : '<p>Henüz deneme çözmedin. Ünitelerin yarısını bitirince bir deneme çözmek iyi fikir.</p>'}</div></div>`;
   }
 
@@ -366,6 +372,11 @@
     P = { mode: 'practice', id: u, title: UNIT[u].title + ' · tekrar', items, i: 0, nq: items.length, right: 0, firstRight: 0, xp: 0, wrong: 0 };
     playerShell(); renderStep();
   }
+  function startTB() {
+    const items = wpick(TB_IDS, 10).map(id => ({ type: 'q', q: inst(id), first: true }));
+    P = { mode: 'tb', id: 'tb', title: 'Test bankası', items, i: 0, nq: items.length, right: 0, firstRight: 0, xp: 0, wrong: 0 };
+    playerShell(); renderStep();
+  }
   function startMist() {
     const ids = Object.keys(S.mist).sort((a, b) => S.mist[b].n - S.mist[a].n || S.mist[b].t - S.mist[a].t).slice(0, 10);
     if (!ids.length) { toast('Hata listen boş'); return; }
@@ -388,7 +399,7 @@
   function qHTML(q, opts) {
     opts = opts || {};
     const tr = S.set.tr;
-    const body = `<div class="qmeta">${q.gen ? '<span class="pill">Yeni üretilmiş soru</span>' : ''}${q.src ? `<span class="pill mark">${esc(q.src.replace(/^PS(\d)/, 'Problem Set $1').replace(/ Q(\d+)([a-z]?)/, ' · Soru $1$2'))} benzeri</span>` : ''}
+    const body = `<div class="qmeta">${q.gen ? '<span class="pill">Yeni üretilmiş soru</span>' : ''}${q.src ? `<span class="pill mark">${esc(/^TB /.test(q.src) ? q.src.replace(/^TB (\d+)\.(\d+)/, 'Test bankası · Böl. $1 Soru $2') : q.src.replace(/^PS(\d)/, 'Problem Set $1').replace(/ Q(\d+)([a-z]?)/, ' · Soru $1$2') + ' benzeri')}</span>` : ''}
         <span class="eyebrow">${esc(SHORT[q.unit])}</span><span style="flex:1"></span><button class="trbtn" id="trb" aria-pressed="${tr}">Türkçe</button></div>
       <div class="qstem prose">${md(q.en)}</div>
       <div class="qtr" id="qtr" ${tr ? '' : 'hidden'}>${md(q.tr)}</div>
@@ -532,7 +543,7 @@
     const acc = P.nq ? P.firstRight / P.nq : 0;
     let bonus = 0;
     if (P.mode === 'lesson') { const s = S.les[P.id] || { n: 0, best: 0 }; s.n++; s.best = Math.max(s.best || 0, acc); S.les[P.id] = s; bonus = 20; }
-    else if (P.mode === 'practice') bonus = 15; else bonus = 10;
+    else if (P.mode === 'practice' || P.mode === 'tb') bonus = 15; else bonus = 10;
     addXP(bonus); P.xp += bonus; save();
     const pts = [[20, 112], [48, 96], [70, 102], [98, 78], [124, 84], [150, 60], [178, 64], [204, 42], [232, 36], [258, 22]];
     const msg = acc >= 0.85 ? 'Bu konu sende.' : acc >= 0.6 ? 'İyi gidiyor. Yanlışlar Hatalarım listesinde.' : 'Bu konuyu bir kez daha çöz, ikinci turda oturur.';
@@ -548,7 +559,7 @@
       <div class="p-foot"><div class="p-foot-in"><div class="btnrow" style="justify-content:center">${P.mode === 'lesson' && nl ? `<button class="btn" id="f-next">Sonraki ders: ${esc(LESSON[nl].title)}</button>` : ''}<button class="btn ghost" id="f-again">Tekrar çöz</button><button class="btn ghost" id="f-home">Patikaya dön</button></div></div></div>`;
     const mode = P.mode, id = P.id;
     $('#p-x').onclick = closePlayer; $('#f-home').onclick = closePlayer;
-    $('#f-again').onclick = () => { mode === 'lesson' ? startLesson(id, true) : mode === 'practice' ? startPractice(id) : startMist(); };
+    $('#f-again').onclick = () => { mode === 'lesson' ? startLesson(id, true) : mode === 'practice' ? startPractice(id) : mode === 'tb' ? startTB() : startMist(); };
     const fn = $('#f-next'); if (fn) fn.onclick = () => startLesson(nl, false);
     P.key = null;
   }

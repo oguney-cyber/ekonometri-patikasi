@@ -187,6 +187,42 @@ Sayıyla: $c = 2$, $n = 3$ ise $2\times2\times2 = 8 = 2^3$.
 ## GEN sumLinear
 ## GEN sumSquares
 
+## Q
+SRC: TB 2.31
+EN: $\sum_{i=1}^{n} (aX_i + bY_i + c)$ equals:
+TR: $\sum_{i=1}^{n} (aX_i + bY_i + c)$ neye eşittir?
++ $a\sum_{i=1}^{n} X_i + b\sum_{i=1}^{n} Y_i + nc$
+- $a\sum_{i=1}^{n} X_i + b\sum_{i=1}^{n} Y_i + c$
+- $a + b + nc$
+- $a\sum_{i=1}^{n} X_i + b\sum_{i=1}^{n} Y_i$
+EX: **Doğru cevap: $a\sum X_i + b\sum Y_i + nc$.**
+Üç kural:
+1. Toplam dağılır: $\sum (A_i + B_i + C) = \sum A_i + \sum B_i + \sum C$.
+2. Sabit çarpan dışarı çıkar: $\sum aX_i = a\sum X_i$.
+3. Sabitin toplamı: $\sum_{i=1}^{n} c = c + c + \dots + c = nc$.
+**Diğer şıklar neden yanlış?**
+• "$+ c$": en sık hata. $c$ her terimde var, $n$ kez toplanır; $nc$ olmalı.
+• "$a + b + nc$": $X_i$ ve $Y_i$ kaybolmuş.
+• "$c$ yok": sabit terim unutulmuş.
+
+## Q
+SRC: TB 2.32
+EN: $\sum_{i=1}^{n} (aX_i + b)$ equals:
+TR: $\sum_{i=1}^{n} (aX_i + b)$ neye eşittir?
++ $na\bar X + nb$
+- $n(a + b)$
+- $\bar X + nb$
+- $na\bar X$
+EX: **Doğru cevap: $na\bar X + nb$.**
+1. Dağıt: $\sum (aX_i + b) = a\sum X_i + \sum b$.
+2. Ortalama tanımı $\bar X = \frac{1}{n}\sum X_i$ olduğu için $\sum X_i = n\bar X$.
+3. $\sum_{i=1}^{n} b = nb$.
+Sonuç: $a \cdot n\bar X + nb = na\bar X + nb$.
+**Diğer şıklar neden yanlış?**
+• $n(a+b)$: $X$ kaybolmuş, sanki her $X_i = 1$.
+• $\bar X + nb$: $na$ çarpanı unutulmuş.
+• $na\bar X$: sabit $b$'nin toplamı ($nb$) unutulmuş.
+
 --- LESSON u0b | [ ] | Vektör ve matris
 
 ## CARD Vektör ve matris nedir?

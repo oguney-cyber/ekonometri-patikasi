@@ -192,6 +192,109 @@ Latince bir ifade. Nedensel etkinin ikinci tanımı budur: sadece $X$ değişse,
 • "in the long run": zamanla ilgisi yok.
 • "with random sampling": rastgele örneklem bir veri toplama yöntemi. Ceteris paribus'un anlamı değil.
 
+## Q
+SRC: TB 1.5
+EN: Each of the following describes econometrics EXCEPT:
+TR: Aşağıdakilerin hepsi ekonometriyi tanımlar, BİRİ HARİÇ:
++ ranking economists by their height
+- the science of testing economic theories with data
+- fitting mathematical economic models to real-world data
+- a set of tools for forecasting future values of economic variables
+EX: **Doğru cevap: ranking economists by their height.**
+Bu bir şaka şıkkı; ekonometriyle ilgisi yok. Kitap ekonometriyi üç şekilde tanımlar: ekonomik teoriyi test etme bilimi, ekonomik modelleri gerçek veriye uydurma, ve ekonomik değişkenlerin gelecekteki değerlerini tahmin (forecast) etme araçları.
+**Diğer üç şık** kitaptaki tanımın kendisi, o yüzden "hariç" olamazlar.
+
+## Q
+SRC: TB 1.6
+EN: To give a numerical answer to a policy question (for example, "by how much will smoking fall if cigarette taxes rise by 20%?"), you should:
+TR: Bir politika sorusuna sayısal cevap vermek için (örneğin "sigara vergisi %20 artarsa sigara içimi ne kadar azalır?") ne yapmalısın?
++ examine empirical evidence, that is, data
+- rely on common sense
+- interview the policy makers involved
+- give up, because policy questions cannot be quantified
+EX: **Doğru cevap: examine empirical evidence.**
+"Ne kadar azalır?" sorusunun cevabı bir sayıdır ve bu sayı ancak **veriden** (ampirik kanıt) ölçülür. Ekonometrinin işi tam olarak budur.
+**Diğer şıklar neden yanlış?**
+• common sense: sağduyu en fazla yönü söyler ("azalır"), büyüklüğü söylemez.
+• interview policy makers: onların görüşü ölçüm değildir.
+• "cannot be quantified": yanlış; ekonometri bu tür soruları sayısallaştırmak için var.
+
+## Q
+SRC: TB 1.7
+EN: Which of the following is an example of a randomized controlled experiment?
+TR: Aşağıdakilerden hangisi randomize kontrollü deneye örnektir?
++ Fifth graders in one school are randomly split into two groups; one group may use computers in class and the other may not, and their end-of-year scores are compared.
+- Households receive a tax rebate in one year but not in the next.
+- One state raises its minimum wage while a neighbouring state does not, and employment in the two states is compared.
+- Researchers "control" for random variables by holding other factors constant.
+EX: **Doğru cevap: rastgele ikiye bölünen 5. sınıf öğrencileri.**
+Randomize kontrollü deneyin iki şartı:
+1. **Rastgele atama**: kimin tedavi (bilgisayar) alacağına yazı-tura gibi rastgele karar verilir.
+2. **Kontrol grubu**: tedavi almayan bir grup vardır ve sonuçlar karşılaştırılır.
+Bu şıkta ikisi de var.
+**Diğer şıklar neden yanlış?**
+• tax rebate one year: kontrol grubu yok, sadece zaman içinde değişim var; o yıl başka şeyler de değişmiş olabilir.
+• two neighbouring states: eyalet asgari ücreti kendi seçti, rastgele atanmadı. Bu bir doğal deney ya da gözlemsel karşılaştırma.
+• "control for random variables": anlamsız bir ifade; deney tanımı değil.
+
+## Q
+SRC: TB 1.8
+EN: Ideal randomized controlled experiments are useful in econometrics mainly because they:
+TR: İdeal randomize kontrollü deneyler ekonometride esas olarak neden faydalıdır?
++ provide a definition of a causal effect
+- are carried out very often in practice
+- are what central banks use to study monetary policy
+- are used by universities to decide who graduates in four years
+EX: **Doğru cevap: provide a definition of a causal effect.**
+Kitapta nedensel etki, **ideal randomize kontrollü deneyde ölçülecek etki** olarak tanımlanır. Gerçekte bu deneyi yapamasak bile "ideal deneyde ne olurdu?" sorusu neyi ölçmeye çalıştığımızı netleştirir.
+**Diğer şıklar neden yanlış?**
+• "very often in practice": ekonomide ideal deneyler nadirdir.
+• central banks: merkez bankası faizi rastgele belirlemez.
+• graduation: alakasız.
+
+## Q
+SRC: TB 1.10
+EN: A main advantage of econometrics over economic theory alone is that econometrics:
+TR: Ekonometrinin tek başına ekonomik teoriye göre temel avantajı nedir?
++ can give the size of an effect, not just its direction (positive or negative)
+- teaches you how to use statistical software
+- teaches you how to invert a 4×4 matrix
+- all of the above
+EX: **Doğru cevap: can give the size of an effect, not just its direction.**
+Teori genellikle sadece **yönü** söyler: "vergi artarsa sigara içimi azalır". Ekonometri **ne kadar** azaldığını sayıyla verir: "vergi %10 artarsa tüketim yaklaşık %4 azalır."
+**Diğer şıklar neden yanlış?**
+• software ve matrix inversion: bunlar araç; ekonometrinin teoriye göre avantajı değil.
+• all of the above: diğer iki şık yanlış olduğu için bu da yanlış.
+
+## Q
+SRC: TB 1.11
+EN: In a randomized controlled experiment:
+TR: Randomize kontrollü bir deneyde:
++ subjects are randomly divided into a treatment group and a control group
+- you correct for the fact that computer random numbers are not truly random
+- you control for subjects who answer questions randomly
+- the control group is treated only on even-numbered days
+EX: **Doğru cevap: random division into treatment and control groups.**
+"Randomized" = kimin hangi gruba gireceği rastgele belirlenir. "Controlled" = tedavi almayan bir **kontrol grubu** vardır. İki grubun sonuçları karşılaştırılır.
+**Diğer şıklar neden yanlış?**
+• random numbers / random answers: "control" kelimesiyle oynayan saçma şıklar.
+• "even-numbered days": kontrol grubu hiç tedavi almaz.
+
+## Q
+SRC: TB 1.12
+EN: Economists use experimental data less often than they would like. All of the following are valid reasons EXCEPT:
+TR: Ekonomistler deney verisini istedikleri kadar sık kullanamaz. Aşağıdakilerin hepsi geçerli sebeplerdir, BİRİ HARİÇ:
++ experiments are impossible to carry out in economics
+- experiments with human beings are hard to administer
+- some experiments would be unethical
+- real experiments have flaws compared with ideal randomized experiments, for example people drop out
+EX: **Doğru cevap: experiments are impossible in economics.**
+Bu yanlış bir iddia: ekonomide deneyler yapılır, örneğin Tennessee STAR sınıf büyüklüğü deneyi. Deneyler **zordur**, ama **imkânsız** değildir.
+**Diğer üç şık geçerli sebeplerdir:**
+• insanlarla deney yapmak zor ve pahalı;
+• bazı deneyler etik değil (örneğin insanları rastgele sigara içmeye zorlamak);
+• gerçek deneylerde katılımcılar ayrılır, kurala uymaz; ideal deneyden sapar.
+
 --- LESSON u1b | ▦ | Veri türleri
 
 ## CARD Deneysel veri ve gözlemsel veri
@@ -311,6 +414,110 @@ Panel data = longitudinal data. İkisi de aynı birimlerin (kişi, firma, ülke)
 **Diğer şıklar neden yanlış?** Kesit (tek dönem), zaman serisi (tek birim) ve deneysel (toplama yöntemi) farklı kavramlar.
 
 ## GEN dataType
+
+## Q
+SRC: TB 1.1
+EN: A researcher compares the unemployment rates of all U.S. states, all measured in the same single month. This is an example of:
+TR: Bir araştırmacı ABD'deki tüm eyaletlerin işsizlik oranlarını karşılaştırıyor; hepsi aynı tek ayda ölçülmüş. Bu hangi veri türüne örnektir?
++ cross-sectional data
+- time series data
+- panel data
+- experimental data
+EX: **Doğru cevap: cross-sectional data (kesit verisi).**
+Çok sayıda birim (50 eyalet) var ama hepsi **tek bir zaman noktasında** (aynı ay) gözlenmiş. Çok birim + tek dönem = kesit verisi.
+**Diğer şıklar neden yanlış?**
+• time series: tek bir birimin (örneğin sadece Teksas'ın) birçok dönem boyunca izlenmesi.
+• panel: aynı birimlerin birçok dönem boyunca izlenmesi (çok birim + çok dönem).
+• experimental: araştırmacının rastgele atama yaptığı deney verisi. Burada sadece gözlem var.
+
+## Q
+SRC: TB 1.2
+EN: Tracking the U.S. inflation rate every year from 1970 to 2006 uses:
+TR: ABD enflasyon oranını 1970'ten 2006'ya kadar her yıl izlemek hangi veri türünü kullanır?
++ time series data
+- panel data
+- cross-sectional data
+- data from a randomized controlled experiment
+EX: **Doğru cevap: time series data (zaman serisi).**
+Tek bir birim (ABD) var ve bu birim **birçok dönem** (1970–2006, her yıl) boyunca gözleniyor. Tek birim + çok dönem = zaman serisi.
+**Diğer şıklar neden yanlış?**
+• panel: birçok birim (örneğin birçok ülke) birçok yıl izlenseydi panel olurdu.
+• cross-sectional: birçok birim tek bir dönemde gözlenseydi kesit olurdu.
+• randomized experiment: kimse enflasyonu rastgele atamıyor; bu gözlemsel veri.
+
+## Q
+SRC: TB 1.3
+EN: You study how changes in the minimum wage affected teenage employment, using data on the 48 contiguous U.S. states for every year from 1980 to 2004. The data set is:
+TR: Asgari ücret değişikliklerinin genç istihdamına etkisini, ABD'nin 48 bitişik eyaletinin 1980–2004 arasındaki her yılına ait verilerle inceliyorsun. Veri seti hangi türdür?
++ panel data
+- time series data
+- cross-sectional data
+- an experiment with a treatment and a control group, because only teenagers earn the minimum wage
+EX: **Doğru cevap: panel data.**
+48 birim (eyalet) × 25 yıl. **Aynı birimler birçok dönem boyunca** gözleniyor. Çok birim + çok dönem = panel (longitudinal) veri.
+**Diğer şıklar neden yanlış?**
+• time series: tek bir eyalet olsaydı zaman serisi olurdu.
+• cross-sectional: tek bir yıl olsaydı kesit olurdu.
+• experiment: eyaletler asgari ücreti rastgele atanarak almıyor. "Sadece gençler asgari ücret alır" demek, bir tedavi ve kontrol grubu oluşturmaz.
+
+## Q
+SRC: TB 1.4
+EN: Which statement about panel data is correct?
+TR: Panel veri hakkında hangi ifade doğrudur?
++ It is also called longitudinal data.
+- It is just another name for time series data.
+- It observes many people at one single point in time.
+- It always comes with a treatment group and a control group.
+EX: **Doğru cevap: It is also called longitudinal data.**
+Panel veri = aynı birimlerin (kişi, firma, eyalet) **birden çok dönem** boyunca izlenmesi. Kitapta diğer adı **longitudinal data** (boylamsal veri).
+**Diğer şıklar neden yanlış?**
+• "another name for time series": zaman serisi tek birimdir. Panelde birçok birim vardır.
+• "many people at one point in time": bu kesit verisinin tanımı.
+• "treatment and control group": bu deneylerin özelliği. Panel veri genelde gözlemseldir.
+
+## Q
+SRC: TB 1.9
+EN: Most economic data are collected by:
+TR: Ekonomik verilerin çoğu nasıl elde edilir?
++ observing real-world behavior (observational data)
+- running randomized controlled experiments
+- calibrating economic models
+- using small textbook examples with about ten observations
+EX: **Doğru cevap: observing real-world behavior.**
+Ekonomik verilerin büyük çoğunluğu **gözlemsel** veridir: anketler, resmi kayıtlar, piyasa fiyatları. İnsanların gerçek hayatta ne yaptığı kaydedilir, araştırmacı kimseye "tedavi" atamaz.
+**Diğer şıklar neden yanlış?**
+• randomized experiments: ekonomide nadirdir; pahalı, yönetmesi zor, bazen etik değil.
+• calibration: bir veri toplama yöntemi değil, model parametrelerini ayarlama tekniği.
+• "ten observations": ders kitabı örnekleri veri kaynağı değildir.
+
+## Q
+SRC: TB 1.13
+EN: According to the textbook, which type of data is used most often in econometrics?
+TR: Ders kitabına göre ekonometride en sık kullanılan veri türü hangisidir?
++ cross-sectional data
+- randomly generated (simulated) data
+- time series data
+- panel data
+EX: **Doğru cevap: cross-sectional data.**
+Kitabın vurguladığı gibi ekonometride en sık kesit verisi kullanılır: belirli bir anda birçok kişi, firma, okul bölgesi. Örnek: 420 California okul bölgesi (test puanı ve sınıf büyüklüğü).
+**Diğer şıklar neden yanlış?**
+• simulated data: bilgisayarda üretilen veri; yöntemleri test etmek için kullanılır, ana kaynak değildir.
+• time series ve panel: önemli ve yaygın, ama kitaba göre en sık kullanılan değil.
+
+## Q
+SRC: TB 1.14
+EN: A scatterplot shows, for 65 countries, average real GDP growth over 1960–1995 (vertical axis) against the average trade share over the same period (horizontal axis). Each country appears exactly once. These data are:
+TR: Bir serpilme grafiği 65 ülke için 1960–1995 dönemi ortalama reel GSYH büyümesini (dikey eksen) aynı dönemin ortalama ticaret payına (yatay eksen) karşı gösteriyor. Her ülke tam bir kez görünüyor. Bu veri hangi türdür?
++ cross-sectional data
+- a time series
+- panel (longitudinal) data
+- experimental data
+EX: **Doğru cevap: cross-sectional data.**
+Tuzak: soru "1960–1995" diyor, bu yüzden zaman serisi ya da panel sanılabilir. Ama değerler **dönem ortalaması** ve her ülke **tek bir nokta**. Yani her birim için tek gözlem var: 65 ülke, tek "dönem". Bu kesit verisidir.
+**Diğer şıklar neden yanlış?**
+• time series: tek ülke, çok yıl olsaydı.
+• panel: her ülke için her yıl ayrı bir nokta olsaydı (65 × 36 nokta).
+• experimental: ülkelere ticaret payı rastgele atanmıyor.
 
 --- LESSON u1c | Ŷ | Kestirim, tahmin ve öngörü
 

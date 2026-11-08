@@ -160,6 +160,66 @@ Normal dağılımın doğrusal dönüşümü yine normaldir. Sonuç: $N(0,1)$.
 
 ## GEN normalProb
 
+## Q
+SRC: TB 2.16
+EN: To standardize a random variable, you:
+TR: Bir rassal değişkeni standartlaştırmak için ne yaparsın?
++ subtract its mean and divide by its standard deviation
+- subtract its mean and divide by its variance
+- add and subtract 1.96 times its standard deviation
+- divide it by its standard deviation, but only if its mean is 1
+EX: **Doğru cevap: subtract the mean, divide by the standard deviation.**
+$Z = (Y - \mu_Y)/\sigma_Y$. Ortalamayı çıkarınca merkez 0'a kayar, standart sapmaya bölünce yayılım 1 olur. Normal tablosunu kullanmadan önce yapılan adım budur.
+**Diğer şıklar neden yanlış?**
+• varyansa bölmek: sık hata. Varyansa bölersen standart sapma $1/\sigma_Y$ olur, 1 değil (birimler de tutmaz).
+• ±1.96 sd: bu güven aralığı ya da %95 aralığı kurmak, standartlaştırma değil.
+• "only if mean is 1": anlamsız koşul; ortalama her zaman çıkarılır.
+
+## Q
+SRC: TB 2.17
+EN: $Y \sim N(\mu, \sigma^2)$. The probability that $Y$ falls within 1.96 standard deviations of its mean (from $\mu - 1.96\sigma$ to $\mu + 1.96\sigma$) is:
+TR: $Y \sim N(\mu, \sigma^2)$. $Y$'nin ortalamasının 1.96 standart sapma yakınına ($\mu - 1.96\sigma$ ile $\mu + 1.96\sigma$ arasına) düşme olasılığı nedir?
++ 0.95
+- 0.05
+- 0.67
+- 0.33
+EX: **Doğru cevap: 0.95.**
+$\Pr(-1.96 \le Z \le 1.96) = \Phi(1.96) - \Phi(-1.96) = 0.975 - 0.025 = 0.95$. %95 güven aralığında 1.96 kullanmamızın sebebi budur.
+**Diğer şıklar neden yanlış?**
+• 0.05: aralığın **dışında** kalma olasılığı (iki kuyruğun toplamı).
+• 0.67 / 0.33: ±1 standart sapma için içerisi yaklaşık 0.68, dışarısı 0.32. 1.96 için değil.
+
+## Q
+SRC: TB 2.18
+EN: $Y \sim N(\mu, \sigma^2)$ and $c_1 < c_2$. Let $d_i = (c_i - \mu)/\sigma$. Then $\Pr(c_1 \le Y \le c_2)$ equals:
+TR: $Y \sim N(\mu, \sigma^2)$ ve $c_1 < c_2$. $d_i = (c_i - \mu)/\sigma$ olsun. $\Pr(c_1 \le Y \le c_2)$ neye eşittir?
++ $\Phi(d_2) - \Phi(d_1)$
+- $\Phi(d_1) - \Phi(d_2)$
+- $\Phi(d_2) - (1 - \Phi(d_1))$
+- $1 - (\Phi(d_2) - \Phi(d_1))$
+EX: **Doğru cevap: $\Phi(d_2) - \Phi(d_1)$.**
+1. Standartlaştır: $\Pr(c_1\le Y\le c_2) = \Pr(d_1 \le Z \le d_2)$.
+2. $\Phi(d_2)$ = $d_2$'nin solundaki tüm alan. Bundan $d_1$'in solundaki alanı ($\Phi(d_1)$) çıkarınca arada kalan alan kalır.
+**Diğer şıklar neden yanlış?**
+• $\Phi(d_1) - \Phi(d_2)$: negatif çıkar, çünkü $d_1 < d_2$.
+• $1 - \Phi(d_1)$ çıkarmak: bu $d_1$'in **sağındaki** alan; formül karışmış.
+• $1 - (\dots)$: bu aralığın **dışında** kalma olasılığı.
+
+## Q
+SRC: TB 2.19
+EN: Variables that have a joint (multivariate) normal distribution all have zero covariances with each other. Then:
+TR: Ortak (çok değişkenli) normal dağılıma sahip değişkenlerin birbirleriyle kovaryansları sıfır. O zaman:
++ the variables are independent
+- their correlation is usually zero, but need not be
+- you must use the $\chi^2$ distribution to compute probabilities
+- the marginal distribution of each variable is no longer normal
+EX: **Doğru cevap: the variables are independent.**
+Genel kural: bağımsızlık ⇒ kovaryans 0, ama tersi her zaman doğru **değil**. **İstisna**: değişkenler ortak normal dağılıyorsa kovaryans 0 ⇒ bağımsız. Bu, normal dağılımın özel bir özelliğidir.
+**Diğer şıklar neden yanlış?**
+• "correlation need not be zero": kovaryans 0 ise korelasyon tanım gereği 0.
+• $\chi^2$: kare toplamları için kullanılır; burada gerek yok.
+• "no longer normal": ortak normalin her marjinali her zaman normaldir.
+
 --- LESSON u3b | χ² | Ki-kare, t ve F dağılımları
 
 ## CARD Ki-kare (χ²)
@@ -341,6 +401,36 @@ Neden kalın kuyruk? Paydadaki $\sqrt{W/m}$ rastgele; bazen küçük çıkar ve 
 ## GEN chiF
 ## GEN chiMoments
 
+## Q
+SRC: TB 2.20
+EN: The Student $t$ distribution with $m$ degrees of freedom is the distribution of:
+TR: $m$ serbestlik dereceli Student $t$ dağılımı neyin dağılımıdır?
++ $Z / \sqrt{W/m}$, where $Z \sim N(0,1)$ and $W \sim \chi^2_m$ are independent
+- $\sum_{i=1}^{m} Z_i^2$, for independent standard normals $Z_i$
+- $W/m$, where $W \sim \chi^2_m$
+- $(W_1/m)/(W_2/n)$, for independent chi-squared variables $W_1 \sim \chi^2_m$ and $W_2 \sim \chi^2_n$
+EX: **Doğru cevap: $Z/\sqrt{W/m}$.**
+$t_m$ = standart normal ÷ $\sqrt{\chi^2_m/m}$, pay ve payda bağımsız. Paydadaki belirsizlik kuyrukları normalden kalın yapar; $m$ büyüdükçe $W/m \to 1$ ve $t_m$ normale yaklaşır.
+**Diğer şıklar neden yanlış?**
+• $\sum Z_i^2$: bu $\chi^2_m$ dağılımı.
+• $W/m$: bu $F_{m,\infty}$ dağılımı.
+• iki ki-karenin oranı: bu $F_{m,n}$ dağılımı.
+
+## Q
+SRC: TB 2.21
+EN: When the degrees of freedom go to infinity, the Student $t$ distribution:
+TR: Serbestlik derecesi sonsuza giderken Student $t$ dağılımı:
++ becomes the standard normal distribution
+- can no longer be calculated
+- is bell-shaped like the normal, but keeps fatter tails
+- becomes the $\chi^2$ distribution
+EX: **Doğru cevap: becomes the standard normal.**
+$t_m = Z/\sqrt{W/m}$ ve $m \to \infty$ iken $W/m \to 1$, yani $t_m \to Z$. $t$ tablosunun $\infty$ satırında %5 iki taraflı kritik değer tam 1.96'dır. Büyük örneklemde normal kritik değerleri kullanmamızın sebebi budur.
+**Diğer şıklar neden yanlış?**
+• "cannot be calculated": limit gayet iyi tanımlı.
+• "fatter tails": kalın kuyruk **küçük** serbestlik derecesinin özelliğidir; sonsuzda kaybolur.
+• $\chi^2$: $\chi^2$ sağa çarpık ve sadece pozitif değer alır; $t$ ise simetriktir.
+
 --- LESSON u3c | Ȳ | Rastgele örnekleme ve Ȳ'nın dağılımı
 
 ## CARD Basit rastgele örneklem ve i.i.d.
@@ -464,6 +554,68 @@ Sezgi: daha çok gözlem = daha çok bilgi = tahminde daha az belirsizlik. Bu, $
 
 ## GEN ybarVar
 ## GEN ybarProb
+
+## Q
+SRC: TB 2.22
+EN: The sample average $\bar Y$ is a random variable and:
+TR: Örneklem ortalaması $\bar Y$ bir rassal değişkendir ve:
++ it has a probability distribution called its sampling distribution
+- it is a single number, so it cannot have a distribution
+- its distribution is always the standard normal
+- its distribution is identical to the distribution of each $Y_i$
+EX: **Doğru cevap: it has a sampling distribution.**
+Her yeni örneklemde farklı $Y_i$'ler gelir, bu yüzden $\bar Y$ de değişir. $\bar Y$'nin olası örneklemler boyunca aldığı değerlerin dağılımına **örnekleme dağılımı** denir.
+**Diğer şıklar neden yanlış?**
+• "single number": elindeki **tahmin** (hesaplanan değer) tek sayıdır; ama örneklem çekilmeden önce $\bar Y$ rassaldır.
+• "always standard normal": büyük örneklemde yaklaşık $N(\mu_Y, \sigma_Y^2/n)$ olur; standart normal değil, ve küçük örneklemde normal olmayabilir.
+• "same as each $Y_i$": $\bar Y$'nin varyansı $\sigma_Y^2/n$, yani $Y_i$'den çok daha dar.
+
+## Q
+SRC: TB 2.23
+EN: To learn the political views of students at your university, you want a simple random sample of 150 students. Which method gives one?
+TR: Üniversitendeki öğrencilerin siyasi görüşlerini öğrenmek için 150 öğrencilik basit rastgele örneklem istiyorsun. Hangi yöntem bunu sağlar?
++ Let a computer draw 150 random numbers between 1 and the number of students, and pick the matching names from the student list.
+- Make sure the share of minority students in the sample matches the share in the whole student body.
+- Call every 50th name in the student directory at 9 a.m.; if nobody answers, call the next name.
+- Interview students at random in the main dining hall.
+EX: **Doğru cevap: bilgisayarla rastgele 150 numara çekmek.**
+Basit rastgele örneklem: popülasyondaki **her birimin seçilme olasılığı eşit** ve seçimler birbirinden bağımsız. Tüm öğrenci listesinden rastgele numara çekmek tam olarak budur.
+**Diğer şıklar neden yanlış?**
+• azınlık oranını eşitlemek: bu **tabakalı** örneklem; basit rastgele değil.
+• sabah 9'da arama: o saatte evde olmayan (derste, işte) öğrenciler sistematik olarak dışarıda kalır; seçim yanlılığı.
+• yemekhane: yemekhaneye gitmeyenler hiç seçilemez; herkesin şansı eşit değil.
+
+## Q
+SRC: TB 2.24
+EN: With i.i.d. sampling, the variance of the sample average, $\sigma_{\bar Y}^2$, is:
+TR: i.i.d. örneklemede örneklem ortalamasının varyansı $\sigma_{\bar Y}^2$ nedir?
++ $\sigma_Y^2 / n$
+- $\sigma_Y^2$
+- $\sigma_Y / \sqrt{n}$
+- $\sigma_Y^2 / (n-1)$
+EX: **Doğru cevap: $\sigma_Y^2/n$.**
+$$\text{var}(\bar Y) = \frac{1}{n^2}\,\text{var}\Big(\sum Y_i\Big) = \frac{1}{n^2}\cdot n\sigma_Y^2 = \frac{\sigma_Y^2}{n}$$
+(Bağımsızlık sayesinde kovaryans terimleri 0.)
+**Diğer şıklar neden yanlış?**
+• $\sigma_Y^2$: tek bir gözlemin varyansı; ortalama almak varyansı küçültür.
+• $\sigma_Y/\sqrt n$: bu **standart sapma** $\sigma_{\bar Y}$, varyans değil.
+• $n-1$: $n-1$ örneklem varyansı $s_Y^2$'nin paydasında çıkar; buraya ait değil.
+
+## Q
+SRC: TB 2.25
+EN: The mean of the sample average, $E(\bar Y)$, is:
+TR: Örneklem ortalamasının beklenen değeri $E(\bar Y)$ nedir?
++ $\mu_Y$
+- $\mu_Y / n$
+- $\sigma_Y^2 / n$
+- $\mu_Y$, but only when $n > 30$
+EX: **Doğru cevap: $\mu_Y$.**
+$$E(\bar Y) = \frac{1}{n}\sum_{i=1}^n E(Y_i) = \frac{1}{n}\cdot n\mu_Y = \mu_Y$$
+Yani $\bar Y$, $\mu_Y$'nin **yansız** tahmincisidir; bu her $n$ için geçerlidir.
+**Diğer şıklar neden yanlış?**
+• $\mu_Y/n$: $n$'ler birbirini götürür, kalan $\mu_Y$.
+• $\sigma_Y^2/n$: bu $\bar Y$'nin **varyansı**.
+• "only when $n>30$": yansızlık her örneklem büyüklüğünde geçerlidir. $n > 30$ kuralı normale yaklaşma (MLT) ile ilgili bir kaba kuraldır.
 
 --- LESSON u3d | ⟿ | Büyük sayılar yasası ve merkezi limit teoremi
 
@@ -629,6 +781,65 @@ Ders: aralığı 10 kat daraltmak için $n$ 100 kat büyümeli ($n$, genişliği
 ## GEN cltBern
 ## GEN cltCount
 
+## Q
+SRC: TB 2.26
+EN: Econometricians usually rely on large-sample (asymptotic) distributions instead of exact sampling distributions because:
+TR: Ekonometristler genelde tam (kesin) örnekleme dağılımları yerine büyük örneklem (asimptotik) dağılımlarına güvenir, çünkü:
++ asymptotic distributions give good approximations for the sample sizes usually available
+- we effectively have an infinite number of observations
+- economic variables are usually normally distributed
+- the covariances between $Y_i$ and $Y_j$ are usually not zero
+EX: **Doğru cevap: asymptotic distributions are good approximations.**
+Kesin örnekleme dağılımı $Y$'nin popülasyon dağılımına bağlıdır ve onu genelde bilmeyiz. Büyük örneklemde ise MLT sayesinde dağılım ne olursa olsun yaklaşık normal elde ederiz. Elimizdeki tipik örneklem büyüklükleri için bu yaklaşım yeterince iyidir.
+**Diğer şıklar neden yanlış?**
+• "infinite observations": hiçbir zaman sonsuz gözlemimiz yok; asimptotik dağılım bir **yaklaşımdır**.
+• "variables are normal": çoğu ekonomik değişken (gelir, servet) normal değildir; asimptotiğe zaten bu yüzden ihtiyaç var.
+• covariances not zero: i.i.d. örneklemede kovaryanslar sıfırdır; ilgisiz.
+
+## Q
+SRC: TB 2.27
+EN: Each of the following describes the consistency of $\bar Y$ EXCEPT:
+TR: Aşağıdakilerin hepsi $\bar Y$'nin tutarlılığını (consistency) tarif eder, BİRİ HARİÇ:
++ $\bar Y$ has the smallest variance of all estimators
+- $\bar Y$ converges in probability to $\mu_Y$
+- $\Pr(|\bar Y - \mu_Y| > c) \to 0$ as $n \to \infty$, for every $c > 0$
+- for any $c > 0$, the probability that $\bar Y$ lies in $\mu_Y \pm c$ gets arbitrarily close to 1 as $n$ grows
+EX: **Doğru cevap: smallest variance of all estimators.**
+"En küçük varyans" **etkinlik** (efficiency) özelliğidir, tutarlılık değil.
+**Diğer üç şık aynı şeyi söyler** (büyük sayılar yasası):
+• $\bar Y \xrightarrow{p} \mu_Y$ (olasılıkta yakınsama);
+• $\mu_Y$'den $c$'den fazla uzak olma olasılığı 0'a gider;
+• $\mu_Y \pm c$ aralığında olma olasılığı 1'e gider (önceki şıkkın tümleyeni).
+
+## Q
+SRC: TB 2.28
+EN: The central limit theorem states that:
+TR: Merkezi limit teoremi ne der?
++ the sampling distribution of $(\bar Y - \mu_Y)/\sigma_{\bar Y}$ is approximately $N(0,1)$ when $n$ is large
+- $\bar Y$ converges in probability to $\mu_Y$
+- the probability that $\bar Y$ lies in $\mu_Y \pm c$ gets arbitrarily close to 1 as $n$ grows
+- the $t$ distribution converges to the $F$ distribution for $n > 30$
+EX: **Doğru cevap: standartlaştırılmış $\bar Y$ yaklaşık $N(0,1)$.**
+MLT dağılımın **şeklini** söyler: $Y$ nasıl dağılırsa dağılsın, $n$ büyükken $\dfrac{\bar Y - \mu_Y}{\sigma_{\bar Y}}$ yaklaşık standart normaldir.
+**Diğer şıklar neden yanlış?**
+• olasılıkta yakınsama ve "$\mu_Y\pm c$ aralığı": bunlar **büyük sayılar yasası** (tutarlılık), MLT değil.
+• $t \to F$: yanlış; $t$ normale yakınsar.
+
+## Q
+SRC: TB 2.29
+EN: Which statement about the central limit theorem is correct?
+TR: Merkezi limit teoremi hakkında hangi ifade doğrudur?
++ It gives conditions under which a standardized sum (or average) of i.i.d. $Y_1,\dots,Y_n$ is approximately standard normal.
+- It says that $\bar Y$ is a consistent estimator of $\mu_Y$.
+- It holds only when the law of large numbers also holds.
+- It says that the standardized average follows a Student $t$ distribution.
+EX: **Doğru cevap: standardized sum of i.i.d. variables is approximately standard normal.**
+MLT'nin koşulları: $Y_i$'ler i.i.d. ve $0<\sigma_Y^2<\infty$. Bu koşullarda toplamın (ya da ortalamanın) standartlaştırılmış hali $n$ büyüdükçe $N(0,1)$'e yaklaşır.
+**Diğer şıklar neden yanlış?**
+• tutarlılık: bu büyük sayılar yasası.
+• "only when LLN holds": iki teorem ayrı sonuçlardır; MLT böyle bir koşul koymaz.
+• Student $t$: MLT'nin sonucu normal dağılım. $t$ dağılımı ancak $Y$ normal ise ve küçük örneklemde kesin sonuç olarak çıkar.
+
 --- LESSON u3e | r | Örneklem kovaryansı ve korelasyonu
 
 ## CARD Saçılım grafiği ve örneklem istatistikleri
@@ -711,4 +922,113 @@ $s^2_X = \frac{1}{n-1}\sum(X_i-\bar X)^2$. Sapmaları $\mu$'den değil, örnekle
 • $\sqrt n$: standart hata formülünde $\sqrt n$ geçer, varyans tanımında değil.
 
 ## GEN sampleCorr
+
+## Q
+SRC: TB 3.14
+EN: A scatterplot is:
+TR: Serpilme grafiği (scatterplot) nedir?
++ a plot of $n$ observations on $X_i$ and $Y_i$, with each observation shown as the point $(X_i, Y_i)$
+- a plot that shows how $Y$ and $X$ are related only when the points are scattered all over
+- a graph that converts the covariance of $X$ and $Y$ into a correlation coefficient
+- a plot of $n$ observations of $Y$ over time
+EX: **Doğru cevap: each observation is the point $(X_i, Y_i)$.**
+Serpilme grafiğinde yatay eksen $X$, dikey eksen $Y$'dir ve her gözlem bir noktadır. Örnek: her okul bölgesi için (öğrenci-öğretmen oranı, test puanı).
+**Diğer şıklar neden yanlış?**
+• "scattered all over": isim benzerliğiyle oynayan bir şık; noktalar bir doğruya yakın da olabilir.
+• covariance → correlation: grafik bir hesaplama yapmaz.
+• "over time": bu bir **zaman serisi grafiği**.
+
+## Q
+SRC: TB 3.25
+EN: The sample covariance $s_{XY}$ can be computed in each of the following ways EXCEPT:
+TR: Örneklem kovaryansı $s_{XY}$ aşağıdaki yolların hepsiyle hesaplanabilir, BİRİ HARİÇ:
++ $\dfrac{1}{n-1}\left[\sum_{i=1}^{n}(X_i - \bar X)\right]\left[\sum_{i=1}^{n}(Y_i - \bar Y)\right]$
+- $\dfrac{1}{n-1}\sum_{i=1}^{n}(X_i - \bar X)(Y_i - \bar Y)$
+- $\dfrac{1}{n-1}\left(\sum_{i=1}^{n}X_iY_i - n\bar X\bar Y\right)$
+- $r_{XY}\, s_X\, s_Y$, where $r_{XY}$ is the sample correlation
+EX: **Doğru cevap (hesaplayamayan): toplamların çarpımı.**
+$\sum (X_i - \bar X) = 0$ olduğu için bu ifade **her zaman 0** çıkar. Kovaryans için sapmaların **çarpımlarının toplamı** gerekir, toplamların çarpımı değil.
+**Diğer üç formül doğru:**
+• tanım: $\frac{1}{n-1}\sum (X_i - \bar X)(Y_i - \bar Y)$.
+• kısa yol: çarpımı açınca $\sum X_iY_i - n\bar X\bar Y$ çıkar.
+• $r_{XY} = s_{XY}/(s_X s_Y)$ tanımından $s_{XY} = r_{XY}s_Xs_Y$.
+
+## Q
+SRC: TB 3.29
+EN: Which statement about the sample correlation coefficient $r_{XY}$ is TRUE?
+TR: Örneklem korelasyon katsayısı $r_{XY}$ hakkında hangi ifade DOĞRUDUR?
++ $-1 \le r_{XY} \le 1$
+- $r_{XY} = \text{corr}(X_i, Y_i)$ in every sample
+- $r_{XY}^2 < 1$ always
+- $r_{XY} = s_{XY}/s_X^2$
+EX: **Doğru cevap: $-1 \le r_{XY} \le 1$.**
+$|s_{XY}| \le s_Xs_Y$ olduğundan $|r_{XY}| \le 1$. Uç değerler $\pm 1$, tüm noktalar tam bir doğru üzerindeyse gerçekleşir.
+**Diğer şıklar neden yanlış?**
+• "every sample": $r_{XY}$ bir tahmindir; popülasyon korelasyonuna ancak **olasılıkta yakınsar**, her örneklemde eşit değildir.
+• "$r^2 < 1$ always": noktalar tam bir doğruya düşerse $r^2 = 1$ olur; kesin eşitsizlik yanlış.
+• $s_{XY}/s_X^2$: bu OLS **eğimi** $\hat\beta_1$.
+
+## Q
+SRC: TB 3.30
+EN: The correlation coefficient:
+TR: Korelasyon katsayısı:
++ is a measure of linear association
+- lies between zero and one
+- is close to one whenever $X$ causes $Y$
+- is large whenever there is a strong nonlinear relationship
+EX: **Doğru cevap: a measure of linear association.**
+Korelasyon sadece **doğrusal** ilişkinin gücünü ve yönünü ölçer. Örnek: $X$ sıfır etrafında simetrik ve $Y = X^2$ ise ilişki tam ama korelasyon 0.
+**Diğer şıklar neden yanlış?**
+• "zero and one": negatif de olabilir; aralık $[-1, 1]$.
+• "$X$ causes $Y$": korelasyon nedensellik değildir; ayrıca nedensellik olsa bile etki küçükse korelasyon düşük olabilir.
+• "strong nonlinear": doğrusal olmayan ilişkileri yakalamaz (yukarıdaki $X^2$ örneği).
+
+## Q
+SRC: TB 3.33
+EN: You have 125 observations on the height ($H$) and weight ($W$) of your classmates. The sample covariance is $s_{HW} = 68$, and the sample standard deviations are $s_H = 3.5$ and $s_W = 29$. The sample correlation coefficient is:
+TR: Sınıf arkadaşlarının boyu ($H$) ve kilosu ($W$) için 125 gözlemin var. Örneklem kovaryansı $s_{HW} = 68$, örneklem standart sapmaları $s_H = 3.5$ ve $s_W = 29$. Örneklem korelasyon katsayısı nedir?
++ 0.67
+- 1.22
+- 0.50
+- It cannot be computed, because men and women are not separated.
+EX: **Doğru cevap: 0.67.**
+$$r_{HW} = \frac{s_{HW}}{s_H s_W} = \frac{68}{3.5 \times 29} = \frac{68}{101.5} \approx 0.67$$
+Pozitif ve oldukça güçlü bir doğrusal ilişki: uzun olanlar ortalamada daha ağır.
+**Diğer şıklar neden yanlış?**
+• 1.22: korelasyon 1'i geçemez; bu sonuç bir hesap hatası demektir.
+• 0.50: yanlış hesap.
+• "cannot be computed": cinsiyete göre ayırmak gerekmez; korelasyon tüm örneklem için hesaplanabilir.
+
+## Q
+SRC: TB 3.34
+EN: You have data on weekly study time ($T$) and grades ($G$). If you change the measurement of study time from minutes to hours, the correlation coefficient $r_{TG}$:
+TR: Haftalık çalışma süresi ($T$) ve notlar ($G$) verin var. Çalışma süresini dakikadan saate çevirirsen korelasyon katsayısı $r_{TG}$:
++ does not change
+- is divided by 60
+- becomes larger
+- cannot be computed, because some students study less than an hour per week
+EX: **Doğru cevap: does not change.**
+$T_{saat} = T_{dk}/60$. Kovaryans 60'a bölünür: $s_{T_s G} = s_{T_{dk} G}/60$. Standart sapma da 60'a bölünür: $s_{T_s} = s_{T_{dk}}/60$. Korelasyonda ikisi birbirini götürür:
+$$r = \frac{s_{TG}/60}{(s_T/60)\,s_G} = \frac{s_{TG}}{s_T s_G}$$
+Korelasyon **birimsizdir**.
+**Diğer şıklar neden yanlış?**
+• "divided by 60": kovaryans 60'a bölünür, korelasyon değil.
+• "larger": birim değişikliği ilişkinin gücünü değiştirmez.
+• "less than an hour": 0.5 saat gibi kesirli değerler sorun değil.
+
+## Q
+SRC: TB 3.35
+EN: A low correlation coefficient implies that:
+TR: Düşük bir korelasyon katsayısı neyi gösterir?
++ in the scatterplot, the points lie quite far from the line
+- the regression line must have a flat slope
+- the two variables are unrelated
+- you should tighten the axis scales to bring the points closer to the line
+EX: **Doğru cevap: points lie far from the line.**
+Düşük $|r|$: noktalar en iyi doğru etrafında **dağınık**, doğrusal ilişki zayıf.
+**Diğer şıklar neden yanlış?**
+• "flat slope": eğim $\hat\beta_1 = r\,(s_Y/s_X)$; $s_Y$ büyükse düşük $r$ ile bile dik eğim olabilir. Korelasyon eğim demek değil.
+• "unrelated": doğrusal olmayan güçlü bir ilişki olabilir (örneğin U şekli).
+• eksen ölçeğini değiştirmek: grafiğin görünüşünü değiştirir, korelasyonu değiştirmez (birimsiz).
+
 `);

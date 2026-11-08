@@ -135,6 +135,232 @@ Sütun adı bile bunu söyler: "Pr(>|t|)" = $P(|T| > |t|)$, yani iki kuyruğun t
 ## GEN regT
 ## GEN regOutput
 
+## Q
+SRC: TB 5.3
+EN: You estimate a demand function in which the quantity demanded is a linear function of the good's price. To test whether price affects quantity, the textbook suggests that you:
+TR: Talep edilen miktarın malın fiyatının doğrusal bir fonksiyonu olduğu bir talep fonksiyonu tahmin ediyorsun. Fiyatın miktarı etkileyip etkilemediğini test etmek için kitap ne öneriyor?
++ use a one-sided alternative ($\beta_1 < 0$), because economic theory predicts the sign of the effect
+- leave out the intercept, because the price of the good is never zero
+- always use a two-sided alternative, whatever theory says
+- reject the idea that price affects demand unless the coefficient is at least 1.96
+EX: **Doğru cevap: one-sided alternative.**
+Talep yasası fiyat artınca talep edilen miktarın **azalacağını** söyler. Etkinin yönü teoriden önceden bilindiği için $H_0: \beta_1 = 0$, $H_1: \beta_1 < 0$ tek taraflı testi makuldür. Reddetme kuralı (%5): $t < -1.64$.
+**Diğer şıklar neden yanlış?**
+• sabit terimi atmak: $X = 0$ gözlenmese bile sabit terim modelde kalmalı; atarsan eğim yanlı olur.
+• "always two-sided": iki taraflı varsayılan seçimdir, ama teori yönü açıkça söylüyorsa tek taraflı test kullanılabilir.
+• "at least 1.96": 1.96 katsayı için değil, $t$ istatistiği için bir eşiktir.
+
+## Q
+SRC: TB 5.4
+EN: The $t$-statistic is calculated by dividing:
+TR: $t$ istatistiği neyin neye bölünmesiyle hesaplanır?
++ the estimator minus its hypothesized value by the standard error of the estimator
+- the OLS estimator by its standard error, whatever the null hypothesis
+- the slope by the standard deviation of the regressor
+- the slope by 1.96
+EX: **Doğru cevap: (estimator − hypothesized value) / SE.**
+$$t = \frac{\hat\beta_1 - \beta_{1,0}}{SE(\hat\beta_1)}$$
+Tahminin, sıfır hipotezindeki değerden kaç standart hata uzakta olduğunu ölçer.
+**Diğer şıklar neden yanlış?**
+• "estimator / SE": bu sadece $H_0: \beta_1 = 0$ için doğru. $H_0: \beta_1 = 1$ olsaydı 1'i çıkarmak gerekirdi.
+• $X$'in standart sapmasına bölmek: tahminin belirsizliği $SE(\hat\beta_1)$, $s_X$ değil.
+• 1.96'ya bölmek: 1.96 kritik değer; istatistiği hesaplamakta kullanılmaz.
+
+## Q
+SRC: TB 5.6
+EN: If the absolute value of your computed $t$-statistic exceeds the critical value from the standard normal distribution, you can:
+TR: Hesapladığın $t$ istatistiğinin mutlak değeri standart normal dağılımdan alınan kritik değeri aşıyorsa ne yapabilirsin?
++ reject the null hypothesis
+- conclude that all your regression results are significant
+- reject the assumption that the errors are homoskedastic
+- conclude that most observations lie very close to the regression line
+EX: **Doğru cevap: reject the null hypothesis.**
+Kural (iki taraflı, %5): $|t^{act}| > 1.96$ ise $H_0$'ı reddet. Bu, $H_0$ doğru olsaydı bu kadar uç bir $t$'nin %5'ten az ihtimalle görüleceği anlamına gelir.
+**Diğer şıklar neden yanlış?**
+• "all results significant": test sadece **o** katsayı ve **o** hipotez hakkındadır.
+• homoskedasticity: $t$ testi hata varyansını test etmez.
+• "close to the line": bu uyumla ($R^2$, SER) ilgili; $t$ testiyle değil.
+
+## Q
+SRC: TB 5.8
+EN: For testing $H_0: \beta_1 = \beta_{1,0}$, the $t$-statistic is:
+TR: $H_0: \beta_1 = \beta_{1,0}$'ı test etmek için $t$ istatistiği nedir?
++ $t = \dfrac{\hat\beta_1 - \beta_{1,0}}{SE(\hat\beta_1)}$
+- $t = \dfrac{\hat\beta_1 - \beta_{1,0}}{s_X}$
+- $t = \dfrac{\beta_{1,0} - SE(\hat\beta_1)}{\hat\beta_1}$
+- $t = \dfrac{\hat\beta_1}{\sqrt{SSR}}$
+EX: **Doğru cevap: $(\hat\beta_1 - \beta_{1,0})/SE(\hat\beta_1)$.**
+Ortalama için $t = (\bar Y - \mu_{Y,0})/SE(\bar Y)$ idi; regresyonda aynı kalıp $\hat\beta_1$ için uygulanır.
+**Diğer şıklar neden yanlış?**
+• $s_X$'e bölmek: $X$'in yayılımı, tahminin belirsizliği değil.
+• karışık kesir: anlamsız.
+• $\sqrt{SSR}$: standart hata değil; $n$'e ve $X$'in yayılımına bağlı değil.
+
+## Q
+SRC: TB 5.9
+EN: The estimated regression line is $\widehat{TestScore} = 698.9 - 2.28 \times STR$, and the $t$-statistic for the slope (testing $\beta_1 = 0$) has absolute value 4.38. What is the standard error of the slope coefficient?
+TR: Tahmin edilen regresyon doğrusu $\widehat{TestScore} = 698.9 - 2.28 \times STR$ ve eğim için $t$ istatistiğinin ($\beta_1 = 0$ testi) mutlak değeri 4.38. Eğim katsayısının standart hatası nedir?
++ 0.52
+- 1.96
+- −1.96
+- 4.38
+EX: **Doğru cevap: 0.52.**
+$$|t| = \frac{|\hat\beta_1 - 0|}{SE(\hat\beta_1)} \ \Rightarrow\ SE(\hat\beta_1) = \frac{2.28}{4.38} \approx 0.52$$
+**Diğer şıklar neden yanlış?**
+• ±1.96: kritik değer; standart hata değil. Standart hata negatif de olamaz.
+• 4.38: $t$ istatistiğinin kendisi.
+
+## Q
+SRC: TB 5.10
+EN: In the regression $\widehat{TestScore} = 698.9 - 2.28 \times STR$, the $t$-statistic for the slope is $-4.38$. In what units is the $t$-statistic measured?
+TR: $\widehat{TestScore} = 698.9 - 2.28 \times STR$ regresyonunda eğimin $t$ istatistiği $-4.38$. $t$ istatistiği hangi birimle ölçülür?
++ in standard errors (standard deviations of the estimator): it has no economic units
+- in test score points
+- in students per teacher
+- in test score points per student
+EX: **Doğru cevap: standard errors, no economic units.**
+Pay ($\hat\beta_1 - 0$) ve payda ($SE(\hat\beta_1)$) aynı birimde (puan/öğrenci). Bölünce birim kaybolur. $t = -4.38$, tahminin sıfırdan **4.38 standart hata** uzakta olduğunu söyler.
+**Diğer şıklar neden yanlış?**
+• points: $Y$'nin birimi.
+• students per teacher: $X$'in birimi.
+• points per student: bu **eğimin** ($\hat\beta_1$) birimi; $t$'nin değil.
+
+## Q
+SRC: TB 5.11
+EN: How is the $t$-statistic constructed for a one-sided test compared with a two-sided test?
+TR: Tek taraflı bir testte $t$ istatistiği, iki taraflı teste göre nasıl hesaplanır?
++ in exactly the same way
+- differently, because the critical value must be 1.645 for the one-sided test and 1.96 for the two-sided test
+- with a formula that depends on the critical value of the appropriate distribution
+- by using $\pm 1.96$ in the two-sided test but only $+1.96$ in the one-sided test
+EX: **Doğru cevap: exactly the same way.**
+$t = (\hat\beta_1 - \beta_{1,0})/SE(\hat\beta_1)$ formülü alternatiften bağımsızdır. Değişen sadece **karar kuralı**: iki taraflıda $|t| > 1.96$; tek taraflıda $t > 1.64$ ya da $t < -1.64$.
+**Diğer şıklar neden yanlış?**
+• kritik değerler farklı: doğru ama bu **istatistiği** değil, **kuralı** değiştirir. Soru istatistiğin nasıl hesaplandığını soruyor.
+• "depends on critical value": istatistik kritik değer kullanmaz.
+• "+1.96 for one-sided": tek taraflı %5 kritik değeri 1.64'tür, 1.96 değil.
+
+## Q
+SRC: TB 5.12
+EN: For the alternative $H_1: \beta_1 < \beta_{1,0}$ (a left-tail test), the large-sample p-value is:
+TR: $H_1: \beta_1 < \beta_{1,0}$ alternatifi (sol kuyruk testi) için büyük örneklem p-değeri nedir?
++ $\Pr(Z < t^{act}) = \Phi(t^{act})$
+- $\Pr(Z > t^{act}) = 1 - \Phi(t^{act})$
+- $2\Phi(-|t^{act}|)$
+- impossible to compute, because probabilities must be positive and $t^{act}$ is negative
+EX: **Doğru cevap: $\Phi(t^{act})$.**
+Sol kuyruk testinde aşırı değerler küçük (negatif) $t$'lerdir. p-değeri, $t^{act}$'in solundaki alandır: $\Phi(t^{act})$. Örnek: $t^{act} = -2$ ise $p = \Phi(-2) \approx 0.023$.
+**Diğer şıklar neden yanlış?**
+• $1 - \Phi$: sağ kuyruk testinin p-değeri.
+• $2\Phi(-|t|)$: iki taraflı p-değeri.
+• "negative t": $t$ negatif olabilir; $\Phi(t)$ yine 0 ile 1 arasında bir olasılıktır.
+
+## Q
+SRC: TB 5.17
+EN: Which of the following steps is NOT required when testing $H_0: \beta_1 = \beta_{1,0}$ in a large sample?
+TR: Büyük bir örneklemde $H_0: \beta_1 = \beta_{1,0}$'ı test ederken aşağıdaki adımlardan hangisi GEREKLİ DEĞİLDİR?
++ testing whether the errors are normally distributed
+- computing the standard error of $\hat\beta_1$
+- computing the $t$-statistic
+- computing the p-value
+EX: **Doğru cevap: testing the errors for normality.**
+Üç adım: (1) $SE(\hat\beta_1)$'i hesapla, (2) $t$'yi hesapla, (3) p-değerini hesapla (ya da $|t|$'yi 1.96 ile karşılaştır). Büyük örneklemde MLT, hatalar normal olmasa da $\hat\beta_1$'i yaklaşık normal yapar; bu yüzden normallik testi gerekmez.
+**Diğer üç şık** testin zorunlu adımlarıdır.
+
+## Q
+SRC: TB 5.18
+EN: Finding a small p-value (for example, below 5%):
+TR: Küçük bir p-değeri (örneğin %5'in altında) bulmak:
++ is evidence against the null hypothesis
+- is evidence in favour of the null hypothesis
+- implies that $|t|$ is less than 1.96
+- will happen in only about one sample out of twenty, whatever the truth
+EX: **Doğru cevap: evidence against the null.**
+p < 0.05: $H_0$ doğruysa bu kadar uç bir sonuç %5'ten az ihtimalle görülür. Ya çok nadir bir şey oldu, ya da $H_0$ yanlış. Bu yüzden $H_0$'ı reddederiz.
+**Diğer şıklar neden yanlış?**
+• "in favour of the null": tersi.
+• "$|t| < 1.96$": iki taraflı p < 0.05 ⇔ $|t| > 1.96$.
+• "one in twenty": bu sadece $H_0$ **doğruysa** geçerli. $H_0$ yanlışsa küçük p-değerleri çok daha sık çıkar (testin gücü).
+
+## Q
+SRC: TB 5.19
+EN: The only difference between a one-sided and a two-sided test of $\beta_1$ is:
+TR: $\beta_1$ için tek taraflı ve iki taraflı test arasındaki tek fark nedir?
++ how you use the $t$-statistic to decide (the rejection rule and the p-value)
+- the null hypothesis
+- the sample size $n$
+- the sign of the slope coefficient
+EX: **Doğru cevap: how you interpret the $t$-statistic.**
+$H_0: \beta_1 = \beta_{1,0}$ ve $t$ formülü aynı. Fark, $t$'yi nasıl yorumladığında: kritik değer (1.64 ya da 1.96), hangi kuyruğa baktığın ve p-değerinin hesabı.
+**Diğer şıklar neden yanlış?**
+• null hypothesis: ikisinde de aynı.
+• sample size: test türünü belirlemez.
+• sign of the slope: tek taraflı alternatifin **yönünü** teori belirler; tahminin işareti değil.
+
+## Q
+SRC: TB 5.27
+EN: The estimated equation is
+$$\widehat{TestScore} = \underset{(10.4)}{698.9} - \underset{(0.52)}{2.28} \times STR, \quad R^2 = 0.051,\ SER = 18.6$$
+with standard errors in parentheses. The $t$-statistic for $H_0: \beta_1 = 0$ is approximately:
+TR: Tahmin edilen denklem yukarıda; parantez içinde standart hatalar var. $H_0: \beta_1 = 0$ için $t$ istatistiği yaklaşık kaçtır?
++ $-4.38$
+- $67.20$
+- $-0.52$
+- $-0.12$
+EX: **Doğru cevap: $-4.38$.**
+$$t = \frac{-2.28 - 0}{0.52} \approx -4.38$$
+$|t| = 4.38 > 1.96$, yani %5 düzeyinde $H_0$ reddedilir (aslında %1'de de: $4.38 > 2.58$).
+**Diğer şıklar neden yanlış?**
+• 67.20: $698.9/10.4$, yani **sabit terimin** $t$ istatistiği.
+• $-0.52$: standart hata, işaretli.
+• $-0.12$: $-2.28/18.6$; SER'e bölmek yanlış.
+
+## Q
+SRC: TB 5.29
+EN: Using 143 observations, you estimate a simple regression and find a slope of 0.04 with a standard error of 0.01. Which conclusion is correct?
+TR: 143 gözlemle basit bir regresyon tahmin ediyorsun; eğim 0.04, standart hatası 0.01. Hangi sonuç doğrudur?
++ The slope is statistically significant, since it is four standard errors away from zero.
+- The coefficient is small, so it is most likely zero in the population.
+- The effect of $X$ on $Y$ must be economically important, since it is statistically significant.
+- Since the slope is small, the regression $R^2$ must also be small.
+EX: **Doğru cevap: statistically significant, $t = 4$.**
+$t = 0.04/0.01 = 4 > 1.96$, yani $H_0: \beta_1 = 0$ %5'te (ve %1'de) reddedilir.
+**Diğer şıklar neden yanlış?**
+• "small, so zero": katsayının büyüklüğü birimlere bağlıdır; önemli olan standart hataya oranıdır.
+• "economically important": istatistiksel anlamlılık **ekonomik önem** demek değildir; ikisi ayrı sorulardır.
+• "$R^2$ small": $R^2$, eğimin büyüklüğüne değil, noktaların doğru etrafındaki dağınıklığına bağlıdır.
+
+## Q
+SRC: TB 5.31
+EN: The estimated regression is $\widehat{Earnings} = -7.29 + 1.13 \times YearsEducation$, and the $t$-statistic on the slope (testing $\beta_1 = 0$) is 14.125. What is the standard error of the slope coefficient?
+TR: Tahmin edilen regresyon $\widehat{Earnings} = -7.29 + 1.13 \times YearsEducation$ ve eğimin $t$ istatistiği ($\beta_1 = 0$ testi) 14.125. Eğim katsayısının standart hatası nedir?
++ 0.08
+- 0.30
+- 1.64
+- −0.08
+EX: **Doğru cevap: 0.08.**
+$$SE(\hat\beta_1) = \frac{\hat\beta_1}{t} = \frac{1.13}{14.125} = 0.08$$
+==Not:== Test bankasının basılı sürümünde katsayı ile $t$ istatistiği birbirini tutmuyor; burada sayılar cevap anahtarındaki 0.08'i verecek şekilde düzeltildi.
+**Diğer şıklar neden yanlış?**
+• 0.30: yanlış bölme.
+• 1.64: tek taraflı %5 kritik değeri.
+• −0.08: standart hata hiçbir zaman negatif olamaz.
+
+## Q
+SRC: TB 5.32
+EN: You test $H_0: \beta_1 = \beta_{1,0}$ against the one-sided alternative $H_1: \beta_1 < \beta_{1,0}$. In a large sample, the null hypothesis is rejected at the 5% significance level if:
+TR: $H_0: \beta_1 = \beta_{1,0}$'ı tek taraflı $H_1: \beta_1 < \beta_{1,0}$ alternatifine karşı test ediyorsun. Büyük örneklemde %5 anlamlılık düzeyinde sıfır hipotezi ne zaman reddedilir?
++ $t^{act} < -1.64$
+- $t^{act} > 1.64$
+- $|t^{act}| > 1.96$
+- $t^{act} < 1.96$
+EX: **Doğru cevap: $t^{act} < -1.64$.**
+Sol kuyruk testi: tüm %5 sol kuyrukta. $\Phi(-1.64) \approx 0.05$, bu yüzden $t < -1.64$ ise reddet.
+**Diğer şıklar neden yanlış?**
+• $t > 1.64$: sağ kuyruk testinin kuralı ($H_1: \beta_1 > \beta_{1,0}$).
+• $|t| > 1.96$: iki taraflı testin kuralı.
+• $t < 1.96$: neredeyse her zaman doğru; bu bir reddetme bölgesi değil.
+
 --- LESSON u6b | ± | β₁ için güven aralığı
 
 ## CARD Güven aralığı
@@ -247,6 +473,90 @@ EX: **Doğru cevap: 2.58.**
 ## GEN regCI
 ## GEN regCIdx
 
+## Q
+SRC: TB 5.5
+EN: A confidence interval for the slope of the population regression function:
+TR: Popülasyon regresyon fonksiyonunun eğimi için bir güven aralığı:
++ can be used to test a hypothesis about the population slope
+- can be used to compare the size of the slope with the size of the intercept
+- is formed by adding and subtracting 1.96 from the estimated slope
+- tells you whether the estimate is economically important
+EX: **Doğru cevap: can be used to test a hypothesis.**
+%95 güven aralığı = %5 düzeyinde iki taraflı testle **reddedilemeyen** tüm $\beta_{1,0}$ değerleri. Kural: $\beta_{1,0}$ aralığın dışındaysa $H_0: \beta_1 = \beta_{1,0}$ %5'te reddedilir.
+**Diğer şıklar neden yanlış?**
+• intercept ile karşılaştırma: eğim ve sabit farklı birimlerdedir; aralık böyle bir karşılaştırma yapmaz.
+• "± 1.96": standart hata unutulmuş; doğrusu $\hat\beta_1 \pm 1.96\,SE(\hat\beta_1)$.
+• economic importance: aralık istatistiksel belirsizliği gösterir; ekonomik önem ayrı bir değerlendirme.
+
+## Q
+SRC: TB 5.13
+EN: The 95% confidence interval for $\beta_1$ (in large samples) is:
+TR: $\beta_1$ için %95 güven aralığı (büyük örneklemde) nedir?
++ $\left(\hat\beta_1 - 1.96\,SE(\hat\beta_1),\ \hat\beta_1 + 1.96\,SE(\hat\beta_1)\right)$
+- $\left(\beta_1 - 1.96\,SE(\beta_1),\ \beta_1 + 1.96\,SE(\beta_1)\right)$
+- $\left(\hat\beta_1 - 1.645\,SE(\hat\beta_1),\ \hat\beta_1 + 1.645\,SE(\hat\beta_1)\right)$
+- $\left(\hat\beta_1 - 1.96,\ \hat\beta_1 + 1.96\right)$
+EX: **Doğru cevap: $\hat\beta_1 \pm 1.96\,SE(\hat\beta_1)$.**
+Aralık **tahmin** etrafında kurulur, çünkü gerçek $\beta_1$'i bilmiyoruz; aralığın amacı zaten onu yakalamak. %95 → 1.96. Aynı formül $\beta_0$ için de geçerlidir: $\hat\beta_0 \pm 1.96\,SE(\hat\beta_0)$.
+**Diğer şıklar neden yanlış?**
+• $\beta_1$ merkezli: bilinmeyen değer etrafında aralık kurulamaz.
+• 1.645: bu %90 güven aralığı.
+• SE yok: aralığın genişliği tahminin belirsizliğine bağlı olmalı.
+
+## Q
+SRC: TB 5.15
+EN: The 95% confidence interval for the effect on $Y$ of a change $\Delta x$ in $X$ is:
+TR: $X$'teki $\Delta x$'lik bir değişimin $Y$ üzerindeki etkisi için %95 güven aralığı nedir?
++ $\left(\hat\beta_1\Delta x - 1.96\,SE(\hat\beta_1)\,|\Delta x|,\ \hat\beta_1\Delta x + 1.96\,SE(\hat\beta_1)\,|\Delta x|\right)$
+- $\left(\beta_1\Delta x - 1.96\,SE(\beta_1)\,|\Delta x|,\ \beta_1\Delta x + 1.96\,SE(\beta_1)\,|\Delta x|\right)$
+- $\left(\hat\beta_1\Delta x - 1.645\,SE(\hat\beta_1)\,|\Delta x|,\ \hat\beta_1\Delta x + 1.645\,SE(\hat\beta_1)\,|\Delta x|\right)$
+- $\left(\hat\beta_1\Delta x - 1.96,\ \hat\beta_1\Delta x + 1.96\right)$
+EX: **Doğru cevap: $\hat\beta_1\Delta x \pm 1.96\,SE(\hat\beta_1)|\Delta x|$.**
+Etki $\beta_1\Delta x$. $\Delta x$ sabit bir sayı olduğu için $SE(\hat\beta_1\Delta x) = SE(\hat\beta_1)\,|\Delta x|$. Pratik yol: önce $\beta_1$ için aralığı bul, sonra iki ucu $\Delta x$ ile çarp.
+Örnek: STR'yi 2 azalt ($\Delta x = -2$): $\beta_1$ aralığı $(-3.30, -1.26)$ ise etki aralığı $(2.52, 6.60)$ puan.
+**Diğer şıklar neden yanlış?**
+• şapkasız $\beta_1$: bilinmeyen değer etrafında aralık kurulamaz.
+• 1.645: %90 aralık.
+• SE yok: belirsizlik unutulmuş.
+
+## Q
+SRC: TB 5.28
+EN: Using data for the 50 U.S. states, you regress the change in the unemployment rate, $\Delta ur$, on the growth rate of state real GDP, $gy$:
+$$\widehat{\Delta ur} = \underset{(0.12)}{2.81} - \underset{(0.04)}{0.23}\, gy, \quad R^2 = 0.36,\ SER = 0.78$$
+Assuming the estimator is normally distributed, the 95% confidence interval for the slope is approximately:
+TR: ABD'nin 50 eyaleti verisiyle işsizlik oranındaki değişimi ($\Delta ur$) eyalet reel GSYH büyümesi ($gy$) üzerine regres ediyorsun. Tahminci normal dağılıyorsa eğim için %95 güven aralığı yaklaşık nedir?
++ $[-0.31, -0.15]$
+- $[2.57, 3.05]$
+- $[-0.31, 0.15]$
+- $[-0.33, -0.13]$
+EX: **Doğru cevap: $[-0.31, -0.15]$.**
+$$-0.23 \pm 1.96 \times 0.04 = -0.23 \pm 0.078 \Rightarrow [-0.308,\ -0.152]$$
+Aralık 0'ı içermediği için eğim %5'te anlamlıdır.
+**Diğer şıklar neden yanlış?**
+• $[2.57, 3.05]$: **sabit terimin** aralığı ($2.81 \pm 1.96 \times 0.12$).
+• $[-0.31, 0.15]$: üst uçta işaret hatası; aralık tahmin etrafında simetrik olmalı.
+• $[-0.33, -0.13]$: $\pm 0.10$, yani 1.96 yerine 2.5 kullanılmış.
+
+## Q
+SRC: TB 5.30
+EN: Using about 5,000 observations from the Current Population Survey, you estimate
+$$\widehat{ahe} = \underset{(1.00)}{3.32} + \underset{(0.03)}{0.45}\, Age, \quad R^2 = 0.02,\ SER = 8.66$$
+where $ahe$ is average hourly earnings in dollars. The 95% confidence interval (in dollars per hour) for the effect on earnings of being 5 years older is approximately:
+TR: Yaklaşık 5.000 gözlemle yukarıdaki regresyonu tahmin ediyorsun; $ahe$ dolar cinsinden ortalama saatlik kazanç. 5 yaş daha büyük olmanın kazanç üzerindeki etkisi için %95 güven aralığı yaklaşık nedir?
++ $[1.96,\ 2.54]$
+- $[2.32,\ 4.32]$
+- $[0.39,\ 0.51]$
+- It cannot be determined from the information given.
+EX: **Doğru cevap: $[1.96,\ 2.54]$ dolar.**
+1. Etki: $5 \times 0.45 = 2.25$ dolar.
+2. Standart hata: $5 \times 0.03 = 0.15$.
+3. Aralık: $2.25 \pm 1.96 \times 0.15 = 2.25 \pm 0.294 \Rightarrow [1.956,\ 2.544]$.
+==Not:== Test bankasının basılı sürümünde katsayının işareti ve standart hatası bozuk; burada sayılar cevap anahtarındaki aralığı verecek şekilde düzeltildi.
+**Diğer şıklar neden yanlış?**
+• $[2.32, 4.32]$: sabit terim ± bir standart hata ($3.32 \pm 1.00$); hem yanlış katsayı kullanılmış hem de 1.96 unutulmuş.
+• $[0.39, 0.51]$: tek bir yıl için aralık; 5 ile çarpmak unutulmuş.
+• "cannot be determined": $\Delta x = 5$ ile aralık kurmak için gereken her şey var.
+
 --- LESSON u6c | D | Kukla (binary) regresör
 
 ## CARD X sadece 0 ya da 1 ise
@@ -339,6 +649,50 @@ EX: **Doğru cevap:** kukla (dummy) değişken ya da gösterge (indicator) deği
 • Araç değişken (instrumental variable): ileri ekonometride ayrı bir kavram.
 
 ## GEN dummyReg
+
+## Q
+SRC: TB 4.5
+EN: Binary variables:
+TR: İkili (binary) değişkenler:
++ can take on only two values
+- can take on more than two values
+- are generally used to control for outliers in the sample
+- exclude certain individuals from the sample
+EX: **Doğru cevap: only two values.**
+İkili (kukla, dummy) değişken sadece iki değer alır, genelde 0 ve 1. Örnek: $D_i = 1$ ise öğrenci-öğretmen oranı 20'den küçük, aksi halde $D_i = 0$.
+**Diğer şıklar neden yanlış?**
+• "more than two": o zaman ikili değil, kategorik ya da sürekli olur.
+• outliers ve "exclude individuals": kuklalar gözlem dışlamaz; grupları ayırt eder ve herkes örneklemde kalır.
+
+## Q
+SRC: TB 5.20
+EN: A binary variable is often called a:
+TR: İkili (binary) değişkene sıkça ne ad verilir?
++ dummy variable
+- dependent variable
+- residual
+- power of a test
+EX: **Doğru cevap: dummy variable (kukla değişken).**
+0/1 değerli değişkenlere **dummy** (kukla) ya da **indicator** (gösterge) değişken denir. Regresyonda $Y_i = \beta_0 + \beta_1 D_i + u_i$ ise $\beta_0$ = $D = 0$ grubunun ortalaması, $\beta_0 + \beta_1$ = $D = 1$ grubunun ortalaması, $\beta_1$ = iki grup ortalamasının farkı.
+**Diğer şıklar neden yanlış?**
+• dependent variable: bağımlı değişken $Y$; ikili olmak zorunda değil.
+• residual ve power: alakasız kavramlar.
+
+## Q
+SRC: TB 5.34
+EN: Using a CPS sample of 7,440 individuals, you estimate $\widehat{Earnings} = 20.91 - 2.61 \times Female$, where $Female = 1$ for women and 0 for men. The standard error of the coefficient on $Female$ is 0.25. The 95% confidence interval for the gender wage gap (how much less women earn) is:
+TR: 7.440 kişilik bir CPS örneklemiyle $\widehat{Earnings} = 20.91 - 2.61 \times Female$ tahmin ediyorsun; kadınlar için $Female = 1$, erkekler için 0. $Female$ katsayısının standart hatası 0.25. Cinsiyet ücret farkı için %95 güven aralığı nedir?
++ $[-3.10,\ -2.12]$
+- $[18.30,\ 23.52]$
+- $[-3.02,\ -2.20]$
+- $[-1.96,\ -1.64]$
+EX: **Doğru cevap: $[-3.10, -2.12]$.**
+$$-2.61 \pm 1.96 \times 0.25 = -2.61 \pm 0.49 \Rightarrow [-3.10,\ -2.12]$$
+Yorum: %95 güvenle kadınlar erkeklerden saat başına ortalama 2.12 ile 3.10 dolar arası daha az kazanıyor. Sıfır aralıkta yok, yani fark anlamlı.
+**Diğer şıklar neden yanlış?**
+• $[18.30, 23.52]$: sabit terim (erkeklerin ortalaması) etrafında bir aralık; soru farkı soruyor.
+• $[-3.02, -2.20]$: $\pm 0.41$, yani 1.96 yerine 1.645 kullanılmış (%90 aralık).
+• $[-1.96, -1.64]$: kritik değerlerle karıştırılmış, anlamsız.
 
 --- LESSON u6d | σ² | Heteroskedastisite ve homoskedastisite
 
@@ -461,6 +815,93 @@ Gerekçe: robust SE her iki durumda da geçerli. Homoskedastisite gerçekten var
 
 ## GEN homoVar
 
+## Q
+SRC: TB 5.1
+EN: Heteroskedasticity means that:
+TR: Heteroskedastisite ne demektir?
++ the variance of the error term is not constant, that is, it depends on $X$
+- the units in the sample are not homogeneous
+- the observed units have different preferences
+- not all agents are rational
+EX: **Doğru cevap: the error variance is not constant.**
+Heteroskedastisite: $\text{var}(u_i \mid X_i = x)$, $x$'e göre değişir. Örnek: kazanç–eğitim regresyonunda yüksek eğitimlilerin kazançları çok daha dağınıktır; hata varyansı eğitimle artar.
+**Diğer şıklar neden yanlış?**
+• homogeneity, preferences, rationality: kelime oyunları; hata varyansıyla ilgisi yok.
+
+## Q
+SRC: TB 5.2
+EN: With heteroskedastic errors, the weighted least squares (WLS) estimator is BLUE. You should nevertheless use OLS with heteroskedasticity-robust standard errors because:
+TR: Hatalar heteroskedastik olduğunda ağırlıklı en küçük kareler (WLS) tahmincisi BLUE'dur. Yine de heteroskedastisiteye dayanıklı standart hatalarla OLS kullanmalısın, çünkü:
++ the exact form of the conditional variance is rarely known
+- this method is simpler
+- the Gauss–Markov theorem holds
+- spreadsheet programs have no command for weighted least squares
+EX: **Doğru cevap: the exact form of the conditional variance is rarely known.**
+WLS her gözleme $1/\sigma_i$ ağırlığı verir. Bunun için $\text{var}(u\mid X)$'in tam biçimini bilmek gerekir; pratikte bilinmez. Yanlış ağırlıklarla WLS'nin avantajı kaybolur. Dayanıklı (robust) SE ile OLS ise varyansın biçimini bilmeden geçerli çıkarım sağlar.
+**Diğer şıklar neden yanlış?**
+• "simpler": asıl sebep sadelik değil, bilgi eksikliği.
+• Gauss–Markov holds: heteroskedastisite altında Gauss–Markov **geçerli değildir**; OLS artık BLUE değil.
+• spreadsheet: alakasız.
+
+## Q
+SRC: TB 5.21
+EN: The error term is homoskedastic if:
+TR: Hata terimi ne zaman homoskedastiktir?
++ $\text{var}(u_i \mid X_i = x)$ is constant for $i = 1, \dots, n$
+- $\text{var}(u_i \mid X_i = x)$ depends on $x$
+- $X_i$ is normally distributed
+- there are no outliers
+EX: **Doğru cevap: conditional variance is constant.**
+Homoskedastisite: $\text{var}(u_i \mid X_i = x) = \sigma_u^2$, yani $x$'e bağlı değil. Grafikte noktalar, regresyon doğrusu boyunca hep aynı genişlikte bir bantta dağılır.
+**Diğer şıklar neden yanlış?**
+• "depends on $x$": bu **heteroskedastisite**.
+• $X$ normal: dağılım şekli varyansın sabitliğiyle ilgili değil.
+• no outliers: ayrı bir varsayım (sonlu dördüncü moment).
+
+## Q
+SRC: TB 5.22
+EN: In the presence of heteroskedasticity, and assuming that the usual least squares assumptions hold, the OLS estimator is:
+TR: Heteroskedastisite varsa ve olağan en küçük kareler varsayımları sağlanıyorsa OLS tahmincisi:
++ unbiased and consistent
+- efficient
+- BLUE
+- unbiased but not consistent
+EX: **Doğru cevap: unbiased and consistent.**
+Yansızlık ve tutarlılık için üç en küçük kareler varsayımı yeter ($E(u\mid X) = 0$, i.i.d., sonlu dördüncü moment). Homoskedastisite gerekmez. Heteroskedastisite sadece **varyans formülünü** değiştirir; bu yüzden dayanıklı (robust) SE kullanırız.
+**Diğer şıklar neden yanlış?**
+• efficient / BLUE: bunlar için homoskedastisite gerekir (Gauss–Markov); heteroskedastisite altında WLS daha etkindir.
+• "not consistent": tutarlılık heteroskedastisiteden etkilenmez.
+
+## Q
+SRC: TB 5.26
+EN: In the California school data, regressing test scores on the student–teacher ratio gives a slope standard error of 0.52 with the heteroskedasticity-robust formula and 0.48 with the homoskedasticity-only formula. When computing the $t$-statistic, the recommended procedure is to:
+TR: California okul verisinde test puanlarının öğrenci-öğretmen oranı üzerine regresyonunda eğimin standart hatası dayanıklı (robust) formülle 0.52, sadece-homoskedastik formülle 0.48. $t$ istatistiğini hesaplarken önerilen yöntem nedir?
++ use the heteroskedasticity-robust standard error
+- use the homoskedasticity-only standard error, because it makes the $t$-statistic larger
+- first test the errors for homoskedasticity, then decide
+- decide based on how different the slope estimates are under the two formulas
+EX: **Doğru cevap: use the robust SE.**
+Dayanıklı SE, hatalar homoskedastik olsa da olmasa da (büyük örneklemde) geçerlidir. Sadece-homoskedastik SE ise ancak homoskedastisite gerçekten varsa doğrudur. Kitabın tavsiyesi: **her zaman** robust SE kullan.
+**Diğer şıklar neden yanlış?**
+• "makes $t$ larger": istediğin sonucu verecek formülü seçmek dürüst değil; heteroskedastisite varsa o $t$ yanıltıcıdır.
+• "first test": gerek yok; robust SE her iki durumda da çalışır.
+• "slope estimates differ": iki formül aynı $\hat\beta_1$'i kullanır, sadece SE farklıdır.
+
+## Q
+SRC: TB 5.16
+EN: The homoskedasticity-only estimator of the variance of $\hat\beta_1$ is:
+TR: $\hat\beta_1$'in varyansının sadece-homoskedastik tahmincisi nedir?
++ $\tilde\sigma^2_{\hat\beta_1} = \dfrac{s_{\hat u}^2}{\sum_{i=1}^{n}(X_i - \bar X)^2}$
+- $\tilde\sigma^2_{\hat\beta_1} = \dfrac{s_{\hat u}^2}{\sum_{i=1}^{n}X_i^2}$
+- $\tilde\sigma^2_{\hat\beta_1} = \dfrac{\sum_{i=1}^{n}(X_i - \bar X)^2}{s_{\hat u}^2}$
+- $\tilde\sigma^2_{\hat\beta_1} = \dfrac{1}{n}\,\dfrac{s_{\hat u}^2}{\sum_{i=1}^{n}(X_i - \bar X)^2}$
+EX: **Doğru cevap: $s_{\hat u}^2 / \sum (X_i - \bar X)^2$.**
+Homoskedastisite altında $\text{var}(\hat\beta_1) = \sigma_u^2/(n\sigma_X^2)$. Örneklemde $\sigma_u^2$ yerine $s_{\hat u}^2 = SER^2$, $n\sigma_X^2$ yerine $\sum(X_i - \bar X)^2$ konur.
+**Diğer şıklar neden yanlış?**
+• $\sum X_i^2$: ortalamadan sapmalar alınmamış.
+• ters kesir: varyans hata varyansıyla **artmalı**, $X$'in yayılımıyla azalmalı.
+• ekstra $1/n$: $\sum (X_i - \bar X)^2$ zaten $n$ kadar terim içeriyor; $n$'i iki kez bölmüş olursun.
+
 --- LESSON u6e | ★ | Gauss–Markov ve normallik
 
 ## CARD Gauss–Markov teoremi
@@ -577,4 +1018,58 @@ Gerekçe: hataların normal ve homoskedastik olduğuna inanmak için genelde seb
 **Diğer şıklar neden yanlış?**
 • Tam normal hatalar ve homoskedastisite: pratikte nadiren inandırıcı varsayımlar.
 • "Small-sample t values only": büyük örneklemde $t_{n-2} \approx N(0,1)$; ayrıca küçük örneklem t değerleri ancak normallik varsa geçerli.
+
+## Q
+SRC: TB 5.7
+EN: Under the least squares assumptions ($E(u_i \mid X_i) = 0$; $(X_i, Y_i)$ i.i.d.; $X_i$ and $u_i$ have finite fourth moments), the OLS estimators of the slope and the intercept:
+TR: En küçük kareler varsayımları altında ($E(u_i\mid X_i)=0$; $(X_i,Y_i)$ i.i.d.; $X_i$ ve $u_i$'nin sonlu dördüncü momenti var) eğim ve sabit terimin OLS tahmincileri:
++ are unbiased
+- are BLUE
+- have an exact normal distribution when $n > 15$
+- are normally distributed even in small samples
+EX: **Doğru cevap: unbiased.**
+Üç varsayım OLS'yi **yansız** ve **tutarlı** yapar; büyük örneklemde de yaklaşık normal dağılır.
+**Diğer şıklar neden yanlış?**
+• BLUE: Gauss–Markov için ek olarak **homoskedastisite** gerekir.
+• "exact normal for $n > 15$": büyük örneklem normalliği **yaklaşıktır**; sihirli bir $n$ eşiği yok.
+• "even in small samples": küçük örneklemde normallik için hataların normal olması gerekir; bu üç varsayımda yok.
+
+## Q
+SRC: TB 5.23
+EN: The proof that OLS is BLUE (the Gauss–Markov theorem) requires all of the following assumptions EXCEPT:
+TR: OLS'nin BLUE olduğunun ispatı (Gauss–Markov teoremi) aşağıdaki varsayımların hepsini gerektirir, BİRİ HARİÇ:
++ the errors are normally distributed
+- the errors are homoskedastic
+- $E(u_i \mid X_i) = 0$
+- large outliers are unlikely
+EX: **Doğru cevap (gerekmez): normal errors.**
+Gauss–Markov için gerekenler: en küçük kareler varsayımları ($E(u\mid X)=0$, i.i.d., büyük aykırı değer yok) + **homoskedastisite**. Normallik gerekmez. Normallik, küçük örneklemde $t$ istatistiğinin tam $t_{n-2}$ dağılması için gereken ayrı bir varsayımdır.
+**Diğer üç şık** teoremin gerektirdiği varsayımlardır.
+
+## Q
+SRC: TB 5.24
+EN: If the errors are heteroskedastic, then:
+TR: Hatalar heteroskedastikse:
++ WLS is BLUE if the conditional variance of the errors is known up to a constant factor of proportionality
+- OLS is BLUE
+- LAD is BLUE if the conditional variance of the errors is known up to a constant factor
+- OLS is efficient
+EX: **Doğru cevap: WLS is BLUE (if the variance is known up to a constant).**
+$\text{var}(u_i\mid X_i) = \lambda\,h(X_i)$ ve $h$ biliniyorsa, her gözlemi $1/\sqrt{h(X_i)}$ ile ağırlıklandırmak modeli homoskedastik yapar. Dönüştürülmüş modelde OLS (yani WLS) BLUE olur.
+**Diğer şıklar neden yanlış?**
+• OLS BLUE / efficient: heteroskedastisite altında değildir (yine de yansız ve tutarlıdır).
+• LAD: en küçük mutlak sapmalar doğrusal bir tahminci bile değil; BLUE olamaz.
+
+## Q
+SRC: TB 5.25
+EN: The homoskedastic normal regression assumptions include all of the following EXCEPT:
+TR: Homoskedastik normal regresyon varsayımları aşağıdakilerin hepsini içerir, BİRİ HARİÇ:
++ there are at least 10 observations
+- the errors are homoskedastic
+- the errors are normally distributed
+- large outliers are unlikely
+EX: **Doğru cevap (varsayım değil): at least 10 observations.**
+Homoskedastik normal regresyon varsayımları: üç en küçük kareler varsayımı (aykırı değer şartı dahil) + homoskedastisite + $u_i \sim N$. Bu varsayımlar altında $t$ istatistiği **her $n$ için** tam $t_{n-2}$ dağılır. Belirli bir minimum gözlem sayısı yoktur.
+**Diğer üç şık** varsayımların parçasıdır.
+
 `);

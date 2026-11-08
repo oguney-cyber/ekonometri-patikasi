@@ -134,6 +134,53 @@ Olay, bir ya da daha fazla sonucun toplanmasıdır. İki para örneğinde "en az
 
 ## GEN cdfTable
 
+## Q
+SRC: TB 2.1
+EN: The probability of an outcome is:
+TR: Bir sonucun olasılığı nedir?
++ the proportion of times the outcome occurs in the long run
+- the number of times the outcome occurs in the long run
+- $M \times N$, where $M$ is the number of occurrences and $N$ is the population size
+- the sample mean divided by the sample standard deviation
+EX: **Doğru cevap: the proportion of times the outcome occurs in the long run.**
+Olasılık, deney çok kez tekrarlandığında o sonucun gerçekleştiği **zamanların oranıdır**. Örnek: hilesiz zar sonsuz kez atılırsa 6 gelme oranı 1/6'ya yaklaşır.
+**Diğer şıklar neden yanlış?**
+• "number of times": sayı (frekans) 0–1 arasında kalmaz, sınırsız büyür; olasılık oran olmalı.
+• $M \times N$: çarpmak anlamsız; oran için bölmek gerekir.
+• mean / std: bu bir olasılık değil, bir tür standartlaştırılmış ölçü.
+
+## Q
+SRC: TB 2.2
+EN: For two events $A$ and $B$, $\Pr(A \text{ or } B)$ equals:
+TR: İki olay $A$ ve $B$ için $\Pr(A \text{ veya } B)$ neye eşittir?
++ $\Pr(A) + \Pr(B)$ if $A$ and $B$ are mutually exclusive
+- $\Pr(A) \times \Pr(B)$
+- $\Pr(A) + \Pr(B)$ even if $A$ and $B$ can happen together
+- $\Pr(A) / \Pr(B)$
+EX: **Doğru cevap: $\Pr(A)+\Pr(B)$, if A and B are mutually exclusive.**
+Genel toplama kuralı: $\Pr(A \text{ or } B) = \Pr(A) + \Pr(B) - \Pr(A \text{ and } B)$.
+"Mutually exclusive" (ayrık) = ikisi aynı anda olamaz, yani $\Pr(A \text{ and } B) = 0$. Bu durumda formül $\Pr(A)+\Pr(B)$'ye iner.
+Örnek: zarda "1 gelir" ve "2 gelir" ayrıktır: $1/6 + 1/6 = 1/3$.
+**Diğer şıklar neden yanlış?**
+• $\Pr(A)\times\Pr(B)$: bu "A **ve** B"nin olasılığı, üstelik sadece bağımsızlık varsa.
+• "even if they can happen together": ortak kısım iki kez sayılır. Örnek: "çift gelir" (1/2) ve "6'dan küçük" (5/6) toplamı 1'i geçer!
+• bölme: anlamsız.
+
+## Q
+SRC: TB 2.3
+EN: The cumulative probability distribution of a random variable tells you the probability that:
+TR: Bir rassal değişkenin birikimli olasılık dağılımı (CDF) hangi olasılığı verir?
++ the variable is less than or equal to a given value
+- two or more events happen at the same time
+- all possible outcomes happen
+- the variable takes a given value, given that another event has happened
+EX: **Doğru cevap: less than or equal to a given value.**
+CDF: $F(y) = \Pr(Y \le y)$. $y$'ye kadar (dahil) tüm olasılıklar toplanır. Örnek: $\Pr(Y\le 1) = \Pr(Y=0) + \Pr(Y=1)$.
+**Diğer şıklar neden yanlış?**
+• "two or more events at the same time": bu ortak (joint) olasılık.
+• "all possible outcomes": tüm olasılıkların toplamı her zaman 1; bir dağılım değil.
+• "given that another event has happened": bu koşullu olasılık.
+
 --- LESSON u2b | E | Beklenen değer ve varyans
 
 ## CARD Beklenen değer
@@ -309,6 +356,75 @@ Neden karekök? Varyansın birimi $Y$'nin biriminin karesi (TL²). Karekök alı
 ## GEN twoCoins
 ## GEN meanVar
 
+## Q
+SRC: TB 2.4
+EN: The expected value of a discrete random variable is:
+TR: Kesikli bir rassal değişkenin beklenen değeri nedir?
++ the probability-weighted average of its possible outcomes
+- the outcome that is most likely to occur
+- the value at which the c.d.f. reaches 50%
+- always equal to the population median
+EX: **Doğru cevap: probability-weighted average.**
+$E(Y) = \sum_i y_i \Pr(Y=y_i)$. Her olası değer kendi olasılığıyla çarpılır ve toplanır, yani olasılık ağırlıklı ortalama.
+**Diğer şıklar neden yanlış?**
+• "most likely outcome": bu **mod** (tepe değer).
+• "c.d.f. reaches 50%": bu **medyan**.
+• "always equal to the median": sadece simetrik dağılımlarda eşittir. Örneğin gelir dağılımında ortalama medyandan büyüktür.
+
+## Q
+SRC: TB 2.5
+EN: Let $Y$ be a random variable with mean $\mu_Y$. Its variance, $\text{var}(Y)$, is:
+TR: $Y$, ortalaması $\mu_Y$ olan bir rassal değişken olsun. Varyansı $\text{var}(Y)$ nedir?
++ $E[(Y - \mu_Y)^2]$
+- $E(Y - \mu_Y)$
+- $\sqrt{E[(Y - \mu_Y)^2]}$
+- $E[(Y - \mu_Y)^3]$
+EX: **Doğru cevap: $E[(Y-\mu_Y)^2]$.**
+Varyans = ortalamadan sapmaların **karesinin** beklenen değeri. Kare alınır çünkü pozitif ve negatif sapmalar birbirini götürmesin.
+**Diğer şıklar neden yanlış?**
+• $E(Y-\mu_Y)$: her zaman 0'dır, çünkü $E(Y) - \mu_Y = 0$. Kare almamanın sebebi tam olarak bu.
+• $\sqrt{\cdot}$: bu **standart sapma** $\sigma_Y$.
+• üçüncü kuvvet: çarpıklığın payı (skewness).
+
+## Q
+SRC: TB 2.33
+EN: You assign these subjective probabilities to your final econometrics grade (on the scale A = 4, B = 3, C = 2, D = 1, F = 0):
+
+| Grade | A | B | C | D | F |
+|---|---|---|---|---|---|
+| Probability | 0.20 | 0.50 | 0.20 | 0.08 | 0.02 |
+
+The expected value of your grade is:
+TR: Ekonometri final notun için şu öznel olasılıkları veriyorsun (A = 4, B = 3, C = 2, D = 1, F = 0 ölçeğinde). Notunun beklenen değeri nedir?
++ 2.78
+- 3.00
+- 3.25
+- 3.50
+EX: **Doğru cevap: 2.78.**
+$E(Y) = \sum y_i \Pr(Y=y_i)$:
+$$E(Y) = 4(0.20) + 3(0.50) + 2(0.20) + 1(0.08) + 0(0.02)$$
+$$= 0.80 + 1.50 + 0.40 + 0.08 + 0 = 2.78$$
+**Diğer şıklar neden yanlış?**
+• 3.00: en olası not (B = 3), yani mod. Beklenen değer mod değildir.
+• 3.25 ve 3.50: hesap hatası; örneğin A'ya ya da B'ye fazla ağırlık verilmiş. D ve F'nin düşük değerleri ortalamayı aşağı çeker.
+
+## Q
+SRC: TB 2.36
+EN: Let $Y$ be the sum of the numbers on two fair dice, so $\Pr(Y=2) = \Pr(Y=12) = 1/36$, and so on. Which statement is FALSE?
+TR: $Y$ iki hilesiz zarın toplamı olsun; $\Pr(Y=2) = \Pr(Y=12) = 1/36$ vb. Hangi ifade YANLIŞTIR?
++ $\Pr(Y \le 7) = 0.5$
+- $E(Y) = 7$
+- $\text{var}(Y) \approx 5.83$
+- the skewness of $Y$ is 0
+EX: **Doğru cevap (yanlış ifade): $\Pr(Y\le 7) = 0.5$.**
+$Y$'nin dağılımı 7 etrafında simetrik ve 7'nin kendisinin olasılığı 6/36.
+$$\Pr(Y\le 7) = \frac{1+2+3+4+5+6}{36} = \frac{21}{36} \approx 0.583$$
+Simetri sadece $\Pr(Y<7) = \Pr(Y>7) = 15/36$ demektir; 7'nin kendi olasılığı da eklenince 0.5'i geçer.
+**Diğer ifadeler neden doğru?**
+• $E(Y) = 3.5 + 3.5 = 7$.
+• Tek zarın varyansı $35/12$. Zarlar bağımsız olduğu için toplamın varyansı $35/12 + 35/12 = 35/6 \approx 5.83$.
+• Dağılım simetrik, bu yüzden çarpıklık 0.
+
 --- LESSON u2c | p | Bernoulli, çarpıklık, basıklık
 
 ## CARD Bernoulli değişkeninin momentleri
@@ -464,6 +580,80 @@ Not: resmi çözümde 0.2591 yazıyor ama bu bir yazım hatası; doğrusu 0.2491
 
 ## GEN bernoulli
 
+## Q
+SRC: TB 2.6
+EN: The skewness of the distribution of a random variable $Y$ is defined as:
+TR: Bir $Y$ rassal değişkeninin dağılımının çarpıklığı (skewness) nasıl tanımlanır?
++ $\dfrac{E[(Y-\mu_Y)^3]}{\sigma_Y^3}$
+- $\dfrac{E[(Y-\mu_Y)^4]}{\sigma_Y^4}$
+- $E[(Y-\mu_Y)^2]$
+- $\dfrac{E[(Y-\mu_Y)^3]}{\sigma_Y^2}$
+EX: **Doğru cevap: $E[(Y-\mu_Y)^3]/\sigma_Y^3$.**
+Üçüncü kuvvet işareti korur: sağdaki uzun kuyruk pozitif, soldaki negatif katkı yapar. $\sigma_Y^3$'e bölmek ölçüyü **birimsiz** yapar; payda $Y$'nin biriminin küpü var, paydada da öyle.
+**Diğer şıklar neden yanlış?**
+• dördüncü kuvvet / $\sigma^4$: bu **basıklık** (kurtosis).
+• $E[(Y-\mu)^2]$: bu **varyans**.
+• $\sigma_Y^2$ ile bölmek: kuvvetler tutmuyor (3 ile 2); sonuç birimsiz olmaz.
+
+## Q
+SRC: TB 2.7
+EN: Which of these distributions most likely has positive skewness (a long right tail)?
+TR: Bu dağılımlardan hangisinin pozitif çarpıklığa (sağa uzun kuyruk) sahip olması en olasıdır?
++ household income in the United States
+- grades at your university
+- SAT scores in English
+- heights of 18-year-old women in the United States
+EX: **Doğru cevap: U.S. household income.**
+Gelir dağılımında çoğu hane orta gelirli, ama birkaç milyarder sağa çok uzun bir kuyruk oluşturur. Sonuç: ortalama > medyan ve **pozitif çarpıklık**.
+**Diğer şıklar neden yanlış?**
+• grades: notlar genelde yukarıda toplanır (çoğu B, A); kuyruk sola uzar, yani negatif çarpıklık.
+• SAT ve boy: bunlar yaklaşık normal (simetrik) dağılır, çarpıklık 0'a yakın.
+
+## Q
+SRC: TB 2.8
+EN: The kurtosis of the distribution of $Y$ is:
+TR: $Y$'nin dağılımının basıklığı (kurtosis) nedir?
++ $\dfrac{E[(Y-\mu_Y)^4]}{\sigma_Y^4}$
+- $\dfrac{E[(Y-\mu_Y)^3]}{\sigma_Y^3}$
+- $E[(Y-\mu_Y)^4]$
+- $\dfrac{E[(Y-\mu_Y)^4]}{\sigma_Y^2}$
+EX: **Doğru cevap: $E[(Y-\mu_Y)^4]/\sigma_Y^4$.**
+Basıklık kuyrukların ne kadar "kalın" olduğunu ölçer. Dördüncü kuvvet büyük sapmaları çok büyütür; $\sigma_Y^4$'e bölmek ölçüyü birimsiz yapar. Normal dağılımda basıklık 3'tür.
+**Diğer şıklar neden yanlış?**
+• üçüncü kuvvet: bu **çarpıklık**.
+• bölmeden: birimsiz değil; $Y$'yi dolar yerine sent ile ölçersen değer değişir.
+• $\sigma^2$ ile bölmek: kuvvetler tutmuyor.
+
+## Q
+SRC: TB 2.9
+EN: For a normal distribution, the skewness and the kurtosis are:
+TR: Normal dağılım için çarpıklık ve basıklık değerleri nedir?
++ 0 and 3
+- 0 and 0
+- 1.96 and 4
+- 1 and 2
+EX: **Doğru cevap: 0 ve 3.**
+• Normal dağılım tam simetrik, bu yüzden çarpıklık = 0.
+• Normal dağılımın basıklığı = 3. Basıklığı 3'ten büyük olan dağılımlara "kalın kuyruklu" (leptokurtic) denir.
+**Diğer şıklar neden yanlış?**
+• 0 ve 0: basıklık hiçbir zaman 0 olamaz (dördüncü kuvvetlerin ortalaması pozitif). "Fazla basıklık" (excess kurtosis = basıklık − 3) normal için 0'dır, karıştırma.
+• 1.96: bu %95 kritik değer, basıklıkla ilgisi yok.
+
+## Q
+SRC: TB 2.34
+EN: A Bernoulli random variable equals 1 with probability $p$ and 0 otherwise. Its mean and variance are:
+TR: Bir Bernoulli rassal değişkeni $p$ olasılıkla 1, aksi halde 0 değerini alır. Ortalaması ve varyansı nedir?
++ $p$ and $p(1-p)$
+- $np$ and $np(1-p)$
+- $p$ and $\sqrt{p(1-p)}$
+- they cannot be calculated
+EX: **Doğru cevap: $p$ ve $p(1-p)$.**
+• Ortalama: $E(G) = 1\cdot p + 0\cdot (1-p) = p$.
+• Varyans: $G$ sadece 0 ya da 1 olduğu için $G^2 = G$, yani $E(G^2) = p$. Böylece $\text{var}(G) = E(G^2) - [E(G)]^2 = p - p^2 = p(1-p)$.
+**Diğer şıklar neden yanlış?**
+• $np$ ve $np(1-p)$: bunlar $n$ bağımsız Bernoulli'nin toplamının, yani **binom** dağılımın ortalaması ve varyansı.
+• $\sqrt{p(1-p)}$: bu standart sapma, varyans değil.
+
 --- LESSON u2d | ⊞ | Ortak, marjinal ve koşullu dağılım
 
 ## CARD Ortak dağılım
@@ -592,6 +782,38 @@ Sezgi: $X=x$ olduğunu bilince sadece $X=x$ olan durumlara bakarsın (toplam ola
 • $P(Y) + P(X) - P(Y,X)$: bu "ya da" olasılığı, $P(Y=y \text{ ya da } X=x)$.
 
 ## GEN joint
+
+## Q
+SRC: TB 2.10
+EN: The conditional distribution of $Y$ given $X = x$, $\Pr(Y = y \mid X = x)$, is:
+TR: $X = x$ verildiğinde $Y$'nin koşullu dağılımı $\Pr(Y = y \mid X = x)$ nedir?
++ $\dfrac{\Pr(X = x,\ Y = y)}{\Pr(X = x)}$
+- $\dfrac{\Pr(X = x,\ Y = y)}{\Pr(Y = y)}$
+- $\Pr(X = x)\,\Pr(Y = y)$
+- $\dfrac{\Pr(Y = y)}{\Pr(X = x)}$
+EX: **Doğru cevap: ortak olasılık / $\Pr(X=x)$.**
+Koşullu olasılık = ortak olasılık ÷ **koşulun** olasılığı. Koşul "$X = x$" olduğu için payda $\Pr(X=x)$. Tabloda düşünürsen: $X = x$ satırına daralırsın ve o satırın toplamına bölersin.
+**Diğer şıklar neden yanlış?**
+• $\Pr(Y=y)$ ile bölmek: bu $\Pr(X=x \mid Y=y)$, yani ters koşul.
+• çarpım: bu ortak olasılık, ama sadece $X$ ve $Y$ bağımsızsa.
+• $\Pr(Y=y)/\Pr(X=x)$: ortak olasılık yok; anlamsız.
+
+## Q
+SRC: TB 2.38
+EN: Bayes' rule states that $\Pr(Y = y \mid X = x)$ equals:
+TR: Bayes kuralına göre $\Pr(Y = y \mid X = x)$ neye eşittir?
++ $\dfrac{\Pr(X = x \mid Y = y)\,\Pr(Y = y)}{\Pr(X = x)}$
+- $\Pr(X = x \mid Y = y)$
+- $\dfrac{\Pr(X = x \mid Y = y)\,\Pr(X = x)}{\Pr(Y = y)}$
+- $\Pr(X = x \mid Y = y)\,\Pr(Y = y)$
+EX: **Doğru cevap: $\Pr(X=x\mid Y=y)\Pr(Y=y)/\Pr(X=x)$.**
+1. Koşullu olasılık tanımı: $\Pr(Y=y\mid X=x) = \Pr(X=x, Y=y)/\Pr(X=x)$.
+2. Ortak olasılığı ters koşulla yaz: $\Pr(X=x, Y=y) = \Pr(X=x\mid Y=y)\Pr(Y=y)$.
+3. Yerine koy, Bayes kuralı çıkar.
+**Diğer şıklar neden yanlış?**
+• sadece $\Pr(X=x\mid Y=y)$: koşulu ters çevirmek genelde aynı sonucu vermez (klasik hata).
+• $\Pr(X=x)$ ile $\Pr(Y=y)$ yer değiştirmiş: pay ortak olasılık olmaz.
+• paydasız: sadece ortak olasılık; koşullu değil.
 
 --- LESSON u2e | E(·|·) | Koşullu beklenti, LIE, bağımsızlık
 
@@ -761,6 +983,51 @@ $E(Y\mid X=x)$ ise ($x$ belli bir sayı) sabit bir sayıdır.
 
 ## GEN condExp
 
+## Q
+SRC: TB 2.11
+EN: The conditional expectation of $Y$ given $X = x$, $E(Y \mid X = x)$, is computed as:
+TR: $X = x$ verildiğinde $Y$'nin koşullu beklenen değeri $E(Y \mid X = x)$ nasıl hesaplanır?
++ $\sum_{i=1}^{k} y_i \Pr(Y = y_i \mid X = x)$
+- $\sum_{i=1}^{k} y_i \Pr(Y = y_i)$
+- $\sum_{i=1}^{k} y_i \Pr(X = x \mid Y = y_i)$
+- $\sum_{i=1}^{k} y_i \Pr(X = x,\ Y = y_i)$
+EX: **Doğru cevap: $\sum y_i \Pr(Y = y_i\mid X=x)$.**
+Koşullu beklenti, koşullu dağılımın ortalamasıdır: her $y_i$ değeri, $X = x$ verildiğinde **koşullu** olasılığıyla çarpılır.
+**Diğer şıklar neden yanlış?**
+• $\Pr(Y=y_i)$: bu koşulsuz ortalama $E(Y)$; $X$'i hiç kullanmıyor.
+• $\Pr(X=x\mid Y=y_i)$: koşul ters.
+• ortak olasılık: $\Pr(X=x)$'e bölmeyi unutmuşsun. Bu toplam $E(Y\mid X=x)\Pr(X=x)$'e eşittir ve 1'e toplanmayan ağırlıklar kullanır.
+
+## Q
+SRC: TB 2.12
+EN: $X$ and $Y$ are independently distributed. Each of the following describes independence EXCEPT:
+TR: $X$ ve $Y$ bağımsız dağılmış. Aşağıdakilerin hepsi bağımsızlığı tarif eder, BİRİ HARİÇ:
++ $E(Y) = E[E(Y \mid X)]$
+- $\Pr(Y = y \mid X = x) = \Pr(Y = y)$ for all $x$ and $y$
+- knowing the value of $X$ tells you nothing about $Y$
+- the conditional distribution of $Y$ given $X$ equals the marginal distribution of $Y$
+EX: **Doğru cevap: $E(Y) = E[E(Y\mid X)]$.**
+Bu **yinelenen beklentiler yasasıdır (LIE)** ve $X$ ile $Y$ bağımlı olsa bile **her zaman** doğrudur. Bu yüzden bağımsızlık hakkında bir şey söylemez.
+**Diğer şıklar bağımsızlığın tanımıdır:**
+• koşullu olasılık = marjinal olasılık;
+• $X$'i bilmek $Y$ hakkında bilgi vermez;
+• koşullu dağılım = marjinal dağılım (ilk şıkkın sözlü hali).
+
+## Q
+SRC: TB 2.39
+EN: You want to predict $Y$ with a function $g(X)$ and judge the prediction by the mean squared prediction error, $E\{[Y - g(X)]^2\}$. The function $g(X)$ that minimizes it is:
+TR: $Y$'yi bir $g(X)$ fonksiyonuyla tahmin etmek istiyorsun ve tahmini ortalama kare tahmin hatasıyla, $E\{[Y - g(X)]^2\}$, değerlendiriyorsun. Bunu en küçük yapan $g(X)$ nedir?
++ $E(Y \mid X)$
+- $E(X \mid Y)$
+- $E(Y)$
+- $X$ itself
+EX: **Doğru cevap: $E(Y\mid X)$.**
+Kare hata ölçüsünde en iyi tahmin her zaman **ortalamadır**. $X$'i bildiğin için $X$'e özgü ortalamayı, yani koşullu beklentiyi kullanırsın. Regresyonun hedeflediği şey de budur: $E(Y\mid X) = \beta_0 + \beta_1 X$.
+**Diğer şıklar neden yanlış?**
+• $E(X\mid Y)$: ters yön; $Y$'yi bilerek $X$'i tahmin eder.
+• $E(Y)$: $X$'i kullanmayan en iyi **sabit** tahmin. $X$ bilgi taşıyorsa $E(Y\mid X)$ daha iyi yapar.
+• $X$: birimleri bile farklı olabilir; hiçbir optimallik özelliği yok.
+
 --- LESSON u2f | ρ | Kovaryans, korelasyon ve kurallar
 
 ## CARD Kovaryans
@@ -923,4 +1190,83 @@ Bu yüzden kovaryansın büyüklüğünü yorumlamak zordur: yılı aya çevirir
 
 ## GEN linComb
 ## GEN corrCalc
+
+## Q
+SRC: TB 2.13
+EN: The correlation between $X$ and $Y$:
+TR: $X$ ile $Y$ arasındaki korelasyon:
++ equals their covariance divided by the product of their standard deviations
+- cannot be negative, because variances are always positive
+- is the covariance squared
+- is the covariance divided by the variance of $X$
+EX: **Doğru cevap: kovaryans / (standart sapmaların çarpımı).**
+$$\text{corr}(X,Y) = \frac{\sigma_{XY}}{\sigma_X \sigma_Y}$$
+Kovaryansın birimi ($X$ birimi × $Y$ birimi), payda $\sigma_X\sigma_Y$ de aynı birimde. Bölünce birimsiz ve $-1$ ile $1$ arasında bir sayı çıkar.
+**Diğer şıklar neden yanlış?**
+• "cannot be negative": payda pozitif ama pay (kovaryans) negatif olabilir.
+• covariance squared: kare almak işareti yok eder; tanım bu değil.
+• $\sigma_{XY}/\sigma_X^2$: bu, regresyon **eğimi** $\beta_1$.
+
+## Q
+SRC: TB 2.14
+EN: Which of the following does NOT imply that $X$ and $Y$ are uncorrelated?
+TR: Aşağıdakilerden hangisi $X$ ile $Y$'nin ilişkisiz (korelasyonsuz) olduğunu GÖSTERMEZ?
++ $|\sigma_{XY}| \le \sigma_X \sigma_Y$
+- $X$ and $Y$ are independent
+- $\text{cov}(X, Y) = 0$
+- $E(Y \mid X) = \mu_Y$
+EX: **Doğru cevap: $|\sigma_{XY}| \le \sigma_X\sigma_Y$.**
+Bu **kovaryans eşitsizliğidir** ve **her** $X$, $Y$ çifti için geçerlidir; korelasyonun $-1$ ile $1$ arasında olmasının sebebi budur. Her zaman doğru olduğu için ilişkisizliği göstermez.
+**Diğer şıklar ilişkisizliği gösterir:**
+• bağımsızlık ⇒ kovaryans 0 (tersi her zaman doğru değil);
+• $\text{cov}=0$: ilişkisizliğin tanımı;
+• $E(Y\mid X) = \mu_Y$ (ortalama bağımsızlığı) ⇒ $\text{cov}(X,Y) = 0$. Kitaptaki önemli sonuç.
+
+## Q
+SRC: TB 2.15
+EN: $\text{var}(aX + bY)$ equals:
+TR: $\text{var}(aX + bY)$ neye eşittir?
++ $a^2\sigma_X^2 + 2ab\,\sigma_{XY} + b^2\sigma_Y^2$
+- $a^2\sigma_X^2 + b^2\sigma_Y^2$
+- $a\,\sigma_X^2 + b\,\sigma_Y^2$
+- $a^2\sigma_X^2 + 2ab\,\sigma_X\sigma_Y + b^2\sigma_Y^2$
+EX: **Doğru cevap: $a^2\sigma_X^2 + 2ab\,\sigma_{XY} + b^2\sigma_Y^2$.**
+Sabitler varyansın içinden **karesi** alınarak çıkar ($\text{var}(aX) = a^2\sigma_X^2$). İki değişken birlikte hareket ettiği için kovaryans terimi $2ab\,\sigma_{XY}$ eklenir.
+**Diğer şıklar neden yanlış?**
+• kovaryans yok: sadece $X$ ve $Y$ ilişkisizse ($\sigma_{XY} = 0$) doğru.
+• $a$, $b$ kare alınmamış: sabitler varyanstan karesiyle çıkar.
+• $\sigma_X\sigma_Y$: bu sadece korelasyon tam 1 ise doğrudur, çünkü $\sigma_{XY} = \rho\,\sigma_X\sigma_Y$. ==Dikkat:== ders slaytında bu formül $\sigma_X\sigma_Y$ ile yazılmış; doğrusu kovaryans $\sigma_{XY}$.
+
+## Q
+SRC: TB 2.30
+EN: The covariance inequality states that:
+TR: Kovaryans eşitsizliği ne der?
++ $\sigma_{XY}^2 \le \sigma_X^2\,\sigma_Y^2$
+- $0 \le \sigma_{XY} \le 1$
+- $\sigma_{XY}^2 \ge \sigma_X^2\,\sigma_Y^2$
+- $\sigma_{XY} = \sigma_X\sigma_Y$ for every pair of variables
+EX: **Doğru cevap: $\sigma_{XY}^2 \le \sigma_X^2\sigma_Y^2$.**
+$|\text{corr}(X,Y)| \le 1$ demek $\sigma_{XY}^2/(\sigma_X^2\sigma_Y^2) \le 1$ demektir. Paydayı karşıya atınca $\sigma_{XY}^2 \le \sigma_X^2\sigma_Y^2$, yani $|\sigma_{XY}| \le \sigma_X\sigma_Y$ çıkar.
+**Diğer şıklar neden yanlış?**
+• $0\le\sigma_{XY}\le 1$: kovaryans negatif olabilir ve birimlere göre 1'den çok büyük olabilir. 0–1 aralığı korelasyonun bile aralığı değil (o $-1$ ile $1$).
+• $\ge$: yön ters.
+• eşitlik: sadece tam doğrusal ilişkide ($\rho = 1$) olur.
+
+## Q
+SRC: TB 2.35
+EN: Let $Y = \dfrac{X - \mu_X}{\sigma_X}$, where $\mu_X$ is the mean and $\sigma_X$ the standard deviation of $X$. The mean and the standard deviation of $Y$ are:
+TR: $Y = \dfrac{X - \mu_X}{\sigma_X}$ olsun; $\mu_X$ $X$'in ortalaması, $\sigma_X$ standart sapmasıdır. $Y$'nin ortalaması ve standart sapması nedir?
++ 0 and 1
+- 1 and 1
+- $\mu_X$ and $\sigma_X$
+- they cannot be computed, because $Y$ is not a linear function of $X$
+EX: **Doğru cevap: 0 ve 1.**
+Bu, standartlaştırmadır. $Y = a + bX$ ile $a = -\mu_X/\sigma_X$, $b = 1/\sigma_X$:
+• $E(Y) = \dfrac{E(X) - \mu_X}{\sigma_X} = \dfrac{\mu_X - \mu_X}{\sigma_X} = 0$
+• $\text{sd}(Y) = \dfrac{1}{\sigma_X}\cdot \sigma_X = 1$ (sabit çıkarmak yayılımı değiştirmez).
+**Diğer şıklar neden yanlış?**
+• 1 ve 1: ortalamayı çıkardığın için ortalama 0 olur.
+• $\mu_X$ ve $\sigma_X$: dönüşüm hiçbir şey yapmamış gibi.
+• "not linear": yanlış; $Y$, $X$'in doğrusal fonksiyonudur ($a + bX$).
+
 `);
