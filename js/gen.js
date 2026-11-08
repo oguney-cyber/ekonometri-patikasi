@@ -169,7 +169,15 @@
     const s = pick(SCEN);
     const all = ['cross-sectional data', 'time series data', 'panel data'];
     const tr = { 'cross-sectional data': 'kesit veri: çok birim, tek dönem', 'time series data': 'zaman serisi: tek birim, çok dönem', 'panel data': 'panel veri: çok birim, çok dönem' };
-    return { en: `A data set containing ${s[0]} is an example of:`, tr: `${s[2]} hangi veri türüdür?`, opts: [s[1], ...all.filter(x => x !== s[1])], ex: `Kaç birim, kaç dönem var? Bu veri ${tr[s[1]]}.` };
+    return { en: `A data set containing ${s[0]} is an example of:`, tr: `${s[2]} hangi veri türüdür?`, opts: [s[1], ...all.filter(x => x !== s[1])], ex: `**Doğru cevap: ${tr[s[1]]}.**
+İki soruyu sırayla sor:
+1. **Kaç birim var?** (kişi, firma, il, ülke)
+2. **Kaç zaman dönemi var?** (yıl, ay, çeyrek)
+| Birim | Dönem | Tür |
+| çok | tek | kesit (cross-sectional) |
+| tek | çok | zaman serisi (time series) |
+| çok | çok | panel (longitudinal) |
+Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı kişilere sorulan anket panel değildir.` };
   };
 
   /* ---------- Ünite 2 ---------- */
