@@ -1,5 +1,5 @@
 /* Çevrimdışı çalışma: uygulama dosyaları önbelleğe alınır. Sürüm değişince eski önbellek silinir. */
-const VERSION = 'ekp-2026-11-09b';
+const VERSION = 'ekp-2026-11-09c';
 const CORE = [
   './', 'index.html', 'styles.css', 'manifest.webmanifest',
   'js/stats.js', 'js/gen.js', 'js/parse.js', 'js/app.js', 'js/ink.js', 'js/calc.js', 'js/aids.js', 'js/formulas.js',
@@ -12,7 +12,7 @@ self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', (e) => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('ekp-') && k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', (e) => {
   const req = e.request;
