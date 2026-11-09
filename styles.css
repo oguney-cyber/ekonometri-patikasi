@@ -224,7 +224,8 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--surface-2
 .pill.mark { background: var(--mark); color: var(--mark-ink); }
 
 /* ---------- içerik metni ---------- */
-.prose { display: grid; gap: 12px; }
+.prose { display: grid; gap: 12px; grid-auto-rows: max-content; }
+.prose p.step > strong:first-child { color: var(--pen); }
 .prose p { margin: 0; }
 .prose ul, .prose ol { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
 .prose strong { font-weight: 700; }

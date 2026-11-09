@@ -33,6 +33,16 @@
   const iv = (a, b, d) => '(' + f(a, d) + ',\\ ' + f(b, d) + ')';
   const ivm = (a, b, d) => '$' + iv(a, b, d) + '$';
   const sq = (x) => x * x;
+  // Adım adım çözüm metni: steps(['başlık', 'gövde'], ...) → "**Adım 1: başlık**\ngövde\n\n**Adım 2: ...**"
+  const steps = (...a) => a.filter(Boolean).map((s, i) => `**Adım ${i + 1}: ${s[0]}**\n${s[1]}`).join('\n\n');
+  const fd = (x, d) => (d == null ? String(x) : f(x, d));
+  const par = (x, d) => (x < 0 ? '(' + fd(x, d) + ')' : fd(x, d));      // negatifse parantez içinde
+  const pm = (x, d) => (x < 0 ? '- ' + fd(-x, d) : '+ ' + fd(x, d));    // "+ 3" ya da "- 3"
+  const sumx = (arr, d) => arr.map((v, i) => (i ? pm(v, d) : fd(v, d))).join(' ');
+  const g4 = (x) => String(+(+x).toFixed(4));                            // gereksiz sıfırsız sayı
+  const kisi = (p) => Math.round(p * 100);
+  // Φ(z); z negatifse simetri adımıyla birlikte
+  const phiTx = (z) => z >= 0 ? `\\Phi(${f(z, 2)}) = ${f(Phi(z), 4)}` : `\\Phi(${f(z, 2)}) = 1 - \\Phi(${f(-z, 2)}) = 1 - ${f(Phi(-z), 4)} = ${f(Phi(z), 4)}`;
 
   const G = {};
 
@@ -45,7 +55,11 @@
         en: `Suppose $n=${n}$ and $\\sum_{i=1}^{n} X_i = ${sx}$. What is $\\sum_{i=1}^{n} (${a} + ${b}X_i)$?`,
         tr: `$n=${n}$ ve $\\sum X_i=${sx}$. $\\sum (${a}+${b}X_i)$ kaçtır?`,
         opts: nopts(c, [a + b * sx, n * (a + b * sx), (a + b) * sx, n * a * b * sx], 0),
-        ex: `Toplam dağılır ve sabitin toplamı $n$ katıdır: $\\sum ${a} + ${b}\\sum X_i = ${n}\\cdot${a} + ${b}\\cdot${sx} = ${n * a} + ${b * sx} = ${c}$. Sabiti $n$ ile çarpmayı unutmak en sık hata.`
+        ex: steps(
+          ['Toplamı parçalara ayır', `Toplam işareti parantezin içindeki her parçaya ayrı ayrı uygulanır:\n$\\sum (${a} + ${b}X_i) = \\sum ${a} + \\sum ${b}X_i$`],
+          ['Sabitin toplamını bul', `${a} sayısı her gözlemde aynı. $n = ${n}$ gözlem olduğu için ${n} kez toplanır:\n$\\sum ${a} = ${n}\\times${a} = ${n * a}$`],
+          ['Sabit çarpanı dışarı al', `Her $X_i$ aynı sayıyla (${b}) çarpılıyor; bu çarpan toplamın dışına çıkar:\n$\\sum ${b}X_i = ${b}\\times\\sum X_i = ${b}\\times${sx} = ${b * sx}$`],
+          ['İki parçayı topla', `$${n * a} + ${b * sx} = ${c}$`])
       };
     }
     const xb = R(2, 15), c = n * xb * b;
@@ -53,7 +67,9 @@
       en: `A sample of $n=${n}$ observations has mean $\\bar X = ${xb}$. What is $\\sum_{i=1}^{n} ${b}X_i$?`,
       tr: `$n=${n}$ gözlemin ortalaması $\\bar X=${xb}$. $\\sum ${b}X_i$ kaçtır?`,
       opts: nopts(c, [b * xb, n * xb, b * xb / n, n * xb + b], 0),
-      ex: `$\\sum X_i = n\\bar X = ${n}\\cdot${xb} = ${n * xb}$. Sabit dışarı çıkar: $\\sum ${b}X_i = ${b}\\cdot${n * xb} = ${c}$.`
+      ex: steps(
+        ['Toplamı ortalamadan bul', `Ortalama = toplam ÷ gözlem sayısı. Ters çevirince toplam = gözlem sayısı × ortalama:\n$\\sum X_i = n\\bar X = ${n}\\times${xb} = ${n * xb}$`],
+        ['Sabit çarpanı dışarı al', `Her $X_i$ aynı sayıyla (${b}) çarpılıyor; bu çarpan toplamın dışına çıkar:\n$\\sum ${b}X_i = ${b}\\times\\sum X_i = ${b}\\times${n * xb} = ${c}$`])
     };
   };
 
@@ -64,9 +80,16 @@
     const xb = s / k, dev = xs.reduce((a, b) => a + sq(b - xb), 0);
     const which = R(0, 2);
     const list = xs.join(',\\ ');
-    if (which === 0) return { en: `Let $X = ${list}$. Compute $\\sum X_i^2$.`, tr: `$X = ${list}$. $\\sum X_i^2$ kaçtır?`, opts: nopts(s2, [s * s, s, dev], 0), ex: `Önce kare al, sonra topla: $${xs.map(x => `${x < 0 ? '(' + x + ')' : x}^2`).join('+')} = ${s2}$. $(\\sum X_i)^2 = ${s}^2 = ${s * s}$ farklıdır, karıştırma.` };
-    if (which === 1) return { en: `Let $X = ${list}$. Compute $\\left(\\sum X_i\\right)^2$.`, tr: `$X = ${list}$. $(\\sum X_i)^2$ kaçtır?`, opts: nopts(s * s, [s2, s, 2 * s], 0), ex: `Önce topla, sonra kare al: $\\sum X_i = ${s}$, karesi $${s * s}$. Karelerin toplamı ise $${s2}$.` };
-    return { en: `Let $X = ${list}$. Compute $\\sum (X_i-\\bar X)^2$.`, tr: `$X = ${list}$. $\\sum (X_i-\\bar X)^2$ kaçtır?`, opts: nopts(dev, [s2, 0, dev / (k - 1), s2 - xb * xb], 2), ex: `$\\bar X = ${s}/${k} = ${f(xb, 3)}$. Kısayol: $\\sum (X_i-\\bar X)^2 = \\sum X_i^2 - n\\bar X^2 = ${s2} - ${k}(${f(xb, 3)})^2 = ${f(dev, 2)}$. Sapmaların kendisinin toplamı 0'dır ama karelerinin toplamı değil.` };
+    if (which === 0) return { en: `Let $X = ${list}$. Compute $\\sum X_i^2$.`, tr: `$X = ${list}$. $\\sum X_i^2$ kaçtır?`, opts: nopts(s2, [s * s, s, dev], 0), ex: steps(
+      ['Her sayının karesini al', xs.map(x => `$${par(x)}^2 = ${x * x}$`).join(', ') + (xs.some(x => x < 0) ? '\nNegatif sayının karesi pozitiftir: eksi çarpı eksi artı.' : '')],
+      ['Kareleri topla', `$\\sum X_i^2 = ${xs.map(x => x * x).join(' + ')} = ${s2}$`]) + `\n\n$(\\sum X_i)^2$ başka bir şey: önce toplanır, sonra karesi alınır. Onun sonucu $${par(s)}^2 = ${s * s}$.` };
+    if (which === 1) return { en: `Let $X = ${list}$. Compute $\\left(\\sum X_i\\right)^2$.`, tr: `$X = ${list}$. $(\\sum X_i)^2$ kaçtır?`, opts: nopts(s * s, [s2, s, 2 * s], 0), ex: steps(
+      ['Önce sayıları topla', `$\\sum X_i = ${sumx(xs)} = ${s}$`],
+      ['Sonra toplamın karesini al', `$${par(s)}^2 = ${s * s}$`]) + `\n\n$\\sum X_i^2$ başka bir şey: önce her sayının karesi alınır, sonra toplanır. Onun sonucu $${s2}$.` };
+    return { en: `Let $X = ${list}$. Compute $\\sum (X_i-\\bar X)^2$.`, tr: `$X = ${list}$. $\\sum (X_i-\\bar X)^2$ kaçtır?`, opts: nopts(dev, [s2, 0, dev / (k - 1), s2 - xb * xb], 2), ex: steps(
+      ['Ortalamayı bul', `$\\bar X = \\dfrac{${sumx(xs)}}{${k}} = \\dfrac{${s}}{${k}} = ${f(xb, 3)}$`],
+      ['Her sayıdan ortalamayı çıkar, sonra karesini al', `\n| $X_i$ | $X_i-\\bar X$ | $(X_i-\\bar X)^2$ |\n` + xs.map(x => `| ${x} | ${f(x - xb, 3)} | ${f(sq(x - xb), 3)} |`).join('\n') + `\n| **Toplam** | 0 | ${f(dev, 3)} |`],
+      ['Son sütunu topla', `$\\sum (X_i-\\bar X)^2 = ${xs.map(x => f(sq(x - xb), 3)).join(' + ')} = ${f(dev, 2)}$\nOrtadaki sütunun toplamı hep 0 çıkar (sapmalar birbirini götürür). Bu yüzden karelerini alıyoruz.`]) + `\n\n**Kontrol (kısayol):** $\\sum X_i^2 - n\\bar X^2 = ${s2} - ${k}\\times(${f(xb, 3)})^2 = ${f(dev, 2)}$` };
   };
 
   G.dotProduct = () => {
@@ -79,17 +102,32 @@
       en: `Let $a = ${v(a)}$ and $b = ${v(b)}$. What is $a'b$?`,
       tr: `$a'b$ iç çarpımı kaçtır?`,
       opts: nopts(c, [aa, sumAll, c + 2 * a[0] * b[0], -c], 0),
-      ex: `$a'b = \\sum a_ib_i = (${a[0]})(${b[0]}) + (${a[1]})(${b[1]}) + (${a[2]})(${b[2]}) = ${c}$. Sonuç tek bir sayı ($1\\times1$).`
+      ex: steps(
+        ['Aynı sıradaki elemanları eşleştir', `Birinciler: ${a[0]} ve ${b[0]}. İkinciler: ${a[1]} ve ${b[1]}. Üçüncüler: ${a[2]} ve ${b[2]}.`],
+        ['Her çifti çarp', [0, 1, 2].map(i => `$${par(a[i])}\\times${par(b[i])} = ${a[i] * b[i]}$`).join(', ')],
+        ['Çarpımları topla', `$a'b = ${sumx([0, 1, 2].map(i => a[i] * b[i]))} = ${c}$`]) + `\n\nSonuç tek bir sayı: $a'$ $1\\times3$, $b$ $3\\times1$, çarpımları $1\\times1$.`
     };
   };
 
   G.matDim = () => {
     const ds = [2, 3, 4, 5, 6, 7].sort(() => Math.random() - 0.5), m = ds[0], n = ds[1], p = ds[2];
     const t = R(0, 3);
-    if (t === 0) return { en: `$A$ is $${m}\\times${n}$ and $B$ is $${n}\\times${p}$. The dimension of $AB$ is:`, tr: `$A$ $${m}\\times${n}$, $B$ $${n}\\times${p}$. $AB$'nin boyutu nedir?`, opts: [`$${m}\\times${p}$`, `$${n}\\times${n}$`, `$${p}\\times${m}$`, `not defined`].filter((x, i, s) => s.indexOf(x) === i), ex: `İçteki sayılar (${n} ve ${n}) eşit, çarpım tanımlı. Sonuç dıştakiler: $${m}\\times${p}$.` };
-    if (t === 1) { const q = ds[3]; return { en: `$A$ is $${m}\\times${n}$ and $B$ is $${q}\\times${p}$. Then $AB$:`, tr: `$A$ $${m}\\times${n}$, $B$ $${q}\\times${p}$. $AB$ için ne söylenir?`, opts: [`is not defined`, `is $${m}\\times${p}$`, `is $${n}\\times${q}$`, `is $${m}\\times${q}$`], ex: `$A$'nın sütun sayısı (${n}) $B$'nin satır sayısına (${q}) eşit değil. Uyumlu değiller, çarpım tanımsız.` }; }
-    if (t === 2) return { en: `$X$ is $${m * 10}\\times${n}$. What is the dimension of $X'X$?`, tr: `$X$ $${m * 10}\\times${n}$ ise $X'X$'in boyutu nedir?`, opts: [`$${n}\\times${n}$`, `$${m * 10}\\times${m * 10}$`, `$${n}\\times${m * 10}$`, `$${m * 10}\\times${n}$`], ex: `$X'$ $${n}\\times${m * 10}$. $(${n}\\times${m * 10})(${m * 10}\\times${n}) = ${n}\\times${n}$. Regresyonda $X'X$ her zaman (katsayı sayısı)×(katsayı sayısı) olur.` };
-    return { en: `$A$ is $${m}\\times${n}$. What is the dimension of $A'A$?`, tr: `$A$ $${m}\\times${n}$ ise $A'A$'nın boyutu nedir?`, opts: [`$${n}\\times${n}$`, `$${m}\\times${m}$`, `$${m}\\times${n}$`, `not defined`].filter((x, i, s) => s.indexOf(x) === i), ex: `$A'$ $${n}\\times${m}$. $(${n}\\times${m})(${m}\\times${n}) = ${n}\\times${n}$.` };
+    if (t === 0) return { en: `$A$ is $${m}\\times${n}$ and $B$ is $${n}\\times${p}$. The dimension of $AB$ is:`, tr: `$A$ $${m}\\times${n}$, $B$ $${n}\\times${p}$. $AB$'nin boyutu nedir?`, opts: [`$${m}\\times${p}$`, `$${n}\\times${n}$`, `$${p}\\times${m}$`, `not defined`].filter((x, i, s) => s.indexOf(x) === i), ex: steps(
+      ['Boyutları yan yana yaz', `$(${m}\\times${n})\\,(${n}\\times${p})$`],
+      ['İçteki iki sayıya bak', `$A$'nın sütun sayısı ${n}, $B$'nin satır sayısı ${n}. Eşitler, yani çarpım tanımlı.`],
+      ['Sonuç dıştaki iki sayı', `Satır sayısı $A$'dan (${m}), sütun sayısı $B$'den (${p}) gelir: $${m}\\times${p}$.`]) };
+    if (t === 1) { const q = ds[3]; return { en: `$A$ is $${m}\\times${n}$ and $B$ is $${q}\\times${p}$. Then $AB$:`, tr: `$A$ $${m}\\times${n}$, $B$ $${q}\\times${p}$. $AB$ için ne söylenir?`, opts: [`is not defined`, `is $${m}\\times${p}$`, `is $${n}\\times${q}$`, `is $${m}\\times${q}$`], ex: steps(
+      ['Boyutları yan yana yaz', `$(${m}\\times${n})\\,(${q}\\times${p})$`],
+      ['İçteki iki sayıya bak', `$A$'nın sütun sayısı ${n}, $B$'nin satır sayısı ${q}. Eşit değiller.`],
+      ['Karar', `Çarpımda $A$'nın her satırı $B$'nin her sütunuyla eleman eleman çarpılır; bunun için ikisinin uzunluğu aynı olmalı. $${n}\\ne${q}$ olduğu için $AB$ tanımsız.`]) }; }
+    if (t === 2) return { en: `$X$ is $${m * 10}\\times${n}$. What is the dimension of $X'X$?`, tr: `$X$ $${m * 10}\\times${n}$ ise $X'X$'in boyutu nedir?`, opts: [`$${n}\\times${n}$`, `$${m * 10}\\times${m * 10}$`, `$${n}\\times${m * 10}$`, `$${m * 10}\\times${n}$`], ex: steps(
+      ['Transpozun boyutunu bul', `Transpoz satırla sütunun yerini değiştirir: $X$ $${m * 10}\\times${n}$ ise $X'$ $${n}\\times${m * 10}$.`],
+      ['Boyutları yan yana yaz', `$X'X$: $(${n}\\times${m * 10})\\,(${m * 10}\\times${n})$. İçteki sayılar eşit (${m * 10}), çarpım tanımlı.`],
+      ['Sonuç dıştaki iki sayı', `$${n}\\times${n}$. Regresyonda $X'X$ hep (katsayı sayısı)×(katsayı sayısı) olur; gözlem sayısı (${m * 10}) içte kalıp kaybolur.`]) };
+    return { en: `$A$ is $${m}\\times${n}$. What is the dimension of $A'A$?`, tr: `$A$ $${m}\\times${n}$ ise $A'A$'nın boyutu nedir?`, opts: [`$${n}\\times${n}$`, `$${m}\\times${m}$`, `$${m}\\times${n}$`, `not defined`].filter((x, i, s) => s.indexOf(x) === i), ex: steps(
+      ['Transpozun boyutunu bul', `Transpoz satırla sütunun yerini değiştirir: $A$ $${m}\\times${n}$ ise $A'$ $${n}\\times${m}$.`],
+      ['Boyutları yan yana yaz', `$A'A$: $(${n}\\times${m})\\,(${m}\\times${n})$. İçteki sayılar eşit (${m}), çarpım tanımlı.`],
+      ['Sonuç dıştaki iki sayı', `$${n}\\times${n}$.`]) };
   };
 
   G.matEntry = () => {
@@ -103,7 +141,10 @@
       en: `Let $A = ${M(A)}$ and $B = ${M(B)}$. What is the $(${i + 1},${j + 1})$ element of $AB$?`,
       tr: `$AB$ çarpımının $(${i + 1},${j + 1})$ elemanı kaçtır?`,
       opts: nopts(c, [BA[i][j], A[i][j] * B[i][j], AB[j][i], AB[1 - i][1 - j]], 0),
-      ex: `$A$'nın ${i + 1}. satırı $(${A[i].join(', ')})$ ile $B$'nin ${j + 1}. sütunu $(${B[0][j]}, ${B[1][j]})$'nin iç çarpımı: $(${A[i][0]})(${B[0][j]}) + (${A[i][1]})(${B[1][j]}) = ${c}$.`
+      ex: steps(
+        ['Hangi satır, hangi sütun?', `$(${i + 1},${j + 1})$ elemanı için $A$'nın ${i + 1}. satırı ile $B$'nin ${j + 1}. sütunu kullanılır.\n$A$'nın ${i + 1}. satırı: $(${A[i][0]},\\ ${A[i][1]})$\n$B$'nin ${j + 1}. sütunu: $(${B[0][j]},\\ ${B[1][j]})$`],
+        ['Sıradaki elemanları çarp', `Birinciler: $${par(A[i][0])}\\times${par(B[0][j])} = ${A[i][0] * B[0][j]}$\nİkinciler: $${par(A[i][1])}\\times${par(B[1][j])} = ${A[i][1] * B[1][j]}$`],
+        ['Topla', `$${sumx([A[i][0] * B[0][j], A[i][1] * B[1][j]])} = ${c}$`])
     };
   };
 
@@ -114,7 +155,10 @@
       en: `What is the determinant of $\\begin{pmatrix} ${a} & ${b} \\\\ ${c} & ${d} \\end{pmatrix}$?`,
       tr: `Bu 2×2 matrisin determinantı kaçtır?`,
       opts: nopts(det, [a * d + b * c, b * c - a * d, a * b - c * d, a + d], 0),
-      ex: `$|A| = a_{11}a_{22} - a_{12}a_{21} = (${a})(${d}) - (${b})(${c}) = ${a * d} - (${b * c}) = ${det}$.${det === 0 ? ' Determinant 0, yani matris tekil ve tersi yok.' : ''}`
+      ex: steps(
+        ['Ana köşegeni çarp (sol üst × sağ alt)', `$${par(a)}\\times${par(d)} = ${a * d}$`],
+        ['Ters köşegeni çarp (sağ üst × sol alt)', `$${par(b)}\\times${par(c)} = ${b * c}$`],
+        ['Birinciden ikinciyi çıkar', `$|A| = ${a * d} - ${par(b * c)} = ${det}$`]) + (det === 0 ? '\n\nDeterminant 0, yani matris tekil ve tersi yok.' : '')
     };
   };
 
@@ -129,7 +173,11 @@
       en: `Let $A = \\begin{pmatrix} ${a} & ${b} \\\\ ${c} & ${d} \\end{pmatrix}$. What is the $(${pos[0] + 1},${pos[1] + 1})$ element of $A^{-1}$?`,
       tr: `$A^{-1}$'in $(${pos[0] + 1},${pos[1] + 1})$ elemanı kaçtır?`,
       opts: nopts(val, [wrong, adj[pos[0]][pos[1]] * det, [[a, b], [c, d]][pos[0]][pos[1]] / det, adj[pos[0]][pos[1]], -val], 3),
-      ex: `$|A| = (${a})(${d}) - (${b})(${c}) = ${det}$. $A^{-1} = \\frac{1}{${det}}\\begin{pmatrix} ${d} & ${-b} \\\\ ${-c} & ${a} \\end{pmatrix}$. İstenen eleman $${adj[pos[0]][pos[1]]}/${det} = ${f(val, 3)}$. Köşegenler yer değiştirir, köşegen dışındakilerin işareti değişir.`
+      ex: steps(
+        ['Determinantı bul', `$|A| = ${par(a)}\\times${par(d)} - ${par(b)}\\times${par(c)} = ${a * d} - ${par(b * c)} = ${det}$`],
+        ['Köşegendeki iki elemanın yerini değiştir', `Sol üstteki ${a} ile sağ alttaki ${d} yer değiştirir.`],
+        ['Köşegen dışındaki iki elemanın işaretini çevir', `${b} yerine ${-b}, ${c} yerine ${-c} yazılır. Elde edilen matris:\n$\\begin{pmatrix} ${d} & ${-b} \\\\ ${-c} & ${a} \\end{pmatrix}$`],
+        ['Determinanta böl', `$A^{-1} = \\dfrac{1}{${det}}\\begin{pmatrix} ${d} & ${-b} \\\\ ${-c} & ${a} \\end{pmatrix}$\nİstenen $(${pos[0] + 1},${pos[1] + 1})$ konumunda ${adj[pos[0]][pos[1]]} var: $${adj[pos[0]][pos[1]]}/${par(det)} = ${f(val, 3)}$`])
     };
   };
 
@@ -149,7 +197,11 @@
       en: `For a simple regression with $n=5$: $\\sum X_i = ${sx}$, $\\sum Y_i = ${sy}$, $\\sum X_i^2 = ${sxx}$, $\\sum X_iY_i = ${sxy}$. Using $\\hat\\beta = (X'X)^{-1}X'Y$, what is $\\hat\\beta_1$?`,
       tr: `Verilen toplamlarla OLS eğimi $\\hat\\beta_1$ kaçtır?`,
       opts: nopts(b1, [sxy / sxx, (n * sxy - sx * sy) / (n * sxx), (sxy - sx * sy) / (sxx - sx * sx), sy / sx], 3),
-      ex: `$\\hat\\beta_1 = \\dfrac{n\\sum X_iY_i - \\sum X_i\\sum Y_i}{n\\sum X_i^2 - (\\sum X_i)^2} = \\dfrac{5(${sxy}) - (${sx})(${sy})}{5(${sxx}) - ${sx}^2} = \\dfrac{${n * sxy - sx * sy}}{${den}} = ${f(b1, 3)}$.`
+      ex: steps(
+        ['Formülü yaz', '$\\hat\\beta_1 = \\dfrac{n\\sum X_iY_i - \\sum X_i\\sum Y_i}{n\\sum X_i^2 - (\\sum X_i)^2}$'],
+        ['Payı hesapla', `$5\\times${par(sxy)} - ${sx}\\times${par(sy)} = ${5 * sxy} - ${par(sx * sy)} = ${n * sxy - sx * sy}$`],
+        ['Paydayı hesapla', `$5\\times${sxx} - ${sx}^2 = ${5 * sxx} - ${sx * sx} = ${den}$`],
+        ['Böl', `$\\hat\\beta_1 = \\dfrac{${n * sxy - sx * sy}}{${den}} = ${f(b1, 3)}$`]) + '\n\nBu formül $\\sum(X_i-\\bar X)(Y_i-\\bar Y)\\,/\\,\\sum(X_i-\\bar X)^2$ ile aynıdır; pay ve payda $n$ ile çarpılmış hali.'
     };
   };
 
@@ -197,9 +249,15 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const k = R(1, 3), t = R(0, 2);
     const le = p.slice(0, k + 1).reduce((a, b) => a + b, 0), lt = le - p[k];
     const table = tbl(['$y$', ...ys], ['$P(Y=y)$', ...p.map(x => f(x, 2))]);
-    if (t === 0) return { en: `$Y$ has the distribution below. What is $P(Y\\le ${k})$?` + table, tr: `$P(Y\\le ${k})$ kaçtır?`, opts: popts(le, [lt, p[k], 1 - le, 1 - lt], 2), ex: `"Küçük ya da eşit": $P(Y=0)+\\dots+P(Y=${k}) = ${f(le, 2)}$. $<$ ile $\\le$ farkına dikkat.` };
-    if (t === 1) return { en: `$Y$ has the distribution below. What is $P(Y\\ge ${k})$?` + table, tr: `$P(Y\\ge ${k})$ kaçtır?`, opts: popts(1 - lt, [1 - le, lt, p[k], le], 2), ex: `$P(Y\\ge${k}) = 1 - P(Y\\le ${k - 1}) = 1 - ${f(lt, 2)} = ${f(1 - lt, 2)}$.` };
-    return { en: `$Y$ has the distribution below. What is $P(Y > ${k})$?` + table, tr: `$P(Y>${k})$ kaçtır?`, opts: popts(1 - le, [1 - lt, le, p[k]], 2), ex: `$P(Y>${k}) = 1 - P(Y\\le ${k}) = 1 - ${f(le, 2)} = ${f(1 - le, 2)}$. $${k}$ dahil değil.` };
+    if (t === 0) return { en: `$Y$ has the distribution below. What is $P(Y\\le ${k})$?` + table, tr: `$P(Y\\le ${k})$ kaçtır?`, opts: popts(le, [lt, p[k], 1 - le, 1 - lt], 2), ex: steps(
+      ['Hangi değerler dahil?', `$Y\\le ${k}$ "küçük ya da eşit" demek: $Y$ = ${ys.slice(0, k + 1).join(', ')}. ${k} de dahil.`],
+      ['Bu değerlerin olasılıklarını topla', `$P(Y\\le ${k}) = ${p.slice(0, k + 1).map(x => f(x, 2)).join(' + ')} = ${f(le, 2)}$`]) + `\n\n$P(Y < ${k})$ sorulsaydı ${k} dahil olmazdı; kesikli değişkende bu fark sonucu değiştirir.` };
+    if (t === 1) return { en: `$Y$ has the distribution below. What is $P(Y\\ge ${k})$?` + table, tr: `$P(Y\\ge ${k})$ kaçtır?`, opts: popts(1 - lt, [1 - le, lt, p[k], le], 2), ex: steps(
+      ['Hangi değerler dahil?', `$Y\\ge ${k}$ "büyük ya da eşit" demek: $Y$ = ${ys.slice(k).join(', ')}. ${k} de dahil.`],
+      ['Bu değerlerin olasılıklarını topla', `$P(Y\\ge ${k}) = ${p.slice(k).map(x => f(x, 2)).join(' + ')} = ${f(1 - lt, 2)}$`]) + `\n\n**Kontrol (tümleyenle):** Dışarıda kalanlar $Y$ = ${ys.slice(0, k).join(', ')}. $1 - (${p.slice(0, k).map(x => f(x, 2)).join(' + ')}) = 1 - ${f(lt, 2)} = ${f(1 - lt, 2)}$` };
+    return { en: `$Y$ has the distribution below. What is $P(Y > ${k})$?` + table, tr: `$P(Y>${k})$ kaçtır?`, opts: popts(1 - le, [1 - lt, le, p[k]], 2), ex: steps(
+      ['Hangi değerler dahil?', `$Y > ${k}$ "büyüktür" demek: $Y$ = ${ys.slice(k + 1).join(', ')}. ${k} dahil değil.`],
+      ['Bu değerlerin olasılıklarını topla', `$P(Y > ${k}) = ${p.slice(k + 1).map(x => f(x, 2)).join(' + ')} = ${f(1 - le, 2)}$`]) + `\n\n**Kontrol (tümleyenle):** $1 - P(Y\\le ${k}) = 1 - (${p.slice(0, k + 1).map(x => f(x, 2)).join(' + ')}) = 1 - ${f(le, 2)} = ${f(1 - le, 2)}$` };
   };
 
   G.twoCoins = () => {
@@ -208,10 +266,14 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const t = R(0, 3);
     const head = `Two coins are tossed independently; each lands heads with probability ${p}. Let $Y$ be the number of heads.`;
     const trh = `İki para atılıyor, tura olasılığı ${p}. $Y$ tura sayısı.`;
-    if (t === 0) return { en: head + ' What is $P(Y=1)$?', tr: trh + ' $P(Y=1)$?', opts: popts(P1, [p * q, p, P2, P0], 4), ex: `$Y=1$: HT ya da TH, yani $2\\times${p}\\times${q} = ${f(P1, 4)}$.` };
-    if (t === 1) return { en: head + ' What is $P(Y=0)$?', tr: trh + ' $P(Y=0)$?', opts: popts(P0, [q, P2, P1, 1 - p * p], 4), ex: `$Y=0$: TT, yani $${q}\\times${q} = ${f(P0, 4)}$.` };
-    if (t === 2) return { en: head + ' What is $E(Y)$?', tr: trh + ' $E(Y)$?', opts: nopts(E, [p, V, P1, E * E], 2), ex: `$E(Y) = 0(${f(P0, 4)}) + 1(${f(P1, 4)}) + 2(${f(P2, 4)}) = ${f(E, 2)}$. Kısayol: $np = 2(${p})$.` };
-    return { en: head + ' What is $\\text{var}(Y)$?', tr: trh + ' $\\text{var}(Y)$?', opts: nopts(V, [p * q, E, 2 * p * p, E * E, 4 * p * q], 4, { min: 0 }), ex: `$E(Y)=${f(E, 2)}$. $\\text{var}(Y) = \\sum (y-\\mu)^2P(y) = ${f(P0, 4)}(${f(E, 2)})^2 + ${f(P1, 4)}(1-${f(E, 2)})^2 + ${f(P2, 4)}(2-${f(E, 2)})^2 = ${f(V, 4)}$. Kısayol: $np(1-p) = 2(${p})(${q})$.` };
+    const s1 = ['Dört olası sonucu yaz', `Tura olasılığı ${p}, yazı olasılığı $1 - ${p} = ${q}$. Paralar bağımsız, olasılıklar çarpılır:\n| 1. para | 2. para | Tura sayısı | Olasılık |\n| yazı | yazı | 0 | $${q}\\times${q} = ${f(P0, 4)}$ |\n| yazı | tura | 1 | $${q}\\times${p} = ${f(p * q, 4)}$ |\n| tura | yazı | 1 | $${p}\\times${q} = ${f(p * q, 4)}$ |\n| tura | tura | 2 | $${p}\\times${p} = ${f(P2, 4)}$ |`];
+    const s2 = ['Dağılımı yaz', `Aynı tura sayısına sahip satırları topla:\n$P(Y=0) = ${f(P0, 4)}$, $P(Y=1) = ${f(p * q, 4)} + ${f(p * q, 4)} = ${f(P1, 4)}$, $P(Y=2) = ${f(P2, 4)}$`];
+    if (t === 0) return { en: head + ' What is $P(Y=1)$?', tr: trh + ' $P(Y=1)$?', opts: popts(P1, [p * q, p, P2, P0], 4), ex: steps(s1, ['$Y=1$ olan satırları topla', `Bir tura iki farklı sırayla gelir (yazı-tura ve tura-yazı):\n$P(Y=1) = ${f(p * q, 4)} + ${f(p * q, 4)} = 2\\times${p}\\times${q} = ${f(P1, 4)}$`]) };
+    if (t === 1) return { en: head + ' What is $P(Y=0)$?', tr: trh + ' $P(Y=0)$?', opts: popts(P0, [q, P2, P1, 1 - p * p], 4), ex: steps(s1, ['$Y=0$ olan satırı al', `Sıfır tura = iki para da yazı. Tek satır var:\n$P(Y=0) = ${q}\\times${q} = ${f(P0, 4)}$`]) };
+    if (t === 2) return { en: head + ' What is $E(Y)$?', tr: trh + ' $E(Y)$?', opts: nopts(E, [p, V, P1, E * E], 2), ex: steps(s1, s2, ['Her değeri olasılığıyla çarp, topla', `$E(Y) = 0\\times${f(P0, 4)} + 1\\times${f(P1, 4)} + 2\\times${f(P2, 4)} = ${f(E, 2)}$`]) + `\n\n**Kontrol (kısayol):** İki atışlık binom: $E(Y) = np = 2\\times${p} = ${f(E, 2)}$` };
+    return { en: head + ' What is $\\text{var}(Y)$?', tr: trh + ' $\\text{var}(Y)$?', opts: nopts(V, [p * q, E, 2 * p * p, E * E, 4 * p * q], 4, { min: 0 }), ex: steps(s1, s2,
+      ['Ortalamayı bul', `$E(Y) = 0\\times${f(P0, 4)} + 1\\times${f(P1, 4)} + 2\\times${f(P2, 4)} = ${f(E, 2)}$`],
+      ['Sapmaların karesini olasılıkla çarp, topla', `$\\text{var}(Y) = (0-${f(E, 2)})^2\\times${f(P0, 4)} + (1-${f(E, 2)})^2\\times${f(P1, 4)} + (2-${f(E, 2)})^2\\times${f(P2, 4)} = ${f(V, 4)}$`]) + `\n\n**Kontrol (kısayol):** $np(1-p) = 2\\times${p}\\times${q} = ${f(V, 4)}$` };
   };
 
   G.meanVar = () => {
@@ -220,9 +282,19 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const E = ys.reduce((a, y, i) => a + y * p[i], 0), E2 = ys.reduce((a, y, i) => a + y * y * p[i], 0), V = E2 - E * E;
     const table = tbl(['$y$', ...ys], ['$P(Y=y)$', ...p.map(x => f(x, 2))]);
     const t = R(0, 2);
-    if (t === 0) return { en: 'Find $E(Y)$ for the distribution below.' + table, tr: 'Bu dağılım için $E(Y)$ kaçtır?', opts: nopts(E, [ys.reduce((a, b) => a + b, 0) / 3, E2, V, ys[p.indexOf(Math.max(...p))]], 3), ex: `$E(Y) = ${ys.map((y, i) => `(${y})(${f(p[i], 2)})`).join(' + ')} = ${f(E, 3)}$. Değerlerin düz ortalaması değil, olasılık ağırlıklı ortalama.` };
-    if (t === 1) return { en: 'Find $\\text{var}(Y)$ for the distribution below.' + table, tr: 'Bu dağılım için $\\text{var}(Y)$ kaçtır?', opts: nopts(V, [E2, E2 + E * E, Math.sqrt(V), E], 3, { min: 0 }), ex: `$E(Y) = ${f(E, 3)}$, $E(Y^2) = ${ys.map((y, i) => `(${y})^2(${f(p[i], 2)})`).join(' + ')} = ${f(E2, 3)}$. $\\text{var}(Y) = E(Y^2) - [E(Y)]^2 = ${f(E2, 3)} - ${f(E * E, 3)} = ${f(V, 3)}$.` };
-    return { en: 'Find $E(Y^2)$ for the distribution below.' + table, tr: 'Bu dağılım için $E(Y^2)$ kaçtır?', opts: nopts(E2, [E * E, V, E], 3), ex: `$E(Y^2) = \\sum y^2P(Y=y) = ${f(E2, 3)}$. $[E(Y)]^2 = ${f(E * E, 3)}$ farklı bir şey.` };
+    const pr = ys.map((y, i) => y * p[i]), pr2 = ys.map((y, i) => y * y * p[i]);
+    const eLine = `$E(Y) = ${ys.map((y, i) => `${par(y)}\\times${f(p[i], 2)}`).join(' + ')} = ${f(E, 3)}$`;
+    if (t === 0) return { en: 'Find $E(Y)$ for the distribution below.' + table, tr: 'Bu dağılım için $E(Y)$ kaçtır?', opts: nopts(E, [ys.reduce((a, b) => a + b, 0) / 3, E2, V, ys[p.indexOf(Math.max(...p))]], 3), ex: steps(
+      ['Her değeri kendi olasılığıyla çarp', ys.map((y, i) => `$${par(y)}\\times${f(p[i], 2)} = ${f(pr[i], 2)}$`).join(', ')],
+      ['Çarpımları topla', `$E(Y) = ${sumx(pr, 2)} = ${f(E, 3)}$`]) + `\n\nBu, olasılık ağırlıklı ortalama. Değerlerin düz ortalaması ($${ys.reduce((a, b) => a + b, 0)}/3$) yanlış olur, çünkü değerlerin olasılıkları eşit değil.` };
+    if (t === 1) return { en: 'Find $\\text{var}(Y)$ for the distribution below.' + table, tr: 'Bu dağılım için $\\text{var}(Y)$ kaçtır?', opts: nopts(V, [E2, E2 + E * E, Math.sqrt(V), E], 3, { min: 0 }), ex: steps(
+      ['Ortalamayı bul', 'Her değeri olasılığıyla çarp, topla:\n' + eLine],
+      ['Karelerin ortalamasını bul', `Her değerin karesini olasılığıyla çarp, topla:\n$E(Y^2) = ${ys.map((y, i) => `${par(y)}^2\\times${f(p[i], 2)}`).join(' + ')} = ${f(E2, 3)}$`],
+      ['Varyans = karelerin ortalaması − ortalamanın karesi', `$\\text{var}(Y) = E(Y^2) - [E(Y)]^2 = ${f(E2, 3)} - (${f(E, 3)})^2 = ${f(E2, 3)} - ${f(E * E, 3)} = ${f(V, 3)}$`]) };
+    return { en: 'Find $E(Y^2)$ for the distribution below.' + table, tr: 'Bu dağılım için $E(Y^2)$ kaçtır?', opts: nopts(E2, [E * E, V, E], 3), ex: steps(
+      ['Her değerin karesini al', ys.map(y => `$${par(y)}^2 = ${y * y}$`).join(', ')],
+      ['Kareleri olasılıklarıyla çarp', ys.map((y, i) => `$${y * y}\\times${f(p[i], 2)} = ${f(pr2[i], 2)}$`).join(', ')],
+      ['Topla', `$E(Y^2) = ${pr2.map(x => f(x, 2)).join(' + ')} = ${f(E2, 3)}$`]) + `\n\n$[E(Y)]^2$ farklı bir şey: önce ortalama alınır, sonra karesi. Onun sonucu $(${f(E, 3)})^2 = ${f(E * E, 3)}$.` };
   };
 
   G.bernoulli = () => {
@@ -230,11 +302,29 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const v = p * (1 - p), sk = (1 - 2 * p) / Math.sqrt(v), ku = 1 / v - 3;
     const t = R(0, 4);
     const h = `$X$ is Bernoulli with $P(X=1) = ${p}$.`, th = `$X$ Bernoulli, $P(X=1)=${p}$.`;
-    if (t === 0) return { en: h + ' What is $\\text{var}(X)$?', tr: th + ' $\\text{var}(X)$?', opts: popts(v, [p * p, p, 1 - p, Math.sqrt(v)], 4), ex: `$\\text{var}(X) = p(1-p) = ${p}\\times${f(1 - p, 2)} = ${f(v, 4)}$.` };
-    if (t === 1) { const k = R(2, 6); return { en: h + ` What is $E(X^${k})$?`, tr: th + ` $E(X^${k})$?`, opts: popts(p, [Math.pow(p, k), v, k * p > 1 ? null : k * p], 4), ex: `$E(X^${k}) = 1^${k}\\cdot p + 0^${k}(1-p) = p = ${p}$. Üs, değere uygulanır, olasılığa değil.` }; }
-    if (t === 2) return { en: h + ' The skewness of $X$ is:', tr: th + ' Çarpıklığı nedir?', opts: [p > 0.5 ? 'negative' : 'positive', p > 0.5 ? 'positive' : 'negative', 'zero', 'equal to 3'], ex: `Çarpıklık $= (1-2p)/\\sqrt{p(1-p)} = (1-2\\times${p})/\\sqrt{${p}\\times${f(1 - p, 2)}} = ${f(sk, 3)}$. $p${p > 0.5 ? '>' : '<'}0.5$ olduğu için uzun kuyruk ${p > 0.5 ? 'solda (0 tarafında), çarpıklık negatif' : 'sağda (1 tarafında), çarpıklık pozitif'}.` };
-    if (t === 3) return { en: h + ' Compute the skewness of $X$.', tr: th + ' Çarpıklığı hesapla.', opts: nopts(sk, [-sk, (1 - 2 * p) / v, (1 - 2 * p), sk * sk], 3), ex: `$E(X-p)^3 = p(1-p)^3 + (1-p)(-p)^3 = ${f(p * Math.pow(1 - p, 3) - (1 - p) * Math.pow(p, 3), 4)}$, $\\sigma^3 = ${f(Math.pow(v, 1.5), 4)}$. Çarpıklık $= ${f(sk, 3)}$. Kısayol: $(1-2p)/\\sqrt{p(1-p)} = (1-2\\times${p})/\\sqrt{${p}\\times${f(1 - p, 2)}} = ${f(sk, 3)}$.` };
-    return { en: h + ' Compute the kurtosis of $X$.', tr: th + ' Basıklığı hesapla.', opts: nopts(ku, [ku + 3, 1 / v, 3, v], 3), ex: `$E(X-p)^4 = p(1-p)^4 + (1-p)p^4 = ${f(p * Math.pow(1 - p, 4) + (1 - p) * Math.pow(p, 4), 4)}$, $\\sigma^4 = ${f(v * v, 4)}$. Basıklık $= ${f(ku, 3)}$. Kısayol: $\\frac{1}{p(1-p)} - 3 = 1/(${p}\\times${f(1 - p, 2)}) - 3 = ${f(ku, 3)}$.` };
+    const q = f(1 - p, 2), sdv = Math.sqrt(v);
+    const skf = `$\\dfrac{1-2p}{\\sqrt{p(1-p)}} = \\dfrac{1-2\\times${p}}{\\sqrt{${p}\\times${q}}} = ${f(sk, 3)}$`;
+    const dev = `$X=1$ iken ortalamadan sapma $1-${p} = ${q}$, $X=0$ iken sapma $-${p}$.`;
+    if (t === 0) return { en: h + ' What is $\\text{var}(X)$?', tr: th + ' $\\text{var}(X)$?', opts: popts(v, [p * p, p, 1 - p, Math.sqrt(v)], 4), ex: steps(
+      ['Bernoulli ne demek?', `$X$ sadece iki değer alır: 1 (olasılık $p = ${p}$) ya da 0 (olasılık $1-p = ${q}$).`],
+      ['Ortalama ve karelerin ortalaması', `$E(X) = 1\\times${p} + 0\\times${q} = ${p}$\n$E(X^2) = 1^2\\times${p} + 0^2\\times${q} = ${p}$ (1'in karesi yine 1, 0'ın karesi yine 0)`],
+      ['Varyans', `$\\text{var}(X) = E(X^2) - [E(X)]^2 = p - p^2 = p(1-p)$\n$${p}\\times${q} = ${f(v, 4)}$`]) };
+    if (t === 1) { const k = R(2, 6); return { en: h + ` What is $E(X^${k})$?`, tr: th + ` $E(X^${k})$?`, opts: popts(p, [Math.pow(p, k), v, k * p > 1 ? null : k * p], 4), ex: steps(
+      ['Değerlerin kuvvetini al', `$X$ sadece 1 ya da 0 olur. $1^${k} = 1$ ve $0^${k} = 0$; yani $X^${k}$ yine $X$ ile aynı.`],
+      ['Beklenen değeri yaz', `$E(X^${k}) = 1^${k}\\times${p} + 0^${k}\\times${q} = ${p}$`]) + `\n\nÜs değere uygulanır, olasılığa değil; $p^${k}$ yanlış olur.` }; }
+    if (t === 2) return { en: h + ' The skewness of $X$ is:', tr: th + ' Çarpıklığı nedir?', opts: [p > 0.5 ? 'negative' : 'positive', p > 0.5 ? 'positive' : 'negative', 'zero', 'equal to 3'], ex: steps(
+      ['Hangi değer seyrek görülüyor?', `1 olasılığı ${p}, 0 olasılığı ${q}. ` + (p > 0.5 ? "Değerlerin çoğu 1'de toplanır, 0 seyrek görülür." : "Değerlerin çoğu 0'da toplanır, 1 seyrek görülür.")],
+      ['Kuyruk seyrek değerin tarafındadır', p > 0.5 ? 'Seyrek değer (0) solda kalır, yani uzun kuyruk solda: çarpıklık **negatif**.' : 'Seyrek değer (1) sağda kalır, yani uzun kuyruk sağda: çarpıklık **pozitif**.'],
+      ['Formülle kontrol', skf]) };
+    if (t === 3) { const m3 = p * Math.pow(1 - p, 3) - (1 - p) * Math.pow(p, 3); return { en: h + ' Compute the skewness of $X$.', tr: th + ' Çarpıklığı hesapla.', opts: nopts(sk, [-sk, (1 - 2 * p) / v, (1 - 2 * p), sk * sk], 3), ex: steps(
+      ['Varyans ve standart sapma', `$\\sigma^2 = p(1-p) = ${p}\\times${q} = ${f(v, 4)}$\n$\\sigma = \\sqrt{${f(v, 4)}} = ${f(sdv, 4)}$`],
+      ['Üçüncü merkezi moment', dev + `\n$E(X-p)^3 = ${p}\\times(${q})^3 + ${q}\\times(-${p})^3 = ${f(m3, 4)}$`],
+      ['Böl', `Çarpıklık $= \\dfrac{E(X-p)^3}{\\sigma^3} = \\dfrac{${f(m3, 4)}}{${f(sdv, 4)}^3} = ${f(sk, 3)}$`]) + '\n\n**Kontrol (kısayol):** ' + skf }; }
+    const m4 = p * Math.pow(1 - p, 4) + (1 - p) * Math.pow(p, 4);
+    return { en: h + ' Compute the kurtosis of $X$.', tr: th + ' Basıklığı hesapla.', opts: nopts(ku, [ku + 3, 1 / v, 3, v], 3), ex: steps(
+      ['Varyans', `$\\sigma^2 = p(1-p) = ${p}\\times${q} = ${f(v, 4)}$\n$\\sigma^4 = (${f(v, 4)})^2 = ${f(v * v, 4)}$`],
+      ['Dördüncü merkezi moment', dev + `\n$E(X-p)^4 = ${p}\\times(${q})^4 + ${q}\\times(${p})^4 = ${f(m4, 4)}$`],
+      ['Böl', `Basıklık $= \\dfrac{E(X-p)^4}{\\sigma^4} = \\dfrac{${f(m4, 4)}}{${f(v * v, 4)}} = ${f(ku, 3)}$`]) + `\n\n**Kontrol (kısayol):** $\\dfrac{1}{p(1-p)} - 3 = \\dfrac{1}{${f(v, 4)}} - 3 = ${f(ku, 3)}$` };
   };
 
   const CTX = [
@@ -254,21 +344,44 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
   G.joint = () => {
     const { P, ctx, table } = jointTable();
     const t = R(0, 3), h = `The joint distribution of $Y$ (${ctx.yl}) and $X$ (${ctx.xl}) is:` + table;
-    if (t === 0) return { en: h + 'What is $P(Y=1)$?', tr: '$Y=1$ (' + ctx.yt[1] + ') marjinal olasılığı?', opts: popts(P.y1, [P.y1x1, P.x1, P.y1x0, P.y0], 2), ex: `Marjinal = satır toplamı: $P(Y=1) = ${f(P.y1x0, 2)} + ${f(P.y1x1, 2)} = ${f(P.y1, 2)}$.` };
-    if (t === 1) return { en: h + 'What is $P(Y=1\\mid X=1)$?', tr: `$X=1$ (${ctx.xt[1]}) iken $Y=1$ (${ctx.yt[1]}) olasılığı?`, opts: popts(P.y1x1 / P.x1, [P.y1x1, P.y1x1 / P.y1, P.y1, P.x1], 3), ex: `$P(Y=1\\mid X=1) = \\dfrac{P(Y=1,X=1)}{P(X=1)} = \\dfrac{${f(P.y1x1, 2)}}{${f(P.x1, 2)}} = ${f(P.y1x1 / P.x1, 3)}$. Koşul $X=1$, payda $P(X=1)$.` };
-    if (t === 2) return { en: h + 'Given $Y=0$, what is the probability that $X=1$?', tr: `$Y=0$ (${ctx.yt[0]}) olduğu biliniyorsa $X=1$ (${ctx.xt[1]}) olasılığı?`, opts: popts(P.y0x1 / P.y0, [P.y0x1, P.y0x1 / P.x1, P.x1, P.y0], 3), ex: `$P(X=1\\mid Y=0) = \\dfrac{P(X=1,Y=0)}{P(Y=0)} = \\dfrac{${f(P.y0x1, 2)}}{${f(P.y0, 2)}} = ${f(P.y0x1 / P.y0, 3)}$.` };
+    const read = ['Tablodaki sayılar ne demek?', 'Her hücre, iki şeyin **aynı anda** olma olasılığı. Kolay düşünmek için 100 kişi hayal et: hücredeki 0.20, 100 kişiden 20 kişi demek.'];
+    if (t === 0) return { en: h + 'What is $P(Y=1)$?', tr: '$Y=1$ (' + ctx.yt[1] + ') marjinal olasılığı?', opts: popts(P.y1, [P.y1x1, P.x1, P.y1x0, P.y0], 2), ex: steps(read,
+      ['$Y=1$ satırını topla', `$Y=1$ (${ctx.yt[1]}) satırında iki hücre var: ${kisi(P.y1x0)} kişi $X=0$ (${ctx.xt[0]}), ${kisi(P.y1x1)} kişi $X=1$ (${ctx.xt[1]}).\n$P(Y=1) = P(Y=1, X=0) + P(Y=1, X=1) = ${f(P.y1x0, 2)} + ${f(P.y1x1, 2)} = ${f(P.y1, 2)}$\nYani 100 kişiden ${kisi(P.y1)} kişi ${ctx.yt[1]}.`]) + '\n\n"Marjinal" olasılık satır ya da sütun toplamıdır; adını tablonun kenarına (marjına) yazılmasından alır.' };
+    if (t === 1) return { en: h + 'What is $P(Y=1\\mid X=1)$?', tr: `$X=1$ (${ctx.xt[1]}) iken $Y=1$ (${ctx.yt[1]}) olasılığı?`, opts: popts(P.y1x1 / P.x1, [P.y1x1, P.y1x1 / P.y1, P.y1, P.x1], 3), ex: steps(
+      ['Koşul ne?', `"$\\mid$" işaretinin sağı koşuldur: $X=1$ (${ctx.xt[1]}) olduğunu biliyoruz. Artık sadece $X=1$ sütununa bakıyoruz.`],
+      ['Koşulun toplamını bul (payda)', `$X=1$ sütununu topla: $P(X=1) = ${f(P.y0x1, 2)} + ${f(P.y1x1, 2)} = ${f(P.x1, 2)}$\n100 kişi düşünürsek ${kisi(P.x1)} kişi $X=1$ (${ctx.xt[1]}).`],
+      ['İstenen hücreyi al (pay)', `Bu sütunda $Y=1$ olan hücre: $P(Y=1, X=1) = ${f(P.y1x1, 2)}$, yani ${kisi(P.y1x1)} kişi.`],
+      ['Hücreyi sütun toplamına böl', `$P(Y=1\\mid X=1) = \\dfrac{${f(P.y1x1, 2)}}{${f(P.x1, 2)}} = ${f(P.y1x1 / P.x1, 3)}$\n100 kişiyle: ${kisi(P.x1)} kişinin ${kisi(P.y1x1)} tanesi, yani $${kisi(P.y1x1)}/${kisi(P.x1)}$.`]) };
+    if (t === 2) return { en: h + 'Given $Y=0$, what is the probability that $X=1$?', tr: `$Y=0$ (${ctx.yt[0]}) olduğu biliniyorsa $X=1$ (${ctx.xt[1]}) olasılığı?`, opts: popts(P.y0x1 / P.y0, [P.y0x1, P.y0x1 / P.x1, P.x1, P.y0], 3), ex: steps(
+      ['Koşul ne?', `$Y=0$ (${ctx.yt[0]}) olduğu biliniyor. Artık sadece $Y=0$ satırına bakıyoruz.`],
+      ['Koşulun toplamını bul (payda)', `$Y=0$ satırını topla: $P(Y=0) = ${f(P.y0x0, 2)} + ${f(P.y0x1, 2)} = ${f(P.y0, 2)}$\n100 kişi düşünürsek ${kisi(P.y0)} kişi $Y=0$.`],
+      ['İstenen hücreyi al (pay)', `Bu satırda $X=1$ olan hücre: $P(X=1, Y=0) = ${f(P.y0x1, 2)}$, yani ${kisi(P.y0x1)} kişi.`],
+      ['Hücreyi satır toplamına böl', `$P(X=1\\mid Y=0) = \\dfrac{${f(P.y0x1, 2)}}{${f(P.y0, 2)}} = ${f(P.y0x1 / P.y0, 3)}$\n100 kişiyle: ${kisi(P.y0)} kişinin ${kisi(P.y0x1)} tanesi.`]) };
     const prod = P.y0 * P.x0, ind = Math.abs(prod - P.y0x0) < 0.0005;
-    return { en: h + 'Compare $P(Y=0,X=0)$ with $P(Y=0)P(X=0)$. Are $X$ and $Y$ independent?', tr: '$X$ ve $Y$ bağımsız mı?', opts: ind ? ['Yes, because the joint probability equals the product of the marginals', 'No, because the joint probability differs from the product of the marginals', 'No, because $P(Y=1)>P(Y=0)$', 'It cannot be determined from the table'] : ['No, because the joint probability differs from the product of the marginals', 'Yes, because the joint probability equals the product of the marginals', 'Yes, because all probabilities are positive', 'It cannot be determined from the table'], ex: `$P(Y=0)P(X=0) = ${f(P.y0, 2)}\\times${f(P.x0, 2)} = ${f(prod, 4)}$, ortak olasılık ise $${f(P.y0x0, 2)}$. ${ind ? 'Eşit (2×2 tabloda bir hücre tutuyorsa hepsi tutar), yani bağımsız.' : 'Eşit değil, yani bağımsız değiller.'}` };
+    return { en: h + 'Compare $P(Y=0,X=0)$ with $P(Y=0)P(X=0)$. Are $X$ and $Y$ independent?', tr: '$X$ ve $Y$ bağımsız mı?', opts: ind ? ['Yes, because the joint probability equals the product of the marginals', 'No, because the joint probability differs from the product of the marginals', 'No, because $P(Y=1)>P(Y=0)$', 'It cannot be determined from the table'] : ['No, because the joint probability differs from the product of the marginals', 'Yes, because the joint probability equals the product of the marginals', 'Yes, because all probabilities are positive', 'It cannot be determined from the table'], ex: steps(
+      ['Marjinalleri bul', `$P(Y=0) = ${f(P.y0x0, 2)} + ${f(P.y0x1, 2)} = ${f(P.y0, 2)}$ (satır toplamı)\n$P(X=0) = ${f(P.y0x0, 2)} + ${f(P.y1x0, 2)} = ${f(P.x0, 2)}$ (sütun toplamı)`],
+      ['Marjinalleri çarp', `$P(Y=0)\\times P(X=0) = ${f(P.y0, 2)}\\times${f(P.x0, 2)} = ${f(prod, 4)}$`],
+      ['Tablodaki hücreyle karşılaştır', `Tabloda $P(Y=0, X=0) = ${f(P.y0x0, 2)}$. ` + (ind ? 'İkisi eşit, yani **bağımsızlar**. (2×2 tabloda bir hücre tutuyorsa hepsi tutar.)' : `$${f(prod, 4)}\\ne${f(P.y0x0, 2)}$, yani **bağımsız değiller**.`)]) + "\n\nBağımsızlık şu demek: $X$'i öğrenmek $Y$ hakkındaki olasılıkları değiştirmez. O zaman ortak olasılık, marjinallerin çarpımına eşit olur." };
   };
 
   G.condExp = () => {
     const { P, ctx, table } = jointTable();
     const t = R(0, 2), h = `The joint distribution of $Y$ (${ctx.yl}) and $X$ (${ctx.xl}) is:` + table;
     const e1 = P.y1x1 / P.x1, e0 = P.y1x0 / P.x0;
-    if (t === 0) { const x = R(0, 1), e = x ? e1 : e0, j = x ? P.y1x1 : P.y1x0, m = x ? P.x1 : P.x0; return { en: h + `What is $E(Y\\mid X=${x})$?`, tr: `$E(Y\\mid X=${x})$ kaçtır?`, opts: popts(e, [j, x ? e0 : e1, P.y1, 1 - e], 3), ex: `$Y$ 0/1 olduğu için $E(Y\\mid X=${x}) = P(Y=1\\mid X=${x}) = ${f(j, 2)}/${f(m, 2)} = ${f(e, 3)}$.` }; }
-    if (t === 1) return { en: h + 'Verify the law of iterated expectations: $E(Y) = E(Y\\mid X=0)P(X=0) + E(Y\\mid X=1)P(X=1)$ equals:', tr: 'LIE ile $E(Y)$ kaçtır?', opts: popts(P.y1, [(e0 + e1) / 2, e1, P.y1x1, e0 * e1], 3), ex: `$E(Y) = ${f(e0, 3)}(${f(P.x0, 2)}) + ${f(e1, 3)}(${f(P.x1, 2)}) = ${f(P.y1, 3)}$. Bu, doğrudan $P(Y=1)$'e eşit. Koşullu ortalamaların düz ortalaması değil.` };
-    const x = R(0, 1), e = x ? e1 : e0;
-    return { en: h + `What is $\\text{var}(Y\\mid X=${x})$?`, tr: `$\\text{var}(Y\\mid X=${x})$ kaçtır?`, opts: popts(e * (1 - e), [e, 1 - e, P.y1 * (1 - P.y1), e * e], 4), ex: `Koşullu dağılım Bernoulli, $p = ${f(e, 3)}$. $\\text{var}(Y\\mid X=${x}) = p(1-p) = ${f(e, 3)}\\times${f(1 - e, 3)} = ${f(e * (1 - e), 4)}$.` };
+    // X=x sütunu: toplam ve Y=1 oranı
+    const col = (x) => { const j = x ? P.y1x1 : P.y1x0, z = x ? P.y0x1 : P.y0x0, m = x ? P.x1 : P.x0; return { j, m,
+      sum: [`Koşul: sadece $X=${x}$ sütunu`, `$X=${x}$ (${ctx.xt[x]}) olanlara bakıyoruz. Sütunu topla:\n$P(X=${x}) = ${f(z, 2)} + ${f(j, 2)} = ${f(m, 2)}$\n100 kişi düşünürsek ${kisi(m)} kişi $X=${x}$.`],
+      rate: [`Bu sütunda $Y=1$ oranı`, `Hücreyi sütun toplamına böl:\n$P(Y=1\\mid X=${x}) = \\dfrac{${f(j, 2)}}{${f(m, 2)}} = ${f(j / m, 3)}$\n100 kişiyle: ${kisi(m)} kişinin ${kisi(j)} tanesi $Y=1$ (${ctx.yt[1]}).`] }; };
+    if (t === 0) { const x = R(0, 1), e = x ? e1 : e0, c = col(x); return { en: h + `What is $E(Y\\mid X=${x})$?`, tr: `$E(Y\\mid X=${x})$ kaçtır?`, opts: popts(e, [c.j, x ? e0 : e1, P.y1, 1 - e], 3), ex: steps(c.sum, c.rate,
+      ['Beklenen değer = 1 olma oranı', `$Y$ sadece 0 ya da 1 olduğu için 0'lar ortalamaya hiçbir şey katmaz:\n$E(Y\\mid X=${x}) = 0\\times P(Y=0\\mid X=${x}) + 1\\times P(Y=1\\mid X=${x}) = ${f(e, 3)}$`]) }; }
+    if (t === 1) return { en: h + 'Verify the law of iterated expectations: $E(Y) = E(Y\\mid X=0)P(X=0) + E(Y\\mid X=1)P(X=1)$ equals:', tr: 'LIE ile $E(Y)$ kaçtır?', opts: popts(P.y1, [(e0 + e1) / 2, e1, P.y1x1, e0 * e1], 3), ex: steps(
+      ['Sütunları topla: $X$ grupları ne kadar büyük?', `$P(X=0) = ${f(P.y0x0, 2)} + ${f(P.y1x0, 2)} = ${f(P.x0, 2)}$\n$P(X=1) = ${f(P.y0x1, 2)} + ${f(P.y1x1, 2)} = ${f(P.x1, 2)}$\n100 kişi düşün: ${kisi(P.x0)} kişi $X=0$ (${ctx.xt[0]}), ${kisi(P.x1)} kişi $X=1$ (${ctx.xt[1]}).`],
+      ['$X=0$ grubunda $Y=1$ oranı', `Hücreyi kendi sütununun toplamına böl:\n$E(Y\\mid X=0) = P(Y=1\\mid X=0) = \\dfrac{${f(P.y1x0, 2)}}{${f(P.x0, 2)}} = ${f(e0, 3)}$\n100 kişiyle: ${kisi(P.x0)} kişinin ${kisi(P.y1x0)} tanesi $Y=1$ (${ctx.yt[1]}).`],
+      ['$X=1$ grubunda $Y=1$ oranı', `$E(Y\\mid X=1) = P(Y=1\\mid X=1) = \\dfrac{${f(P.y1x1, 2)}}{${f(P.x1, 2)}} = ${f(e1, 3)}$\n100 kişiyle: ${kisi(P.x1)} kişinin ${kisi(P.y1x1)} tanesi.\n$Y$ sadece 0 ya da 1 olduğu için ortalaması, 1 olanların oranına eşittir.`],
+      ['LIE: her grubun ortalamasını grubun büyüklüğüyle çarp, topla', `$E(Y) = ${f(e0, 3)}\\times${f(P.x0, 2)} + ${f(e1, 3)}\\times${f(P.x1, 2)} = ${f(P.y1x0, 3)} + ${f(P.y1x1, 3)} = ${f(P.y1, 3)}$\n$${f(e0, 3)}\\times${f(P.x0, 2)}$ çarpımı hücreye (${f(P.y1x0, 2)}) geri döner: az önce ${f(P.x0, 2)} ile bölmüştük, şimdi aynı sayıyla çarptık.`]) + `\n\n**Kontrol:** $Y=1$ satırını doğrudan topla: $${f(P.y1x0, 2)} + ${f(P.y1x1, 2)} = ${f(P.y1, 2)}$. Aynı sonuç. LIE bunu söyler: grup grup hesaplayıp grupların büyüklüğüyle ağırlıklandırsan da, hepsini birden hesaplasan da aynı ortalamayı bulursun.` + (Math.abs(P.x0 - 0.5) > 1e-9 ? `\n\nKoşullu ortalamaların düz ortalaması $(${f(e0, 3)} + ${f(e1, 3)})/2 = ${f((e0 + e1) / 2, 3)}$ yanlış olur, çünkü iki grup eşit büyüklükte değil.` : '') };
+    const x = R(0, 1), e = x ? e1 : e0, c = col(x);
+    return { en: h + `What is $\\text{var}(Y\\mid X=${x})$?`, tr: `$\\text{var}(Y\\mid X=${x})$ kaçtır?`, opts: popts(e * (1 - e), [e, 1 - e, P.y1 * (1 - P.y1), e * e], 4), ex: steps(c.sum, c.rate,
+      ['Koşullu dağılım Bernoulli', `$X=${x}$ iken $Y$, $p = ${f(e, 3)}$ olasılıkla 1, $1-p = ${f(1 - e, 3)}$ olasılıkla 0 olur. Bernoulli varyansı $p(1-p)$:\n$\\text{var}(Y\\mid X=${x}) = ${f(e, 3)}\\times${f(1 - e, 3)} = ${f(e * (1 - e), 4)}$`]) };
   };
 
   G.linComb = () => {
@@ -277,11 +390,22 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const a = R(1, 6), b = pick([-3, -2, 2, 3, 4]), c = pick([-2, 1, 2, 3]);
     const t = R(0, 3);
     const h = `$E(X)=${mx}$, $E(Y)=${my}$, $\\text{var}(X)=${vx}$, $\\text{var}(Y)=${vy}$, $\\text{cov}(X,Y)=${cxy}$.`;
-    if (t === 0) { const v = a + b * mx + c * my; return { en: h + ` Find $E(${a} ${b < 0 ? '-' : '+'} ${Math.abs(b)}X ${c < 0 ? '-' : '+'} ${Math.abs(c)}Y)$.`, tr: 'Doğrusal birleşimin beklenen değeri?', opts: nopts(v, [b * mx + c * my, a + b * mx, a * (b * mx + c * my), a + b * vx + c * vy], 1), ex: `$E(a+bX+cY) = a + bE(X) + cE(Y) = ${a} + (${b})(${mx}) + (${c})(${my}) = ${f(v, 1)}$.` }; }
-    if (t === 1) { const v = b * b * vx; return { en: h + ` Find $\\text{var}(${a} ${b < 0 ? '-' : '+'} ${Math.abs(b)}X)$.`, tr: '$\\text{var}(a+bX)$?', opts: nopts(v, [a + b * b * vx, b * vx, a * a + b * b * vx, Math.abs(b) * vx], 1, { min: 0 }), ex: `$\\text{var}(a+bX) = b^2\\text{var}(X) = (${b})^2(${vx}) = ${v}$. Sabit ${a} varyansı değiştirmez.` }; }
-    if (t === 2) { const v = b * b * vx + c * c * vy + 2 * b * c * cxy; return { en: h + ` Find $\\text{var}(${b}X ${c < 0 ? '-' : '+'} ${Math.abs(c)}Y)$.`, tr: '$\\text{var}(aX+bY)$?', opts: nopts(v, [b * b * vx + c * c * vy, b * vx + c * vy, b * b * vx + c * c * vy + b * c * cxy, b * b * vx + c * c * vy - 2 * b * c * cxy], 1, { min: 0 }), ex: `$\\text{var}(aX+bY) = a^2\\sigma_X^2 + b^2\\sigma_Y^2 + 2ab\\,\\sigma_{XY} = ${b * b}(${vx}) + ${c * c}(${vy}) + 2(${b})(${c})(${cxy}) = ${f(v, 1)}$.` }; }
+    if (t === 0) { const v = a + b * mx + c * my; return { en: h + ` Find $E(${a} ${b < 0 ? '-' : '+'} ${Math.abs(b)}X ${c < 0 ? '-' : '+'} ${Math.abs(c)}Y)$.`, tr: 'Doğrusal birleşimin beklenen değeri?', opts: nopts(v, [b * mx + c * my, a + b * mx, a * (b * mx + c * my), a + b * vx + c * vy], 1), ex: steps(
+      ['Kuralı yaz', 'Beklenen değer doğrusaldır: sabit aynen kalır, katsayılar dışarı çıkar.\n$E(a + bX + cY) = a + b\\,E(X) + c\\,E(Y)$'],
+      ['Yerine koy', `$${a} + ${par(b)}\\times${par(mx)} + ${par(c)}\\times${par(my)}$`],
+      ['Hesapla', `Önce çarpımlar: $${par(b)}\\times${par(mx)} = ${b * mx}$ ve $${par(c)}\\times${par(my)} = ${c * my}$\n$${a} ${pm(b * mx)} ${pm(c * my)} = ${f(v, 1)}$`]) }; }
+    if (t === 1) { const v = b * b * vx; return { en: h + ` Find $\\text{var}(${a} ${b < 0 ? '-' : '+'} ${Math.abs(b)}X)$.`, tr: '$\\text{var}(a+bX)$?', opts: nopts(v, [a + b * b * vx, b * vx, a * a + b * b * vx, Math.abs(b) * vx], 1, { min: 0 }), ex: steps(
+      ['Sabit varyansı değiştirmez', `Herkese ${a} eklemek dağılımı kaydırır ama yayılımını değiştirmez. Bu yüzden sabiti at, sadece $${b}X$ kalır.`],
+      ['Katsayı karesiyle dışarı çıkar', `$X$'i ${b} ile çarpınca sapmalar ${Math.abs(b)} katına, sapmaların kareleri ${b * b} katına çıkar:\n$\\text{var}(${b}X) = ${par(b)}^2\\times${vx} = ${b * b}\\times${vx} = ${v}$`]) }; }
+    if (t === 2) { const v = b * b * vx + c * c * vy + 2 * b * c * cxy; return { en: h + ` Find $\\text{var}(${b}X ${c < 0 ? '-' : '+'} ${Math.abs(c)}Y)$.`, tr: '$\\text{var}(aX+bY)$?', opts: nopts(v, [b * b * vx + c * c * vy, b * vx + c * vy, b * b * vx + c * c * vy + b * c * cxy, b * b * vx + c * c * vy - 2 * b * c * cxy], 1, { min: 0 }), ex: steps(
+      ['Formülü yaz', `$\\text{var}(aX + bY) = a^2\\,\\text{var}(X) + b^2\\,\\text{var}(Y) + 2ab\\,\\text{cov}(X,Y)$\nBurada $X$'in katsayısı ${b}, $Y$'nin katsayısı ${c}.`],
+      ['Üç parçayı ayrı ayrı hesapla', `$${par(b)}^2\\times${vx} = ${b * b * vx}$\n$${par(c)}^2\\times${vy} = ${c * c * vy}$\n$2\\times${par(b)}\\times${par(c)}\\times${par(cxy)} = ${f(2 * b * c * cxy, 1)}$`],
+      ['Topla', `$${b * b * vx} + ${c * c * vy} ${pm(2 * b * c * cxy, 1)} = ${f(v, 1)}$`]) + '\n\nKovaryans terimi negatif olabilir; işaretini katsayıların ve kovaryansın işaretinden al.' }; }
     const v = b * vx + c * cxy;
-    return { en: h + ` Find $\\text{cov}(X,\\ ${a} ${b < 0 ? '-' : '+'} ${Math.abs(b)}X ${c < 0 ? '-' : '+'} ${Math.abs(c)}Y)$.`, tr: 'Kovaryansı bul.', opts: nopts(v, [a + b * vx + c * cxy, b * cxy + c * vy, b * c * cxy, b * vx + c * vy], 1), ex: `$\\text{cov}(X, a+bX+cY) = b\\,\\text{var}(X) + c\\,\\text{cov}(X,Y) = (${b})(${vx}) + (${c})(${cxy}) = ${f(v, 1)}$. Sabit $a$ kovaryansa girmez.` };
+    return { en: h + ` Find $\\text{cov}(X,\\ ${a} ${b < 0 ? '-' : '+'} ${Math.abs(b)}X ${c < 0 ? '-' : '+'} ${Math.abs(c)}Y)$.`, tr: 'Kovaryansı bul.', opts: nopts(v, [a + b * vx + c * cxy, b * cxy + c * vy, b * c * cxy, b * vx + c * vy], 1), ex: steps(
+      ['Sabit kovaryansa girmez', `Sabit bir sayı hiç değişmez, $X$ ile birlikte hareket etmez: $\\text{cov}(X, ${a}) = 0$.`],
+      ['Kovaryansı parçalara ayır', "Katsayılar karesiz dışarı çıkar:\n$\\text{cov}(X, bX + cY) = b\\,\\text{cov}(X,X) + c\\,\\text{cov}(X,Y)$\nBir değişkenin kendisiyle kovaryansı varyansıdır: $\\text{cov}(X,X) = \\text{var}(X)$."],
+      ['Yerine koy', `$${par(b)}\\times${vx} + ${par(c)}\\times${par(cxy)} = ${b * vx} ${pm(c * cxy, 1)} = ${f(v, 1)}$`]) };
   };
 
   G.corrCalc = () => {
@@ -292,7 +416,10 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
       en: `$\\text{var}(X) = ${vx}$, $\\text{var}(Y) = ${vy}$ and $\\text{cov}(X,Y) = ${cov}$. What is $\\text{corr}(X,Y)$?`,
       tr: 'Korelasyon kaçtır?',
       opts: nopts(rr, [cov / (vx * vy), cov / vx, cov, -rr], 3, { min: -1, max: 1 }),
-      ex: `$\\text{corr} = \\dfrac{\\text{cov}}{\\sigma_X\\sigma_Y} = \\dfrac{${cov}}{\\sqrt{${vx}}\\sqrt{${vy}}} = \\dfrac{${cov}}{${Math.sqrt(vx)}\\times${Math.sqrt(vy)}} = ${f(rr, 3)}$. Varyansa değil, standart sapmaya böl.`
+      ex: steps(
+        ['Standart sapmaları bul', `Standart sapma = varyansın karekökü:\n$\\sigma_X = \\sqrt{${vx}} = ${Math.sqrt(vx)}$, $\\sigma_Y = \\sqrt{${vy}} = ${Math.sqrt(vy)}$`],
+        ['Standart sapmaları çarp', `$${Math.sqrt(vx)}\\times${Math.sqrt(vy)} = ${Math.sqrt(vx * vy)}$`],
+        ['Kovaryansı bu çarpıma böl', `$\\text{corr}(X,Y) = \\dfrac{${cov}}{${Math.sqrt(vx * vy)}} = ${f(rr, 3)}$`]) + '\n\n**Kontrol:** Korelasyon her zaman −1 ile 1 arasındadır. Dışarıda çıksaydı bir hata var demekti.'
     };
   };
 
@@ -301,11 +428,18 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const sd = pick([2, 3, 4, 5, 10, 1.5]), mu = R(-5, 60), v = +(sd * sd).toFixed(2);
     const t = R(0, 2);
     const z = () => pick([-2.5, -2, -1.5, -1.2, -1, -0.8, -0.5, 0.4, 0.5, 0.8, 1, 1.2, 1.5, 2, 2.5]);
-    if (t === 0) { const zz = z(), c = +(mu + zz * sd).toFixed(2), ans = Phi(zz); return { en: `If $Y\\sim N(${mu}, ${v})$, find $P(Y\\le ${c})$.`, tr: `$Y\\sim N(${mu},${v})$ ise $P(Y\\le${c})$?`, opts: popts(ans, [Phi((c - mu) / v), 1 - ans, Phi(-Math.abs(zz) / 2), Phi((c - mu) / Math.sqrt(sd))], 4), ex: `$\\sigma = \\sqrt{${v}} = ${sd}$. $z = (${c}-${mu})/${sd} = ${f(zz, 2)}$. $\\Phi(${f(zz, 2)}) = ${f(ans, 4)}$. Varyansa (${v}) bölmek en sık hata.` }; }
-    if (t === 1) { const zz = z(), c = +(mu + zz * sd).toFixed(2), ans = 1 - Phi(zz); return { en: `If $Y\\sim N(${mu}, ${v})$, find $P(Y > ${c})$.`, tr: `$Y\\sim N(${mu},${v})$ ise $P(Y>${c})$?`, opts: popts(ans, [Phi(zz), 1 - Phi((c - mu) / v), Phi(-zz) / 2], 4), ex: `$z = (${c}-${mu})/${sd} = ${f(zz, 2)}$. $P(Y>${c}) = 1-\\Phi(${f(zz, 2)}) = ${f(ans, 4)}$.` }; }
+    const sStep = ['Standart sapmayı bul', `$N(${mu}, ${v})$ yazımında ikinci sayı **varyans**. Standart sapma onun karekökü:\n$\\sigma = \\sqrt{${v}} = ${sd}$`];
+    const zStep = (c, zz) => ['Standartlaştır', `$z = \\dfrac{c - \\mu}{\\sigma} = \\dfrac{${c} - ${par(mu)}}{${sd}} = ${f(zz, 2)}$\nYani ${c}, ortalamanın ${f(Math.abs(zz), 2)} standart sapma ${zz < 0 ? 'altında' : 'üstünde'}.`];
+    if (t === 0) { const zz = z(), c = +(mu + zz * sd).toFixed(2), ans = Phi(zz); return { en: `If $Y\\sim N(${mu}, ${v})$, find $P(Y\\le ${c})$.`, tr: `$Y\\sim N(${mu},${v})$ ise $P(Y\\le${c})$?`, opts: popts(ans, [Phi((c - mu) / v), 1 - ans, Phi(-Math.abs(zz) / 2), Phi((c - mu) / Math.sqrt(sd))], 4), ex: steps(sStep, zStep(c, zz),
+      ['Tablodan oku', `"$\\le$" soldaki alan demek, bu da doğrudan $\\Phi(z)$:\n$P(Y\\le ${c}) = ${phiTx(zz)}$`]) + `\n\nVaryansa (${v}) bölmek en sık hata; $z$ için standart sapmaya böl.` }; }
+    if (t === 1) { const zz = z(), c = +(mu + zz * sd).toFixed(2), ans = 1 - Phi(zz); return { en: `If $Y\\sim N(${mu}, ${v})$, find $P(Y > ${c})$.`, tr: `$Y\\sim N(${mu},${v})$ ise $P(Y>${c})$?`, opts: popts(ans, [Phi(zz), 1 - Phi((c - mu) / v), Phi(-zz) / 2], 4), ex: steps(sStep, zStep(c, zz),
+      ['Sağdaki alanı bul', (zz < 0 ? `Önce $${phiTx(zz)}$\n` : '') + `"$>$" sağdaki alan demek. Tablo soldaki alanı verir, 1'den çıkar:\n$P(Y > ${c}) = 1 - \\Phi(${f(zz, 2)}) = 1 - ${f(Phi(zz), 4)} = ${f(ans, 4)}$`]) }; }
     let z1 = z(), z2 = z(); while (z2 <= z1) { z1 = z(); z2 = z(); }
     const a = +(mu + z1 * sd).toFixed(2), b = +(mu + z2 * sd).toFixed(2), ans = Phi(z2) - Phi(z1);
-    return { en: `If $Y\\sim N(${mu}, ${v})$, find $P(${a}\\le Y\\le ${b})$.`, tr: `$Y\\sim N(${mu},${v})$ ise $P(${a}\\le Y\\le${b})$?`, opts: popts(ans, [Phi(z2), Phi((b - mu) / v) - Phi((a - mu) / v), 1 - ans, Phi(z2) + Phi(z1) - 1], 4), ex: `$z_1 = (${a}-${mu})/${sd} = ${f(z1, 2)}$, $z_2 = (${b}-${mu})/${sd} = ${f(z2, 2)}$. $\\Phi(${f(z2, 2)}) - \\Phi(${f(z1, 2)}) = ${f(Phi(z2), 4)} - ${f(Phi(z1), 4)} = ${f(ans, 4)}$.` };
+    return { en: `If $Y\\sim N(${mu}, ${v})$, find $P(${a}\\le Y\\le ${b})$.`, tr: `$Y\\sim N(${mu},${v})$ ise $P(${a}\\le Y\\le${b})$?`, opts: popts(ans, [Phi(z2), Phi((b - mu) / v) - Phi((a - mu) / v), 1 - ans, Phi(z2) + Phi(z1) - 1], 4), ex: steps(sStep,
+      ['İki sınırı da standartlaştır', `$z_1 = (${a} - ${par(mu)})/${sd} = ${f(z1, 2)}$\n$z_2 = (${b} - ${par(mu)})/${sd} = ${f(z2, 2)}$`],
+      ['Tablodan iki değeri oku', `$${phiTx(z2)}$\n$${phiTx(z1)}$`],
+      ['Büyük alandan küçüğü çıkar', `Aradaki alan = sağ sınırın solundaki alan − sol sınırın solundaki alan:\n$${f(Phi(z2), 4)} - ${f(Phi(z1), 4)} = ${f(ans, 4)}$`]) };
   };
 
   G.chiF = () => {
@@ -314,24 +448,43 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const t = R(0, 2);
     const ao = ['0.10', '0.05', '0.01', '0.90', '0.95', '0.99'];
     const mk = (correct) => { const o = [correct]; for (const s of ao) if (s !== correct && o.length < 4 && !(correct === '0.10' && s === '0.90') && !(correct === '0.05' && s === '0.95') && !(correct === '0.01' && s === '0.99')) o.push(s); return o; };
-    if (t === 0) return { en: `If $W\\sim\\chi^2_{${m}}$, then $P(W > ${c})$ is approximately:`, tr: `$W\\sim\\chi^2_{${m}}$ ise $P(W>${c})$ yaklaşık?`, opts: [f(p, 2), f(1 - p, 2), ...mk(f(p, 2)).slice(1, 3)], ex: `Ki-kare tablosunda ${m} serbestlik derecesi satırında ${c}, üst kuyruk olasılığı ${f(p, 2)} olan kritik değer. Yani $P(W>${c}) = ${f(p, 2)}$ ve $P(W\\le${c}) = ${f(1 - p, 2)}$.` };
-    if (t === 1) { const fc = +(c / m).toFixed(3), pf = 1 - S.fCdf(fc, m, Infinity); return { en: `If $Y\\sim F_{${m},\\infty}$, then $P(Y > ${fc})$ is approximately:`, tr: `$Y\\sim F_{${m},\\infty}$ ise $P(Y>${fc})$?`, opts: [f(pf, 2), f(1 - pf, 2), ...mk(f(pf, 2)).slice(1, 3)], ex: `$F_{${m},\\infty} = \\chi^2_{${m}}/${m}$. $P(Y>${fc}) = P(W > ${m}\\times${fc}) = P(W>${f(m * fc, 2)})$, $W\\sim\\chi^2_{${m}}$. Tablodan $\\approx ${f(pf, 2)}$.` }; }
+    if (t === 0) return { en: `If $W\\sim\\chi^2_{${m}}$, then $P(W > ${c})$ is approximately:`, tr: `$W\\sim\\chi^2_{${m}}$ ise $P(W>${c})$ yaklaşık?`, opts: [f(p, 2), f(1 - p, 2), ...mk(f(p, 2)).slice(1, 3)], ex: steps(
+      ['Doğru satırı bul', `Ki-kare tablosunda serbestlik derecesi ${m} olan satıra git.`],
+      ['Değeri bul', `Bu satırda ${c} değeri ${f(p, 2)} sütununda duruyor. Ki-kare tablosunun sütun başlıkları **üst kuyruk** olasılığıdır, yani $P(W > c)$.`],
+      ['Oku', `$P(W > ${c}) = ${f(p, 2)}$\nTers yön sorulsaydı: $P(W\\le ${c}) = 1 - ${f(p, 2)} = ${f(1 - p, 2)}$`]) };
+    if (t === 1) { const fc = +(c / m).toFixed(3), pf = 1 - S.fCdf(fc, m, Infinity); return { en: `If $Y\\sim F_{${m},\\infty}$, then $P(Y > ${fc})$ is approximately:`, tr: `$Y\\sim F_{${m},\\infty}$ ise $P(Y>${fc})$?`, opts: [f(pf, 2), f(1 - pf, 2), ...mk(f(pf, 2)).slice(1, 3)], ex: steps(
+      ['F dağılımını ki-kareye çevir', `$F_{${m},\\infty} = \\chi^2_{${m}}/${m}$. Yani $Y > ${fc}$ demek $W/${m} > ${fc}$, yani $W > ${m}\\times${fc}$ ($W\\sim\\chi^2_{${m}}$).`],
+      ['Sınırı hesapla', `$${m}\\times${fc} = ${f(m * fc, 2)}$`],
+      ['Ki-kare tablosundan oku', `Serbestlik derecesi ${m} satırında ${f(m * fc, 2)} değeri yaklaşık ${f(pf, 2)} sütununda:\n$P(Y > ${fc}) = P(W > ${f(m * fc, 2)}) \\approx ${f(pf, 2)}$`]) + `\n\nF tablosunda $F_{${m},\\infty}$ satırına doğrudan da bakabilirsin; aynı sonucu verir.` }; }
     const z = pick([1, 1.645, 1.96, 2, 2.576]), c1 = +(z * z).toFixed(3), pr = 2 * Phi(z) - 1;
-    return { en: `If $Y\\sim\\chi^2_1$, find $P(Y\\le ${c1})$.`, tr: `$Y\\sim\\chi^2_1$ ise $P(Y\\le${c1})$?`, opts: popts(pr, [Phi(z), 1 - pr, Phi(c1)], 4), ex: `$\\chi^2_1 = Z^2$. $P(Z^2\\le ${c1}) = P(-${z}\\le Z\\le ${z}) = 2\\Phi(${z}) - 1 = ${f(pr, 4)}$.` };
+    return { en: `If $Y\\sim\\chi^2_1$, find $P(Y\\le ${c1})$.`, tr: `$Y\\sim\\chi^2_1$ ise $P(Y\\le${c1})$?`, opts: popts(pr, [Phi(z), 1 - pr, Phi(c1)], 4), ex: steps(
+      ['$\\chi^2_1$ bir standart normalin karesidir', `$Y = Z^2$, $Z\\sim N(0,1)$. Yani $P(Z^2\\le ${c1})$ arıyoruz.`],
+      ['Karekök al', `$Z^2\\le ${c1}$ demek $-\\sqrt{${c1}}\\le Z\\le\\sqrt{${c1}}$, yani $-${z}\\le Z\\le ${z}$. Hem pozitif hem negatif taraf dahil.`],
+      ['Normal tablosundan hesapla', `$P(-${z}\\le Z\\le ${z}) = \\Phi(${z}) - \\Phi(-${z}) = 2\\Phi(${z}) - 1$\n$2\\times${f(Phi(z), 4)} - 1 = ${f(pr, 4)}$`]) };
   };
 
   G.chiMoments = () => {
     const m = R(2, 30), t = R(0, 2);
-    if (t === 0) return { en: `If $W\\sim\\chi^2_{${m}}$, then $E(W)$ and $\\text{var}(W)$ are:`, tr: `$W\\sim\\chi^2_{${m}}$ için ortalama ve varyans?`, opts: [`$${m}$ and $${2 * m}$`, `$${m}$ and $${m}$`, `$0$ and $1$`, `$${2 * m}$ and $${m}$`], ex: `Ki-kare: $E = m$, $\\text{var} = 2m$. Burada ${m} ve ${2 * m}.` };
-    if (t === 1) return { en: `Let $Z_1,\\dots,Z_{${m}}$ be i.i.d. $N(0,1)$. The distribution of $\\sum_{i=1}^{${m}} Z_i^2$ is:`, tr: `${m} bağımsız standart normalin karelerinin toplamının dağılımı?`, opts: [`$\\chi^2_{${m}}$`, `$N(0, ${m})$`, `$t_{${m}}$`, `$F_{1,${m}}$`], ex: `Tanım gereği $\\chi^2_{${m}}$. $N(0,${m})$ ise karesiz toplamın dağılımı olurdu.` };
-    return { en: `If $W\\sim\\chi^2_{${m}}$, what is $\\text{var}(W/${m})$?`, tr: `$\\text{var}(W/${m})$?`, opts: nopts(2 / m, [2, 2 * m, 1 / m, 2 / (m * m)], 4, { min: 0 }), ex: `$\\text{var}(W/m) = \\text{var}(W)/m^2 = 2m/m^2 = 2/m = ${f(2 / m, 4)}$. Bu, $F_{${m},\\infty}$'un varyansı.` };
+    if (t === 0) return { en: `If $W\\sim\\chi^2_{${m}}$, then $E(W)$ and $\\text{var}(W)$ are:`, tr: `$W\\sim\\chi^2_{${m}}$ için ortalama ve varyans?`, opts: [`$${m}$ and $${2 * m}$`, `$${m}$ and $${m}$`, `$0$ and $1$`, `$${2 * m}$ and $${m}$`], ex: steps(
+      ['Kuralı hatırla', 'Ki-kare $= m$ tane bağımsız $Z^2$ toplamı. Her $Z^2$ için ortalama 1, varyans 2. Toplayınca: $E(W) = m$, $\\text{var}(W) = 2m$.'],
+      ['Yerine koy', `$m = ${m}$: $E(W) = ${m}$ ve $\\text{var}(W) = 2\\times${m} = ${2 * m}$`]) };
+    if (t === 1) return { en: `Let $Z_1,\\dots,Z_{${m}}$ be i.i.d. $N(0,1)$. The distribution of $\\sum_{i=1}^{${m}} Z_i^2$ is:`, tr: `${m} bağımsız standart normalin karelerinin toplamının dağılımı?`, opts: [`$\\chi^2_{${m}}$`, `$N(0, ${m})$`, `$t_{${m}}$`, `$F_{1,${m}}$`], ex: steps(
+      ['Tanımı hatırla', 'Bağımsız standart normallerin **karelerinin** toplamı ki-kare dağılımıdır. Serbestlik derecesi = kaç tane kare toplandığı.'],
+      ['Say', `Burada ${m} tane $Z_i^2$ toplanıyor, yani $\\chi^2_{${m}}$.`]) + `\n\nKaresiz toplam $\\sum Z_i$ olsaydı dağılımı $N(0, ${m})$ olurdu.` };
+    return { en: `If $W\\sim\\chi^2_{${m}}$, what is $\\text{var}(W/${m})$?`, tr: `$\\text{var}(W/${m})$?`, opts: nopts(2 / m, [2, 2 * m, 1 / m, 2 / (m * m)], 4, { min: 0 }), ex: steps(
+      ['Ki-karenin varyansı', `$\\text{var}(W) = 2m = 2\\times${m} = ${2 * m}$`],
+      ['Sabite bölmek varyansı sabitin karesine böler', `$\\text{var}(W/${m}) = \\dfrac{\\text{var}(W)}{${m}^2} = \\dfrac{${2 * m}}{${m * m}} = ${f(2 / m, 4)}$`]) + `\n\nBu, $F_{${m},\\infty}$ dağılımının varyansıdır.` };
   };
 
   G.ybarVar = () => {
     const v = pick([4, 9, 16, 25, 36, 100, 64, 15, 12]), n = pick([16, 25, 36, 49, 64, 100, 400, 50, 80]);
     const t = R(0, 1);
-    if (t === 0) return { en: `$Y_1,\\dots,Y_{${n}}$ are i.i.d. with $\\sigma_Y^2 = ${v}$. What is $\\text{var}(\\bar Y)$?`, tr: `$\\text{var}(\\bar Y)$ kaçtır?`, opts: nopts(v / n, [v, Math.sqrt(v / n), Math.sqrt(v) / n, v / Math.sqrt(n)], 4, { min: 0 }), ex: `$\\text{var}(\\bar Y) = \\sigma^2/n = ${v}/${n} = ${f(v / n, 4)}$.` };
-    return { en: `$Y_1,\\dots,Y_{${n}}$ are i.i.d. with $\\sigma_Y^2 = ${v}$. What is the standard deviation of $\\bar Y$?`, tr: `$\\bar Y$'nin standart sapması?`, opts: nopts(Math.sqrt(v / n), [v / n, Math.sqrt(v), Math.sqrt(v) / n, v / Math.sqrt(n)], 4, { min: 0 }), ex: `$\\text{sd}(\\bar Y) = \\sigma/\\sqrt n = \\sqrt{${v}/${n}} = ${f(Math.sqrt(v / n), 4)}$.` };
+    if (t === 0) return { en: `$Y_1,\\dots,Y_{${n}}$ are i.i.d. with $\\sigma_Y^2 = ${v}$. What is $\\text{var}(\\bar Y)$?`, tr: `$\\text{var}(\\bar Y)$ kaçtır?`, opts: nopts(v / n, [v, Math.sqrt(v / n), Math.sqrt(v) / n, v / Math.sqrt(n)], 4, { min: 0 }), ex: steps(
+      ['Kuralı hatırla', 'Örneklem ortalaması $n$ gözlemin ortalamasıdır. Gözlemler bağımsız olduğu için çok gözlemin ortalaması daha az dalgalanır:\n$\\text{var}(\\bar Y) = \\sigma_Y^2/n$'],
+      ['Yerine koy', `$\\text{var}(\\bar Y) = \\dfrac{${v}}{${n}} = ${f(v / n, 4)}$`]) };
+    return { en: `$Y_1,\\dots,Y_{${n}}$ are i.i.d. with $\\sigma_Y^2 = ${v}$. What is the standard deviation of $\\bar Y$?`, tr: `$\\bar Y$'nin standart sapması?`, opts: nopts(Math.sqrt(v / n), [v / n, Math.sqrt(v), Math.sqrt(v) / n, v / Math.sqrt(n)], 4, { min: 0 }), ex: steps(
+      ['Önce varyans', `$\\text{var}(\\bar Y) = \\sigma_Y^2/n = ${v}/${n} = ${f(v / n, 4)}$`],
+      ['Standart sapma = varyansın karekökü', `$\\text{sd}(\\bar Y) = \\sqrt{${f(v / n, 4)}} = ${f(Math.sqrt(v / n), 4)}$`]) + `\n\nAynı sonuç başka yoldan: $\\sigma_Y/\\sqrt n = \\sqrt{${v}}/\\sqrt{${n}}$.` };
   };
 
   G.ybarProb = () => {
@@ -341,18 +494,28 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
       en: `$Y_i\\sim N(${mu}, ${v})$, i.i.d., $n=${n}$. Find $P(${f(mu - c, 2)}\\le\\bar Y\\le ${f(mu + c, 2)})$.`,
       tr: `$P(${f(mu - c, 2)}\\le\\bar Y\\le${f(mu + c, 2)})$ kaçtır?`,
       opts: popts(ans, [2 * Phi(c / Math.sqrt(v)) - 1, Phi(z), 2 * Phi(c / (v / n)) - 1, 1 - ans], 4),
-      ex: `$\\bar Y\\sim N(${mu}, ${v}/${n})$, $\\text{sd}(\\bar Y) = ${f(sd, 4)}$. $z = ${c}/${f(sd, 4)} = ${f(z, 2)}$. $P(-${f(z, 2)}\\le Z\\le ${f(z, 2)}) = 2\\Phi(${f(z, 2)}) - 1 = ${f(ans, 4)}$.`
+      ex: steps(
+        ['$\\bar Y$ nasıl dağılır?', `$Y$ normal olduğu için $\\bar Y$ de normal. Ortalaması aynı (${mu}), varyansı $n$ ile bölünür:\n$\\sigma^2/n = ${v}/${n} = ${f(v / n, 4)}$`],
+        ['Standart sapma', `$\\text{sd}(\\bar Y) = \\sqrt{${f(v / n, 4)}} = ${f(sd, 4)}$`],
+        ['Sınırları standartlaştır', `Sınırlar ortalamanın ${c} altında ve ${c} üstünde:\n$z = \\dfrac{${c}}{${f(sd, 4)}} = ${f(z, 2)}$, yani $P(-${f(z, 2)}\\le Z\\le ${f(z, 2)})$ arıyoruz.`],
+        ['Tablodan hesapla', `Simetrik aralık: $\\Phi(z) - \\Phi(-z) = 2\\Phi(z) - 1$\n$2\\times${f(Phi(z), 4)} - 1 = ${f(ans, 4)}$`])
     };
   };
 
   G.cltProb = () => {
     const mu = R(10, 80), v = R(5, 60), n = pick([30, 40, 50, 60, 80, 100, 120]), sd = Math.sqrt(v / n);
     const t = R(0, 1);
-    if (t === 0) { const zz = pick([-1.5, -1, -0.7, -0.5, 0.5, 0.8, 1.2, 1.6]), c = +(mu + zz * sd).toFixed(2), z = (c - mu) / sd, ans = Phi(z); return { en: `A population has $\\mu_Y = ${mu}$ and $\\sigma_Y^2 = ${v}$ (not necessarily normal). In a random sample of $n=${n}$, use the CLT to approximate $P(\\bar Y < ${c})$.`, tr: `MLT ile $P(\\bar Y<${c})$ yaklaşık?`, opts: popts(ans, [Phi((c - mu) / Math.sqrt(v)), 1 - ans, Phi((c - mu) / (v / n))], 4), ex: `MLT: $\\bar Y\\approx N(${mu}, ${v}/${n} = ${f(v / n, 4)})$, $\\text{sd} = ${f(sd, 4)}$. $z = (${c}-${mu})/${f(sd, 4)} = ${f(z, 2)}$. $\\Phi(${f(z, 2)}) = ${f(ans, 4)}$.` }; }
+    const sClt = ['MLT ne diyor?', `$n = ${n}$ yeterince büyük. Merkezi Limit Teoremi: $Y$ normal olmasa bile $\\bar Y$ yaklaşık normaldir, $\\bar Y\\approx N(\\mu, \\sigma^2/n)$.`];
+    const sSd = [`$\\bar Y$'nin standart sapması`, `$\\sigma^2/n = ${v}/${n} = ${f(v / n, 4)}$\n$\\text{sd}(\\bar Y) = \\sqrt{${f(v / n, 4)}} = ${f(sd, 4)}$`];
+    if (t === 0) { const zz = pick([-1.5, -1, -0.7, -0.5, 0.5, 0.8, 1.2, 1.6]), c = +(mu + zz * sd).toFixed(2), z = (c - mu) / sd, ans = Phi(z); return { en: `A population has $\\mu_Y = ${mu}$ and $\\sigma_Y^2 = ${v}$ (not necessarily normal). In a random sample of $n=${n}$, use the CLT to approximate $P(\\bar Y < ${c})$.`, tr: `MLT ile $P(\\bar Y<${c})$ yaklaşık?`, opts: popts(ans, [Phi((c - mu) / Math.sqrt(v)), 1 - ans, Phi((c - mu) / (v / n))], 4), ex: steps(sClt, sSd,
+      ['Standartlaştır', `$z = \\dfrac{${c} - ${mu}}{${f(sd, 4)}} = ${f(z, 2)}$`],
+      ['Tablodan oku', `"$<$" soldaki alan: $${phiTx(z)}$`]) }; }
     const z1 = pick([0.5, 1, 1.5]), z2 = z1 + pick([0.5, 1, 1.5]);
     const a = +(mu + z1 * sd).toFixed(2), b = +(mu + z2 * sd).toFixed(2);
     const za = (a - mu) / sd, zb = (b - mu) / sd, ans = Phi(zb) - Phi(za);
-    return { en: `A population has $\\mu_Y = ${mu}$ and $\\sigma_Y^2 = ${v}$. With $n=${n}$, approximate $P(${a} < \\bar Y < ${b})$.`, tr: `MLT ile $P(${a}<\\bar Y<${b})$?`, opts: popts(ans, [Phi((b - mu) / Math.sqrt(v)) - Phi((a - mu) / Math.sqrt(v)), Phi(zb), 1 - Phi(za)], 4), ex: `$\\text{sd}(\\bar Y) = \\sqrt{${v}/${n}} = ${f(sd, 4)}$. $z_a = ${f(za, 2)}$, $z_b = ${f(zb, 2)}$. $\\Phi(${f(zb, 2)}) - \\Phi(${f(za, 2)}) = ${f(ans, 4)}$.` };
+    return { en: `A population has $\\mu_Y = ${mu}$ and $\\sigma_Y^2 = ${v}$. With $n=${n}$, approximate $P(${a} < \\bar Y < ${b})$.`, tr: `MLT ile $P(${a}<\\bar Y<${b})$?`, opts: popts(ans, [Phi((b - mu) / Math.sqrt(v)) - Phi((a - mu) / Math.sqrt(v)), Phi(zb), 1 - Phi(za)], 4), ex: steps(sClt, sSd,
+      ['İki sınırı standartlaştır', `$z_a = (${a} - ${mu})/${f(sd, 4)} = ${f(za, 2)}$\n$z_b = (${b} - ${mu})/${f(sd, 4)} = ${f(zb, 2)}$`],
+      ['Büyük alandan küçüğü çıkar', `$\\Phi(${f(zb, 2)}) - \\Phi(${f(za, 2)}) = ${f(Phi(zb), 4)} - ${f(Phi(za), 4)} = ${f(ans, 4)}$`]) };
   };
 
   G.cltBern = () => {
@@ -364,7 +527,11 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
       en: `$Y_i$ are i.i.d. Bernoulli with $p = ${p}$ and $n = ${n}$. Use the CLT to approximate $P(\\bar Y ${up ? '\\ge' : '\\le'} ${c})$.`,
       tr: `Bernoulli, $p=${p}$, $n=${n}$. $P(\\bar Y${up ? '\\ge' : '\\le'}${c})$ yaklaşık?`,
       opts: popts(ans, [1 - ans, up ? 1 - Phi((c - p) / Math.sqrt(p * (1 - p))) : Phi((c - p) / Math.sqrt(p * (1 - p))), up ? 1 - Phi((c - p) / (p * (1 - p) / n)) : null], 4),
-      ex: `$E(Y_i) = ${p}$, $\\text{var}(Y_i) = p(1-p) = ${f(p * (1 - p), 4)}$. $\\text{sd}(\\bar Y) = \\sqrt{${f(p * (1 - p), 4)}/${n}} = ${f(sd, 4)}$. $z = (${c}-${p})/${f(sd, 4)} = ${f(z, 2)}$. Sonuç: ${up ? `$1-\\Phi(${f(z, 2)})$` : `$\\Phi(${f(z, 2)})$`} $= ${f(ans, 4)}$.`
+      ex: steps(
+        ['Tek gözlemin ortalaması ve varyansı', `Bernoulli: $E(Y_i) = p = ${p}$\n$\\text{var}(Y_i) = p(1-p) = ${p}\\times${f(1 - p, 2)} = ${f(p * (1 - p), 4)}$`],
+        [`$\\bar Y$'nin standart sapması (MLT)`, `$\\text{sd}(\\bar Y) = \\sqrt{\\dfrac{p(1-p)}{n}} = \\sqrt{\\dfrac{${f(p * (1 - p), 4)}}{${n}}} = ${f(sd, 4)}$`],
+        ['Standartlaştır', `$z = \\dfrac{${c} - ${p}}{${f(sd, 4)}} = ${f(z, 2)}$`],
+        ['Tablodan oku', up ? `"$\\ge$" sağdaki alan: $1 - \\Phi(${f(z, 2)}) = 1 - ${f(Phi(z), 4)} = ${f(ans, 4)}$` : `"$\\le$" soldaki alan: $${phiTx(z)}$`])
     };
   };
 
@@ -376,15 +543,22 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
       en: `Each of $n=${n}$ independent students passes with probability ${p}. Let $S$ be the number who pass. Using the CLT (no continuity correction), approximate $P(S > ${k})$.`,
       tr: `${n} öğrenci, geçme olasılığı ${p}. Geçen sayısı $S$. MLT ile $P(S>${k})$?`,
       opts: popts(ans, [Phi(z), 1 - Phi((k - mu) / v), 1 - Phi((k - mu) / Math.sqrt(p * (1 - p)))], 4),
-      ex: `$S\\sim$ Binom$(${n}, ${p})$, $E(S) = np = ${f(mu, 1)}$, $\\text{var}(S) = np(1-p) = ${f(v, 2)}$, $\\text{sd} = ${f(sd, 3)}$. $z = (${k}-${f(mu, 1)})/${f(sd, 3)} = ${f(z, 3)}$. $P(S>${k})\\approx 1-\\Phi(${f(z, 3)}) = ${f(ans, 4)}$ (PS4 Soru 6 ile aynı yöntem).`
+      ex: steps(
+        ['Geçenlerin beklenen sayısı', `$S$ binom dağılır: $E(S) = np = ${n}\\times${p} = ${f(mu, 1)}$`],
+        ['Varyans ve standart sapma', `$\\text{var}(S) = np(1-p) = ${n}\\times${p}\\times${f(1 - p, 2)} = ${f(v, 2)}$\n$\\text{sd}(S) = \\sqrt{${f(v, 2)}} = ${f(sd, 3)}$`],
+        ['Standartlaştır', `$z = \\dfrac{${k} - ${f(mu, 1)}}{${f(sd, 3)}} = ${f(z, 3)}$`],
+        ['Sağdaki alanı bul', `"$>$" sağdaki alan:\n$P(S > ${k})\\approx 1 - \\Phi(${f(z, 2)}) = 1 - ${f(Phi(z), 4)} = ${f(ans, 4)}$`]) + '\n\nPS4 Soru 6 ile aynı yöntem.'
     };
   };
 
   G.sampleCorr = () => {
     const sx = pick([1.5, 2, 2.5, 3, 4, 5, 10]), sy = pick([2, 3, 4, 6, 8, 12, 20]);
     const r = RF(-0.9, 0.9, 0.05), sxy = +(r * sx * sy).toFixed(2), rr = sxy / (sx * sy);
-    if (Math.random() < 0.5) return { en: `In a sample, $s_X = ${sx}$, $s_Y = ${sy}$ and $s_{XY} = ${sxy}$. The sample correlation $r_{XY}$ is:`, tr: '$r_{XY}$ kaçtır?', opts: nopts(rr, [sxy / (sx * sx * sy * sy), sxy / sx, -rr, sxy / (sx + sy)], 3, { min: -1, max: 1 }), ex: `$r = s_{XY}/(s_Xs_Y) = ${sxy}/(${sx}\\times${sy}) = ${f(rr, 3)}$.` };
-    return { en: `In a sample, $s^2_X = ${f(sx * sx, 2)}$, $s^2_Y = ${f(sy * sy, 2)}$ and $s_{XY} = ${sxy}$. The sample correlation $r_{XY}$ is:`, tr: 'Varyanslar verilmiş. $r_{XY}$?', opts: nopts(rr, [sxy / (sx * sx * sy * sy), sxy / (sx * sx), -rr], 3, { min: -1, max: 1 }), ex: `Önce karekök al: $s_X = ${sx}$, $s_Y = ${sy}$. $r = ${sxy}/(${sx}\\times${sy}) = ${f(rr, 3)}$.` };
+    const sM = ['Standart sapmaları çarp', `$${sx}\\times${sy} = ${g4(sx * sy)}$`], sD = ['Kovaryansı bu çarpıma böl', `$r_{XY} = \\dfrac{${sxy}}{${g4(sx * sy)}} = ${f(rr, 3)}$`];
+    if (Math.random() < 0.5) return { en: `In a sample, $s_X = ${sx}$, $s_Y = ${sy}$ and $s_{XY} = ${sxy}$. The sample correlation $r_{XY}$ is:`, tr: '$r_{XY}$ kaçtır?', opts: nopts(rr, [sxy / (sx * sx * sy * sy), sxy / sx, -rr, sxy / (sx + sy)], 3, { min: -1, max: 1 }), ex: steps(
+      ['Formülü yaz', '$r_{XY} = \\dfrac{s_{XY}}{s_X\\,s_Y}$: kovaryansı iki standart sapmanın çarpımına böl.'], sM, sD) };
+    return { en: `In a sample, $s^2_X = ${f(sx * sx, 2)}$, $s^2_Y = ${f(sy * sy, 2)}$ and $s_{XY} = ${sxy}$. The sample correlation $r_{XY}$ is:`, tr: 'Varyanslar verilmiş. $r_{XY}$?', opts: nopts(rr, [sxy / (sx * sx * sy * sy), sxy / (sx * sx), -rr], 3, { min: -1, max: 1 }), ex: steps(
+      ['Varyansların karekökünü al', `Formülde standart sapma var, soruda varyans verilmiş:\n$s_X = \\sqrt{${f(sx * sx, 2)}} = ${sx}$, $s_Y = \\sqrt{${f(sy * sy, 2)}} = ${sy}$`], sM, sD) };
   };
 
   /* ---------- Ünite 4 ---------- */
@@ -394,8 +568,14 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const fr = (x) => Math.abs(x - 1 / 3) < 1e-9 ? '\\tfrac13' : Math.abs(x - 2 / 3) < 1e-9 ? '\\tfrac23' : f(x, 2);
     const est = `${fr(w[0])}Y_1 + ${fr(w[1])}Y_2`;
     const t = R(0, 1), v = pick([4, 6, 10, 12]);
-    if (t === 0) return { en: `$Y_1, Y_2$ are i.i.d. with mean $\\mu$ and variance $\\sigma^2$. Is $\\hat\\mu = ${est}$ unbiased for $\\mu$?`, tr: `$\\hat\\mu = ${est}$ yansız mı?`, opts: s[1] === 'unbiased' ? [`Yes, because the weights sum to 1, so $E(\\hat\\mu)=\\mu$`, `No, because $E(\\hat\\mu) = ${f(sw, 2)}\\mu \\ne \\mu$`, `No, because it does not use all observations equally`, `Yes, because its variance is zero`] : [`No, because $E(\\hat\\mu) = ${f(sw, 2)}\\mu \\ne \\mu$`, `Yes, because the weights sum to 1`, `Yes, because both weights are positive`, `Yes, because its variance is smaller than $\\sigma^2$`], ex: `$E(\\hat\\mu) = (${fr(w[0])} + ${fr(w[1])})\\mu = ${f(sw, 2)}\\mu$. Ağırlıkların toplamı ${Math.abs(sw - 1) < 1e-9 ? '1, yani yansız. Eşit ağırlık zorunlu değil, sadece toplam 1 olmalı.' : f(sw, 2) + ', yani yanlı.'}` };
-    return { en: `$Y_1, Y_2$ are i.i.d. with variance $\\sigma^2 = ${v}$. What is $\\text{var}(${est})$?`, tr: `$\\text{var}(${est})$ kaçtır?`, opts: nopts(v * sw2, [v * sw, v * sw * sw, v / 2, v], 3, { min: 0 }), ex: `Bağımsızlıkta $\\text{var}(w_1Y_1+w_2Y_2) = (w_1^2+w_2^2)\\sigma^2 = (${f(w[0] * w[0], 4)} + ${f(w[1] * w[1], 4)})(${v}) = ${f(v * sw2, 3)}$. Ağırlıkların kendisi değil, kareleri kullanılır.` };
+    if (t === 0) return { en: `$Y_1, Y_2$ are i.i.d. with mean $\\mu$ and variance $\\sigma^2$. Is $\\hat\\mu = ${est}$ unbiased for $\\mu$?`, tr: `$\\hat\\mu = ${est}$ yansız mı?`, opts: s[1] === 'unbiased' ? [`Yes, because the weights sum to 1, so $E(\\hat\\mu)=\\mu$`, `No, because $E(\\hat\\mu) = ${f(sw, 2)}\\mu \\ne \\mu$`, `No, because it does not use all observations equally`, `Yes, because its variance is zero`] : [`No, because $E(\\hat\\mu) = ${f(sw, 2)}\\mu \\ne \\mu$`, `Yes, because the weights sum to 1`, `Yes, because both weights are positive`, `Yes, because its variance is smaller than $\\sigma^2$`], ex: steps(
+      ['Beklenen değeri al', `Beklenen değer doğrusaldır ve $E(Y_1) = E(Y_2) = \\mu$:\n$E(\\hat\\mu) = ${fr(w[0])}\\,E(Y_1) + ${fr(w[1])}\\,E(Y_2) = (${fr(w[0])} + ${fr(w[1])})\\mu$`],
+      ['Ağırlıkları topla', `$${fr(w[0])} + ${fr(w[1])} = ${f(sw, 2)}$, yani $E(\\hat\\mu) = ${f(sw, 2)}\\mu$`],
+      ['Karar', Math.abs(sw - 1) < 1e-9 ? 'Ağırlıkların toplamı 1, yani $E(\\hat\\mu) = \\mu$: **yansız**. Ağırlıkların eşit olması gerekmez, toplamın 1 olması yeter.' : `Ağırlıkların toplamı ${f(sw, 2)}, 1 değil. $E(\\hat\\mu) = ${f(sw, 2)}\\mu \\ne \\mu$: **yanlı**. Yanlılık $= (${f(sw, 2)} - 1)\\mu$.`]) };
+    return { en: `$Y_1, Y_2$ are i.i.d. with variance $\\sigma^2 = ${v}$. What is $\\text{var}(${est})$?`, tr: `$\\text{var}(${est})$ kaçtır?`, opts: nopts(v * sw2, [v * sw, v * sw * sw, v / 2, v], 3, { min: 0 }), ex: steps(
+      ['Kuralı yaz', 'Bağımsız gözlemlerde kovaryans 0 olduğu için varyanslar toplanır; her katsayı **karesiyle** dışarı çıkar:\n$\\text{var}(w_1Y_1 + w_2Y_2) = w_1^2\\sigma^2 + w_2^2\\sigma^2 = (w_1^2 + w_2^2)\\sigma^2$'],
+      ['Ağırlıkların karesini al ve topla', `$(${fr(w[0])})^2 + (${fr(w[1])})^2 = ${f(w[0] * w[0], 4)} + ${f(w[1] * w[1], 4)} = ${f(sw2, 4)}$`],
+      ['$\\sigma^2$ ile çarp', `$${f(sw2, 4)}\\times${v} = ${f(v * sw2, 3)}$`]) };
   };
 
   const HYP = [
@@ -409,7 +589,10 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
   G.hypSetup = () => {
     const h = pick(HYP), c = R(5, 80);
     const ops = ['\\ne', '>', '<'];
-    return { en: `A researcher wants to test ${h[0]} ${c}. The null and alternative hypotheses are:`, tr: `Ortalamanın ${c}'den ${h[2]} test ediliyor. Hipotezler?`, opts: [`$H_0:\\mu=${c}$ vs. $H_1:\\mu${h[1]}${c}$`, ...ops.filter(o => o !== h[1]).map(o => `$H_0:\\mu=${c}$ vs. $H_1:\\mu${o}${c}$`), `$H_0:\\mu${h[1]}${c}$ vs. $H_1:\\mu=${c}$`].slice(0, 4), ex: `Eşitlik her zaman $H_0$'dadır. "${h[2]}" ifadesi $H_1:\\mu${h[1]}${c}$ demek${h[1] === '\\ne' ? ', iki yönlü' : ', tek yönlü'}.` };
+    return { en: `A researcher wants to test ${h[0]} ${c}. The null and alternative hypotheses are:`, tr: `Ortalamanın ${c}'den ${h[2]} test ediliyor. Hipotezler?`, opts: [`$H_0:\\mu=${c}$ vs. $H_1:\\mu${h[1]}${c}$`, ...ops.filter(o => o !== h[1]).map(o => `$H_0:\\mu=${c}$ vs. $H_1:\\mu${o}${c}$`), `$H_0:\\mu${h[1]}${c}$ vs. $H_1:\\mu=${c}$`].slice(0, 4), ex: steps(
+      [`Eşitlik her zaman $H_0$'da`, `$H_0: \\mu = ${c}$. Sıfır hipotezi "fark yok, değişiklik yok" iddiasıdır.`],
+      ['Sorudaki yön kelimesine bak', `Soru "${h[2]}" diye soruyor. Bu, $H_1: \\mu ${h[1]} ${c}$ demek.`],
+      ['Tek yönlü mü, iki yönlü mü?', h[1] === '\\ne' ? '"Farklı mı" iki yönü de kapsar: **iki yönlü** test.' : `Sadece bir yön soruluyor: **tek yönlü** test (${h[1] === '>' ? 'sağ' : 'sol'} kuyruk).`]) };
   };
 
   G.tMean = () => {
@@ -417,18 +600,29 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const mu0 = R(10, 90), tt = pick([-2.8, -2.2, -1.8, -1.2, 1.1, 1.5, 1.75, 2.1, 2.4, 3.0]);
     const yb = +(mu0 + tt * se).toFixed(2), t = (yb - mu0) / se;
     const k = R(0, 2);
-    if (k === 0) return { en: `$n=${n}$, $\\bar Y = ${yb}$, $s_Y = ${s}$. What is the $t$-statistic for $H_0:\\mu_Y = ${mu0}$?`, tr: `$H_0:\\mu=${mu0}$ için t istatistiği?`, opts: nopts(t, [(yb - mu0) / s, (yb - mu0) / (s / n), (yb - mu0) / (s * s / n), -t], 2), ex: `$SE(\\bar Y) = s_Y/\\sqrt n = ${s}/\\sqrt{${n}} = ${f(se, 4)}$. $t = (${yb}-${mu0})/${f(se, 4)} = ${f(t, 2)}$. $s_Y$'ye bölmek SE'yi unutmak demek.` };
-    if (k === 1) { const p2 = 2 * Phi(-Math.abs(t)); return { en: `$n=${n}$, $\\bar Y = ${yb}$, $s_Y = ${s}$. What is the two-sided p-value for $H_0:\\mu_Y = ${mu0}$?`, tr: `İki yönlü p-değeri?`, opts: popts(p2, [p2 / 2, 1 - p2, Phi(Math.abs(t)), 2 * Phi(-Math.abs((yb - mu0) / s))], 4), ex: `$t = (${yb}-${mu0})/(${s}/\\sqrt{${n}}) = ${f(t, 2)}$. $p = 2\\Phi(-|t|) = 2\\Phi(-${f(Math.abs(t), 2)}) = ${f(p2, 4)}$.` }; }
+    const s1 = ['Standart hatayı bul', `$SE(\\bar Y) = \\dfrac{s_Y}{\\sqrt n} = \\dfrac{${s}}{\\sqrt{${n}}} = \\dfrac{${s}}{${Math.sqrt(n)}} = ${f(se, 4)}$`];
+    const s2 = ['t istatistiğini hesapla', `$t = \\dfrac{\\bar Y - \\mu_0}{SE} = \\dfrac{${yb} - ${mu0}}{${f(se, 4)}} = \\dfrac{${f(yb - mu0, 2)}}{${f(se, 4)}} = ${f(t, 2)}$\nYani $\\bar Y$, $H_0$ değerinin ${f(Math.abs(t), 2)} standart hata ${t < 0 ? 'altında' : 'üstünde'}.`];
+    if (k === 0) return { en: `$n=${n}$, $\\bar Y = ${yb}$, $s_Y = ${s}$. What is the $t$-statistic for $H_0:\\mu_Y = ${mu0}$?`, tr: `$H_0:\\mu=${mu0}$ için t istatistiği?`, opts: nopts(t, [(yb - mu0) / s, (yb - mu0) / (s / n), (yb - mu0) / (s * s / n), -t], 2), ex: steps(s1, s2) + "\n\n$s_Y$'ye bölmek en sık hata: payda standart sapma değil, standart hata ($s_Y/\\sqrt n$)." };
+    if (k === 1) { const p2 = 2 * Phi(-Math.abs(t)); return { en: `$n=${n}$, $\\bar Y = ${yb}$, $s_Y = ${s}$. What is the two-sided p-value for $H_0:\\mu_Y = ${mu0}$?`, tr: `İki yönlü p-değeri?`, opts: popts(p2, [p2 / 2, 1 - p2, Phi(Math.abs(t)), 2 * Phi(-Math.abs((yb - mu0) / s))], 4), ex: steps(s1, s2,
+      ['İki yönlü p-değeri', `İki kuyruğun alanı toplanır:\n$p = 2\\Phi(-|t|) = 2\\times\\Phi(-${f(Math.abs(t), 2)}) = 2\\times${f(Phi(-Math.abs(t)), 4)} = ${f(p2, 4)}$`]) }; }
     const a = pick([0.10, 0.05, 0.01]), cv = { 0.1: 1.645, 0.05: 1.96, 0.01: 2.576 }[a], rej = Math.abs(t) > cv;
-    return { en: `$n=${n}$, $\\bar Y = ${yb}$, $s_Y = ${s}$. Test $H_0:\\mu_Y = ${mu0}$ vs. $H_1:\\mu_Y\\ne${mu0}$ at the ${a * 100}% level.`, tr: `%${a * 100} düzeyinde iki yönlü test kararı?`, opts: rej ? [`Reject $H_0$, since $|t| = ${f(Math.abs(t), 2)} > ${cv}$`, `Do not reject $H_0$, since $|t| = ${f(Math.abs(t), 2)} < ${cv}$`, `Reject $H_0$, since $\\bar Y > 0$`, `Do not reject $H_0$, since $s_Y > 1$`] : [`Do not reject $H_0$, since $|t| = ${f(Math.abs(t), 2)} < ${cv}$`, `Reject $H_0$, since $|t| = ${f(Math.abs(t), 2)} > ${cv}$`, `Reject $H_0$, since $\\bar Y \\ne ${mu0}$`, `Accept $H_1$, since $n$ is large`], ex: `$t = (${yb}-${mu0})/(${s}/\\sqrt{${n}}) = ${f(t, 2)}$. İki yönlü %${a * 100} kritik değeri ${cv}. $|t|${rej ? '>' : '<'}${cv}$, ${rej ? 'reddet' : 'reddedemeyiz'}.` };
+    return { en: `$n=${n}$, $\\bar Y = ${yb}$, $s_Y = ${s}$. Test $H_0:\\mu_Y = ${mu0}$ vs. $H_1:\\mu_Y\\ne${mu0}$ at the ${a * 100}% level.`, tr: `%${a * 100} düzeyinde iki yönlü test kararı?`, opts: rej ? [`Reject $H_0$, since $|t| = ${f(Math.abs(t), 2)} > ${cv}$`, `Do not reject $H_0$, since $|t| = ${f(Math.abs(t), 2)} < ${cv}$`, `Reject $H_0$, since $\\bar Y > 0$`, `Do not reject $H_0$, since $s_Y > 1$`] : [`Do not reject $H_0$, since $|t| = ${f(Math.abs(t), 2)} < ${cv}$`, `Reject $H_0$, since $|t| = ${f(Math.abs(t), 2)} > ${cv}$`, `Reject $H_0$, since $\\bar Y \\ne ${mu0}$`, `Accept $H_1$, since $n$ is large`], ex: steps(s1, s2,
+      ['Kritik değeri bul', `İki yönlü %${a * 100} testte kritik değer ${cv}.`],
+      ['Karşılaştır', `$|t| = ${f(Math.abs(t), 2)} ${rej ? '>' : '<'} ${cv}$, yani $H_0$ ${rej ? '**reddedilir**' : '**reddedilemez**'}.`]) };
   };
 
   G.pValue = () => {
     const t = pick([-2.6, -2.1, -1.7, -1.3, 1.2, 1.6, 1.9, 2.3, 2.7, 3.1]), alt = pick(['two', 'gt', 'lt']);
     let p, ex;
-    if (alt === 'two') { p = 2 * Phi(-Math.abs(t)); ex = `İki yönlü: $p = 2\\Phi(-|t|) = 2\\Phi(-${Math.abs(t)}) = ${f(p, 4)}$.`; }
-    else if (alt === 'gt') { p = 1 - Phi(t); ex = `$H_1:\\mu>c$, sağ kuyruk: $p = 1-\\Phi(${t}) = ${f(p, 4)}$.${t < 0 ? ' t negatif olduğu için p büyük çıkar, sağ kuyruk lehine kanıt yok.' : ''}`; }
-    else { p = Phi(t); ex = `$H_1:\\mu<c$, sol kuyruk: $p = \\Phi(${t}) = ${f(p, 4)}$.${t > 0 ? ' t pozitif olduğu için p büyük çıkar.' : ''}`; }
+    const at = Math.abs(t), yon = (s) => [`$H_1$'in yönüne bak`, s];
+    if (alt === 'two') { p = 2 * Phi(-at); ex = steps(yon('$H_1: \\mu\\ne c$ iki yönlü: iki kuyruğun alanı toplanır.'),
+      ['Bir kuyruğun alanı', `$\\Phi(-${at}) = 1 - \\Phi(${at}) = 1 - ${f(Phi(at), 4)} = ${f(Phi(-at), 4)}$`],
+      ['İki ile çarp', `$p = 2\\times${f(Phi(-at), 4)} = ${f(p, 4)}$`]); }
+    else if (alt === 'gt') { p = 1 - Phi(t); ex = steps(yon("$H_1: \\mu > c$ sağ kuyruk: $t$'nin sağındaki alan."),
+      ['Sağdaki alanı bul', (t < 0 ? `Önce $${phiTx(t)}$\n` : '') + `$p = 1 - \\Phi(${t}) = 1 - ${f(Phi(t), 4)} = ${f(p, 4)}$`]) + (t < 0 ? "\n\n$t$ negatif, yani veri $H_1$'in tersi yönünde; bu yüzden p büyük çıkar." : ''); }
+    else { p = Phi(t); ex = steps(yon("$H_1: \\mu < c$ sol kuyruk: $t$'nin solundaki alan."),
+      ['Soldaki alanı bul', `$p = ${phiTx(t)}$`]) + (t > 0 ? "\n\n$t$ pozitif, yani veri $H_1$'in tersi yönünde; bu yüzden p büyük çıkar." : ''); }
+    ex += '\n\np, $H_0$ doğruysa bu kadar uç bir $t$ görme olasılığıdır. p < 0.05 ise %5 düzeyinde $H_0$ reddedilir.';
     const H = { two: '\\mu\\ne c', gt: '\\mu > c', lt: '\\mu < c' }[alt];
     return { en: `The $t$-statistic for $H_0:\\mu=c$ is $t = ${t}$. Using the normal approximation, the p-value for $H_1: ${H}$ is:`, tr: `$t=${t}$, $H_1:${H}$ için p-değeri?`, opts: popts(p, [2 * Phi(-Math.abs(t)), 1 - Phi(Math.abs(t)), 1 - p, Phi(-Math.abs(t)), Phi(Math.abs(t))].filter(x => Math.abs(x - p) > 1e-6), 4), ex };
   };
@@ -442,7 +636,11 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
       en: `$n=${n}$, $\\bar Y=${yb}$, $s_Y=${s}$. The ${L[0]}% confidence interval for $\\mu_Y$ is:`,
       tr: `%${L[0]} güven aralığı?`,
       opts: [ivm(yb - m, yb + m, 2), ivm(yb - others[0][1] * se, yb + others[0][1] * se, 2), ivm(yb - others[1][1] * se, yb + others[1][1] * se, 2), ivm(yb - L[1] * s / n, yb + L[1] * s / n, 2), ivm(yb - L[1] * s, yb + L[1] * s, 2)].filter((x, i, a) => a.indexOf(x) === i).slice(0, 4).map(fmt),
-      ex: `$SE = ${s}/\\sqrt{${n}} = ${f(se, 3)}$. %${L[0]} için kritik değer ${L[1]}. $${yb}\\pm${L[1]}\\times${f(se, 3)} = ${yb}\\pm${f(m, 2)}$, yani $${iv(yb - m, yb + m, 2)}$.`
+      ex: steps(
+        ['Standart hatayı bul', `$SE = \\dfrac{s_Y}{\\sqrt n} = \\dfrac{${s}}{\\sqrt{${n}}} = \\dfrac{${s}}{${Math.sqrt(n)}} = ${f(se, 3)}$`],
+        ['Kritik değeri seç', `%${L[0]} güven için kritik değer ${L[1]}. (Ezber: %90 → 1.645, %95 → 1.96, %99 → 2.576)`],
+        ['Hata payını hesapla', `$${L[1]}\\times${f(se, 3)} = ${f(m, 2)}$`],
+        ['Ortalamadan çıkar ve ekle', `Alt uç: $${yb} - ${f(m, 2)} = ${f(yb - m, 2)}$\nÜst uç: $${yb} + ${f(m, 2)} = ${f(yb + m, 2)}$`])
     };
   };
 
@@ -452,7 +650,11 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
       en: `In a survey of ${n} people, ${k} support a policy. The 95% confidence interval for the population proportion is approximately:`,
       tr: `${n} kişiden ${k}'i destekliyor. %95 GA?`,
       opts: [ivm(ph - 1.96 * se, ph + 1.96 * se, 3), ivm(ph - 2.576 * se, ph + 2.576 * se, 3), ivm(ph - 1.96 * ph * (1 - ph) / n, ph + 1.96 * ph * (1 - ph) / n, 3), ivm(ph - 1.96 * Math.sqrt(ph * (1 - ph)), ph + 1.96 * Math.sqrt(ph * (1 - ph)), 3)],
-      ex: `$\\hat p = ${k}/${n} = ${f(ph, 4)}$. $SE = \\sqrt{\\hat p(1-\\hat p)/n} = ${f(se, 4)}$. $${f(ph, 4)}\\pm1.96(${f(se, 4)}) = ${iv(ph - 1.96 * se, ph + 1.96 * se, 3)}$.`
+      ex: steps(
+        ['Örneklem oranı', `Destekleyenlerin payı: $\\hat p = ${k}/${n} = ${f(ph, 4)}$`],
+        ['Standart hata', `Oran bir Bernoulli ortalaması; varyansı $\\hat p(1-\\hat p)$:\n$SE = \\sqrt{\\dfrac{\\hat p(1-\\hat p)}{n}} = \\sqrt{\\dfrac{${f(ph, 4)}\\times${f(1 - ph, 4)}}{${n}}} = ${f(se, 4)}$`],
+        ['Hata payı', `%95 için kritik değer 1.96: $1.96\\times${f(se, 4)} = ${f(1.96 * se, 4)}$`],
+        ['Uçlar', `Alt uç: $${f(ph, 4)} - ${f(1.96 * se, 4)} = ${f(ph - 1.96 * se, 3)}$\nÜst uç: $${f(ph, 4)} + ${f(1.96 * se, 4)} = ${f(ph + 1.96 * se, 3)}$`])
     };
   };
 
@@ -463,7 +665,10 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
       en: `The 95% confidence interval for $\\mu_Y$ is $(${a},\\ ${b})$. At the 5% level, the two-sided test of $H_0:\\mu_Y = ${mu0}$:`,
       tr: `%95 GA $(${a}, ${b})$. $H_0:\\mu=${mu0}$ kararı?`,
       opts: inside ? [`does not reject $H_0$, because ${mu0} is inside the interval`, `rejects $H_0$, because ${mu0} is inside the interval`, `rejects $H_0$, because the interval does not contain 0`, `cannot be decided without the p-value`] : [`rejects $H_0$, because ${mu0} is outside the interval`, `does not reject $H_0$, because ${mu0} is outside the interval`, `does not reject $H_0$, because the interval is wide`, `cannot be decided without the p-value`],
-      ex: `%95 GA, %5'te reddedilemeyen değerlerin kümesi. ${mu0} aralığın ${inside ? 'içinde, yani reddedemeyiz' : 'dışında, yani reddederiz'}.`
+      ex: steps(
+        ['Güven aralığı ile test arasındaki bağ', '%95 güven aralığı, %5 düzeyindeki iki yönlü testte **reddedilemeyen** değerlerin listesidir.'],
+        ['$H_0$ değeri aralıkta mı?', `Aralık ${a} ile ${b} arası. ` + (inside ? `${mu0} bu iki sayının arasında: **içeride**.` : mu0 < a ? `${mu0} alt uçtan (${a}) küçük: **dışarıda**.` : `${mu0} üst uçtan (${b}) büyük: **dışarıda**.`)],
+        ['Karar', inside ? 'İçerideyse $H_0$ **reddedilemez**.' : 'Dışarıdaysa $H_0$ **reddedilir**.'])
     };
   };
 
@@ -473,9 +678,17 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const se = Math.sqrt(sm * sm / nm + sw * sw / nw), t = diff / se;
     const k = R(0, 2);
     const h = `Men: $\\bar Y_m=${ym}$, $s_m=${sm}$, $n_m=${nm}$. Women: $\\bar Y_w=${yw}$, $s_w=${sw}$, $n_w=${nw}$.`;
-    if (k === 0) return { en: h + ' What is $SE(\\bar Y_m-\\bar Y_w)$?', tr: 'Farkın standart hatası?', opts: nopts(se, [sm / Math.sqrt(nm) + sw / Math.sqrt(nw), Math.sqrt(sm / nm + sw / nw), Math.sqrt(Math.abs(sm * sm / nm - sw * sw / nw)), (sm + sw) / Math.sqrt(nm + nw)], 4, { min: 0 }), ex: `$SE = \\sqrt{s_m^2/n_m + s_w^2/n_w} = \\sqrt{${sm * sm}/${nm} + ${sw * sw}/${nw}} = ${f(se, 4)}$. Varyanslar toplanır, SE'ler toplanmaz.` };
-    if (k === 1) return { en: h + ' What is the $t$-statistic for $H_0:\\mu_m-\\mu_w=0$?', tr: 'Fark testi t istatistiği?', opts: nopts(t, [diff / (sm / Math.sqrt(nm) + sw / Math.sqrt(nw)), diff / Math.sqrt(sm * sm + sw * sw), diff, -t], 2), ex: `Fark $= ${f(diff, 2)}$, $SE = ${f(se, 4)}$. $t = ${f(diff, 2)}/${f(se, 4)} = ${f(t, 2)}$.` };
-    return { en: h + ' The 95% confidence interval for $\\mu_m-\\mu_w$ is:', tr: 'Fark için %95 GA?', opts: [ivm(diff - 1.96 * se, diff + 1.96 * se, 3), ivm(diff - 2.576 * se, diff + 2.576 * se, 3), ivm(diff - 1.96 * (sm / Math.sqrt(nm) + sw / Math.sqrt(nw)), diff + 1.96 * (sm / Math.sqrt(nm) + sw / Math.sqrt(nw)), 3), ivm(diff - se, diff + se, 3)], ex: `$${f(diff, 2)}\\pm1.96(${f(se, 4)}) = ${iv(diff - 1.96 * se, diff + 1.96 * se, 3)}$.${diff - 1.96 * se > 0 || diff + 1.96 * se < 0 ? ' 0 aralıkta yok, yani fark %5\'te anlamlı.' : ' 0 aralıkta, yani fark %5\'te anlamlı değil.'}` };
+    const va = sm * sm / nm, vb = sw * sw / nw;
+    const sV = ['Her grubun $s^2/n$ değeri', `Erkek: $${sm}^2/${nm} = ${sm * sm}/${nm} = ${f(va, 4)}$\nKadın: $${sw}^2/${nw} = ${sw * sw}/${nw} = ${f(vb, 4)}$`];
+    const sS = ['Topla ve karekök al', `İki örneklem bağımsız, varyanslar toplanır:\n$SE = \\sqrt{${f(va, 4)} + ${f(vb, 4)}} = \\sqrt{${f(va + vb, 4)}} = ${f(se, 4)}$`];
+    const sF = ['Ortalamaların farkı', `$\\bar Y_m - \\bar Y_w = ${ym} - ${yw} = ${f(diff, 2)}$`];
+    if (k === 0) return { en: h + ' What is $SE(\\bar Y_m-\\bar Y_w)$?', tr: 'Farkın standart hatası?', opts: nopts(se, [sm / Math.sqrt(nm) + sw / Math.sqrt(nw), Math.sqrt(sm / nm + sw / nw), Math.sqrt(Math.abs(sm * sm / nm - sw * sw / nw)), (sm + sw) / Math.sqrt(nm + nw)], 4, { min: 0 }), ex: steps(sV, sS) + '\n\nStandart hatalar toplanmaz, varyanslar toplanır; sonra karekök alınır. Farkta bile toplanır, çıkarılmaz.' };
+    if (k === 1) return { en: h + ' What is the $t$-statistic for $H_0:\\mu_m-\\mu_w=0$?', tr: 'Fark testi t istatistiği?', opts: nopts(t, [diff / (sm / Math.sqrt(nm) + sw / Math.sqrt(nw)), diff / Math.sqrt(sm * sm + sw * sw), diff, -t], 2), ex: steps(sF, sV, sS,
+      ['t istatistiği', `$H_0$ altında fark 0: $t = \\dfrac{${f(diff, 2)} - 0}{${f(se, 4)}} = ${f(t, 2)}$`]) };
+    const lo = diff - 1.96 * se, hi = diff + 1.96 * se;
+    return { en: h + ' The 95% confidence interval for $\\mu_m-\\mu_w$ is:', tr: 'Fark için %95 GA?', opts: [ivm(diff - 1.96 * se, diff + 1.96 * se, 3), ivm(diff - 2.576 * se, diff + 2.576 * se, 3), ivm(diff - 1.96 * (sm / Math.sqrt(nm) + sw / Math.sqrt(nw)), diff + 1.96 * (sm / Math.sqrt(nm) + sw / Math.sqrt(nw)), 3), ivm(diff - se, diff + se, 3)], ex: steps(sF, sV, sS,
+      ['Hata payı', `$1.96\\times${f(se, 4)} = ${f(1.96 * se, 3)}$`],
+      ['Uçlar', `Alt uç: $${f(diff, 2)} - ${f(1.96 * se, 3)} = ${f(lo, 3)}$\nÜst uç: $${f(diff, 2)} + ${f(1.96 * se, 3)} = ${f(hi, 3)}$`]) + (lo > 0 || hi < 0 ? "\n\n0 aralıkta yok, yani fark %5'te anlamlı." : "\n\n0 aralıkta, yani fark %5'te anlamlı değil.") };
   };
 
   /* ---------- Ünite 5 ---------- */
@@ -499,20 +712,36 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
   G.olsSmall = () => {
     const d = olsData(), t = R(0, 2);
     const table = '\n| $X$ | ' + d.xs.join(' | ') + ' |\n| $Y$ | ' + d.ys.join(' | ') + ' |\n';
-    const steps = `$\\bar X = ${f(d.xb, 3)}$, $\\bar Y = ${f(d.yb, 3)}$, $\\sum(X-\\bar X)(Y-\\bar Y) = ${f(d.sxy, 3)}$, $\\sum(X-\\bar X)^2 = ${f(d.sxx, 3)}$.`;
-    if (t === 0) return { en: 'Using the data below, compute the OLS slope $\\hat\\beta_1$ of $Y$ on $X$.' + table, tr: 'OLS eğimi $\\hat\\beta_1$?', opts: nopts(d.b1, [d.sxx / d.sxy, d.sxy / (d.n - 1), d.yb / d.xb, d.b0], 3), ex: steps + ` $\\hat\\beta_1 = ${f(d.sxy, 3)}/${f(d.sxx, 3)} = ${f(d.b1, 3)}$.` };
-    if (t === 1) return { en: 'Using the data below, compute the OLS intercept $\\hat\\beta_0$.' + table, tr: 'OLS sabiti $\\hat\\beta_0$?', opts: nopts(d.b0, [d.yb + d.b1 * d.xb, d.yb, d.b1, d.yb - d.xb], 3), ex: steps + ` $\\hat\\beta_1 = ${f(d.b1, 3)}$. $\\hat\\beta_0 = \\bar Y - \\hat\\beta_1\\bar X = ${f(d.yb, 3)} - ${f(d.b1, 3)}(${f(d.xb, 3)}) = ${f(d.b0, 3)}$.` };
+    const dx = d.xs.map(x => x - d.xb), dy = d.ys.map(y => y - d.yb);
+    const sA = ['Ortalamaları bul', `$\\bar X = (${sumx(d.xs)})/${d.n} = ${g4(d.xb)}$\n$\\bar Y = (${sumx(d.ys)})/${d.n} = ${g4(d.yb)}$`];
+    const sB = ['Sapmalar tablosunu doldur', 'Her gözlemden ortalamayı çıkar. "Çarpım" sütunu $(X-\\bar X)(Y-\\bar Y)$, son sütun $(X-\\bar X)^2$.\n| $X$ | $Y$ | $X-\\bar X$ | $Y-\\bar Y$ | Çarpım | $(X-\\bar X)^2$ |\n' +
+      d.xs.map((x, i) => `| ${x} | ${d.ys[i]} | ${g4(dx[i])} | ${g4(dy[i])} | ${g4(dx[i] * dy[i])} | ${g4(dx[i] * dx[i])} |`).join('\n') + `\n| | | | **Toplam** | **${g4(d.sxy)}** | **${g4(d.sxx)}** |`];
+    const sC = ['Eğim = çarpım toplamı ÷ kare toplamı', `$\\hat\\beta_1 = \\dfrac{\\sum(X-\\bar X)(Y-\\bar Y)}{\\sum(X-\\bar X)^2} = \\dfrac{${g4(d.sxy)}}{${g4(d.sxx)}} = ${f(d.b1, 3)}$`];
+    const tip = '\n\nHesap makinesinde STAT → A+BX ile kontrol edebilirsin: B eğim, A sabit.';
+    if (t === 0) return { en: 'Using the data below, compute the OLS slope $\\hat\\beta_1$ of $Y$ on $X$.' + table, tr: 'OLS eğimi $\\hat\\beta_1$?', opts: nopts(d.b1, [d.sxx / d.sxy, d.sxy / (d.n - 1), d.yb / d.xb, d.b0], 3), ex: steps(sA, sB, sC) + tip };
+    if (t === 1) return { en: 'Using the data below, compute the OLS intercept $\\hat\\beta_0$.' + table, tr: 'OLS sabiti $\\hat\\beta_0$?', opts: nopts(d.b0, [d.yb + d.b1 * d.xb, d.yb, d.b1, d.yb - d.xb], 3), ex: steps(sA, sB, sC,
+      ['Sabit: doğru ortalamalardan geçer', `$\\hat\\beta_0 = \\bar Y - \\hat\\beta_1\\bar X = ${g4(d.yb)} - (${f(d.b1, 3)})\\times${g4(d.xb)} = ${f(d.b0, 3)}$`]) + tip };
     const i = R(0, d.n - 1), yh = d.b0 + d.b1 * d.xs[i], res = d.ys[i] - yh;
-    return { en: `Using the data below, the OLS line is $\\hat Y = ${f(d.b0, 3)} ${d.b1 < 0 ? '-' : '+'} ${f(Math.abs(d.b1), 3)}X$. What is the residual for the observation with $X=${d.xs[i]}$?` + table, tr: `$X=${d.xs[i]}$ gözleminin kalıntısı?`, opts: nopts(res, [-res, yh, d.ys[i] - d.yb], 3), ex: `$\\hat Y = ${f(d.b0, 3)} + (${f(d.b1, 3)})(${d.xs[i]}) = ${f(yh, 3)}$. Kalıntı $= Y - \\hat Y = ${d.ys[i]} - ${f(yh, 3)} = ${f(res, 3)}$.` };
+    return { en: `Using the data below, the OLS line is $\\hat Y = ${f(d.b0, 3)} ${d.b1 < 0 ? '-' : '+'} ${f(Math.abs(d.b1), 3)}X$. What is the residual for the observation with $X=${d.xs[i]}$?` + table, tr: `$X=${d.xs[i]}$ gözleminin kalıntısı?`, opts: nopts(res, [-res, yh, d.ys[i] - d.yb], 3), ex: steps(
+      ['Tahmini değeri bul', `Doğruda $X = ${d.xs[i]}$ koy:\n$\\hat Y = ${f(d.b0, 3)} + (${f(d.b1, 3)})\\times${d.xs[i]} = ${f(yh, 3)}$`],
+      ['Kalıntı = gerçek − tahmin', `Tabloda $X = ${d.xs[i]}$ için gerçek değer $Y = ${d.ys[i]}$:\n$\\hat u = Y - \\hat Y = ${d.ys[i]} - ${par(+f(yh, 3))} = ${f(res, 3)}$`]) +
+      (res > 0.0005 ? '\n\nKalıntı pozitif: nokta doğrunun üstünde, model bu gözlemi olduğundan düşük tahmin etmiş.' : res < -0.0005 ? '\n\nKalıntı negatif: nokta doğrunun altında, model bu gözlemi olduğundan yüksek tahmin etmiş.' : '\n\nKalıntı sıfır: nokta tam doğrunun üstünde.') };
   };
 
   G.olsMoments = () => {
     const xb = RF(2, 30, 0.5), sx2 = pick([4, 9, 2.25, 16, 25, 6.25]), b1 = RF(-4, 4, 0.25) || 1.5, sxy = +(b1 * sx2).toFixed(3), yb = RF(10, 100, 0.5);
     const b0 = yb - (sxy / sx2) * xb, t = R(0, 2);
-    if (t === 0) return { en: `$s_{XY} = ${sxy}$ and $s^2_X = ${sx2}$. What is $\\hat\\beta_1$?`, tr: '$\\hat\\beta_1$?', opts: nopts(sxy / sx2, [sxy / Math.sqrt(sx2), sx2 / sxy, sxy * sx2], 3), ex: `$\\hat\\beta_1 = s_{XY}/s_X^2 = ${sxy}/${sx2} = ${f(sxy / sx2, 3)}$.` };
-    if (t === 1) return { en: `$\\bar X = ${xb}$, $\\bar Y = ${yb}$, $s_{XY} = ${sxy}$, $s^2_X = ${sx2}$. What is $\\hat\\beta_0$?`, tr: '$\\hat\\beta_0$?', opts: nopts(b0, [yb + (sxy / sx2) * xb, yb - sxy * xb, yb, xb - (sxy / sx2) * yb], 2), ex: `$\\hat\\beta_1 = ${sxy}/${sx2} = ${f(sxy / sx2, 3)}$. $\\hat\\beta_0 = \\bar Y - \\hat\\beta_1\\bar X = ${yb} - ${f(sxy / sx2, 3)}(${xb}) = ${f(b0, 2)}$.` };
+    const b1v = sxy / sx2, sB1 = ['Eğim = kovaryans ÷ $X$\'in varyansı', `$\\hat\\beta_1 = \\dfrac{s_{XY}}{s_X^2} = \\dfrac{${sxy}}{${sx2}} = ${f(b1v, 3)}$`];
+    if (t === 0) return { en: `$s_{XY} = ${sxy}$ and $s^2_X = ${sx2}$. What is $\\hat\\beta_1$?`, tr: '$\\hat\\beta_1$?', opts: nopts(sxy / sx2, [sxy / Math.sqrt(sx2), sx2 / sxy, sxy * sx2], 3), ex: steps(
+      ['Formülü hatırla', 'Tek regresörlü OLS eğimi: $\\hat\\beta_1 = s_{XY}/s_X^2$. Payda $X$\'in **varyansı** ($s_X^2$), standart sapması değil.'], sB1) };
+    if (t === 1) return { en: `$\\bar X = ${xb}$, $\\bar Y = ${yb}$, $s_{XY} = ${sxy}$, $s^2_X = ${sx2}$. What is $\\hat\\beta_0$?`, tr: '$\\hat\\beta_0$?', opts: nopts(b0, [yb + (sxy / sx2) * xb, yb - sxy * xb, yb, xb - (sxy / sx2) * yb], 2), ex: steps(sB1,
+      ['Doğru ortalamalardan geçer', 'OLS doğrusu her zaman $(\\bar X, \\bar Y)$ noktasından geçer: $\\bar Y = \\hat\\beta_0 + \\hat\\beta_1\\bar X$. Buradan $\\hat\\beta_0 = \\bar Y - \\hat\\beta_1\\bar X$.'],
+      ['Yerine koy', `Önce çarpım: $${f(b1v, 3)}\\times${xb} = ${f(b1v * xb, 3)}$\n$\\hat\\beta_0 = ${yb} - ${par(+f(b1v * xb, 3))} = ${f(b0, 2)}$`]) };
     const r = RF(-0.9, 0.9, 0.05) || 0.5, sX = pick([2, 3, 4, 5]), sY = pick([6, 8, 10, 12, 20]), bb = r * sY / sX;
-    return { en: `The sample correlation between $X$ and $Y$ is ${r}, $s_X = ${sX}$ and $s_Y = ${sY}$. What is the OLS slope $\\hat\\beta_1$?`, tr: 'Korelasyondan eğim?', opts: nopts(bb, [r * sX / sY, r, r * sY * sX, r * r * sY / sX], 3), ex: `$\\hat\\beta_1 = r_{XY}\\, s_Y/s_X = ${r}\\times${sY}/${sX} = ${f(bb, 3)}$.` };
+    return { en: `The sample correlation between $X$ and $Y$ is ${r}, $s_X = ${sX}$ and $s_Y = ${sY}$. What is the OLS slope $\\hat\\beta_1$?`, tr: 'Korelasyondan eğim?', opts: nopts(bb, [r * sX / sY, r, r * sY * sX, r * r * sY / sX], 3), ex: steps(
+      ['Kovaryansı korelasyondan yaz', '$r_{XY} = \\dfrac{s_{XY}}{s_X\\,s_Y}$ olduğundan $s_{XY} = r_{XY}\\,s_X\\,s_Y$.'],
+      ['Eğim formülüne koy', '$\\hat\\beta_1 = \\dfrac{s_{XY}}{s_X^2} = \\dfrac{r_{XY}\\,s_X\\,s_Y}{s_X^2} = r_{XY}\\,\\dfrac{s_Y}{s_X}$'],
+      ['Hesapla', `$\\hat\\beta_1 = ${r}\\times${sY}/${sX} = ${f(bb, 3)}$`]) + '\n\nOran $s_Y/s_X$: $Y$\'nin sapması üstte, $X$\'in sapması altta.' };
   };
 
   const REG = [
@@ -530,46 +759,75 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
   const line = (o) => `$\\widehat{${o.c.y}} = ${o.b0} ${o.b1 < 0 ? '-' : '+'} ${Math.abs(o.b1)}\\times ${o.c.x}$`;
   G.regPredict = () => {
     const o = regCtx(), x = o.dec ? +RF(o.c.xr[0], o.c.xr[1], 0.1).toFixed(1) : R(o.c.xr[0], o.c.xr[1]), y = o.b0 + o.b1 * x;
-    return { en: `The estimated regression is ${line(o)}. What is the predicted value of ${o.c.y} when ${o.c.x} $= ${x}$?`, tr: `${o.c.xt} $=${x}$ iken tahmini ${o.c.yt}?`, opts: nopts(y, [o.b0 - o.b1 * x, o.b1 * x, o.b0 + o.b1, o.b0 * x + o.b1], 3), ex: `Yerine koy: $${o.b0} + (${o.b1})(${x}) = ${o.b0} ${o.b1 * x < 0 ? '-' : '+'} ${f(Math.abs(o.b1 * x), 3)} = ${f(y, 3)}$.` };
+    return { en: `The estimated regression is ${line(o)}. What is the predicted value of ${o.c.y} when ${o.c.x} $= ${x}$?`, tr: `${o.c.xt} $=${x}$ iken tahmini ${o.c.yt}?`, opts: nopts(y, [o.b0 - o.b1 * x, o.b1 * x, o.b0 + o.b1, o.b0 * x + o.b1], 3), ex: steps(
+      ['Denklemi oku', `Sabit (başlangıç) ${o.b0}, eğim (${o.c.x} başına değişim) ${o.b1}.`],
+      [`${o.c.x} yerine ${x} koy`, `$\\widehat{${o.c.y}} = ${o.b0} + (${o.b1})\\times${x}$`],
+      ['Önce çarp, sonra topla', `$(${o.b1})\\times${x} = ${f(o.b1 * x, 3)}$\n$${o.b0} ${pm(o.b1 * x, 3)} = ${f(y, 3)}$`]) };
   };
   G.regChange = () => {
     const o = regCtx(), dx = o.dec ? pick([0.1, 0.2, 0.5, -0.3]) : pick([-5, -3, -2, 2, 3, 4, 5, 10]), dy = o.b1 * dx;
-    return { en: `The estimated regression is ${line(o)}. If ${o.c.x} changes by $${dx}$, the predicted change in ${o.c.y} is:`, tr: `${o.c.xt} $${dx}$ değişirse tahmini değişim?`, opts: nopts(dy, [o.b0 + o.b1 * dx, o.b1, -dy, o.b0 * dx], 3), ex: `$\\Delta\\hat Y = \\hat\\beta_1\\Delta X = (${o.b1})(${dx}) = ${f(dy, 3)}$. Sabit terim fark alınınca düşer.` };
+    return { en: `The estimated regression is ${line(o)}. If ${o.c.x} changes by $${dx}$, the predicted change in ${o.c.y} is:`, tr: `${o.c.xt} $${dx}$ değişirse tahmini değişim?`, opts: nopts(dy, [o.b0 + o.b1 * dx, o.b1, -dy, o.b0 * dx], 3), ex: steps(
+      ['Değişimde sabit terim düşer', 'Sonraki tahminden önceki tahmini çıkar:\n$(\\hat\\beta_0 + \\hat\\beta_1X_{\\text{yeni}}) - (\\hat\\beta_0 + \\hat\\beta_1X_{\\text{eski}}) = \\hat\\beta_1\\,\\Delta X$\nSabitler birbirini götürür; başlangıç değeri önemli değil.'],
+      ['Eğimi değişimle çarp', `$\\Delta\\widehat{${o.c.y}} = (${o.b1})\\times(${dx}) = ${f(dy, 3)}$`]) + `\n\nYani ${o.c.x} ${dx} birim değişince tahmini ${o.c.y} ${f(dy, 3)} birim değişir.` };
   };
   G.regMean = () => {
     const o = regCtx(), xb = o.dec ? +RF(o.c.xr[0], o.c.xr[1], 0.01).toFixed(2) : +RF(o.c.xr[0], o.c.xr[1], 0.1).toFixed(1), yb = o.b0 + o.b1 * xb;
-    return { en: `The estimated regression is ${line(o)}. The sample average of ${o.c.x} is ${xb}. What is the sample average of ${o.c.y}?`, tr: `Ortalama ${o.c.xt} ${xb} ise ortalama ${o.c.yt}?`, opts: nopts(yb, [o.b0, o.b0 - o.b1 * xb, o.b1 * xb], 3), ex: `OLS doğrusu $(\\bar X, \\bar Y)$'den geçer: $\\bar Y = \\hat\\beta_0 + \\hat\\beta_1\\bar X = ${o.b0} + (${o.b1})(${xb}) = ${f(yb, 3)}$.` };
+    return { en: `The estimated regression is ${line(o)}. The sample average of ${o.c.x} is ${xb}. What is the sample average of ${o.c.y}?`, tr: `Ortalama ${o.c.xt} ${xb} ise ortalama ${o.c.yt}?`, opts: nopts(yb, [o.b0, o.b0 - o.b1 * xb, o.b1 * xb], 3), ex: steps(
+      ['OLS doğrusunun özelliği', "OLS doğrusu her zaman ortalamalar noktasından, $(\\bar X, \\bar Y)$'den geçer. Bu yüzden $X$ yerine $\\bar X$ koyunca $\\bar Y$ çıkar."],
+      [`$\\bar X = ${xb}$ koy`, `Önce çarpım: $(${o.b1})\\times${xb} = ${f(o.b1 * xb, 3)}$\n$\\bar Y = ${o.b0} ${pm(o.b1 * xb, 3)} = ${f(yb, 3)}$`]) };
   };
 
   G.r2Calc = () => {
     const t = R(0, 2);
-    if (t === 0) { const tss = R(200, 5000), ssr = Math.round(tss * RF(0.3, 0.97, 0.01)), r2 = 1 - ssr / tss; return { en: `A regression has $TSS = ${tss}$ and $SSR = ${ssr}$. What is $R^2$?`, tr: '$R^2$ kaçtır?', opts: popts(r2, [ssr / tss, 1 - tss / (tss + ssr), (tss - ssr) / ssr], 3), ex: `$R^2 = 1 - SSR/TSS = 1 - ${ssr}/${tss} = ${f(r2, 3)}$.` }; }
-    if (t === 1) { const tss = R(200, 5000), ess = Math.round(tss * RF(0.03, 0.7, 0.01)), r2 = ess / tss; return { en: `A regression has $ESS = ${ess}$ and $TSS = ${tss}$. What is $R^2$?`, tr: '$R^2$ kaçtır?', opts: popts(r2, [1 - r2, ess / (tss + ess), Math.sqrt(r2)], 3), ex: `$R^2 = ESS/TSS = ${ess}/${tss} = ${f(r2, 3)}$.` }; }
+    if (t === 0) { const tss = R(200, 5000), ssr = Math.round(tss * RF(0.3, 0.97, 0.01)), r2 = 1 - ssr / tss; return { en: `A regression has $TSS = ${tss}$ and $SSR = ${ssr}$. What is $R^2$?`, tr: '$R^2$ kaçtır?', opts: popts(r2, [ssr / tss, 1 - tss / (tss + ssr), (tss - ssr) / ssr], 3), ex: steps(
+      ['Terimleri tanı', "TSS: $Y$'deki toplam değişkenlik. SSR: modelin açıklayamadığı kısım (kalıntıların karelerinin toplamı)."],
+      ['Açıklanamayan oranı bul', `$SSR/TSS = ${ssr}/${tss} = ${f(ssr / tss, 3)}$`],
+      ["1'den çıkar", `$R^2 = 1 - ${f(ssr / tss, 3)} = ${f(r2, 3)}$`]) + `\n\nYani modelin açıkladığı pay %${f(r2 * 100, 1)}.` }; }
+    if (t === 1) { const tss = R(200, 5000), ess = Math.round(tss * RF(0.03, 0.7, 0.01)), r2 = ess / tss; return { en: `A regression has $ESS = ${ess}$ and $TSS = ${tss}$. What is $R^2$?`, tr: '$R^2$ kaçtır?', opts: popts(r2, [1 - r2, ess / (tss + ess), Math.sqrt(r2)], 3), ex: steps(
+      ['Terimleri tanı', "ESS: modelin açıkladığı değişkenlik. TSS: $Y$'deki toplam değişkenlik."],
+      ['Açıklananı toplama böl', `$R^2 = ESS/TSS = ${ess}/${tss} = ${f(r2, 3)}$`]) + `\n\nYani modelin açıkladığı pay %${f(r2 * 100, 1)}.` }; }
     const r = RF(-0.9, 0.9, 0.05) || 0.3;
-    return { en: `In a simple regression, the sample correlation between $X$ and $Y$ is ${r}. What is the $R^2$?`, tr: `$r=${r}$ ise $R^2$?`, opts: popts(r * r, [Math.abs(r), Math.sqrt(Math.abs(r)), 1 - r * r], 4), ex: `Tek regresörlü modelde $R^2 = r^2 = (${r})^2 = ${f(r * r, 4)}$.` };
+    return { en: `In a simple regression, the sample correlation between $X$ and $Y$ is ${r}. What is the $R^2$?`, tr: `$r=${r}$ ise $R^2$?`, opts: popts(r * r, [Math.abs(r), Math.sqrt(Math.abs(r)), 1 - r * r], 4), ex: steps(
+      ['Tek regresörde kural', 'Tek açıklayıcı değişkenli regresyonda $R^2$, $X$ ile $Y$ arasındaki korelasyonun karesidir.'],
+      ['Kare al', `$R^2 = ${par(r)}^2 = ${f(r * r, 4)}$`]) + (r < 0 ? '\n\nKare alınca eksi işareti kaybolur; $R^2$ negatif olamaz.' : '') };
   };
   G.serCalc = () => {
     const n = pick([22, 52, 102, 202, 420, 65]), ser0 = RF(2, 30, 0.5), ssr = Math.round(ser0 * ser0 * (n - 2)), ser = Math.sqrt(ssr / (n - 2));
-    return { en: `A regression with $n=${n}$ observations has $SSR = ${ssr}$. What is the SER?`, tr: 'SER kaçtır?', opts: nopts(ser, [Math.sqrt(ssr / n), ssr / (n - 2), Math.sqrt(ssr / (n - 1)) + 0.2, Math.sqrt(ssr) / (n - 2)], 3, { min: 0 }), ex: `$SER = \\sqrt{SSR/(n-2)} = \\sqrt{${ssr}/${n - 2}} = ${f(ser, 3)}$. Payda $n-2$, karekök almayı unutma.` };
+    return { en: `A regression with $n=${n}$ observations has $SSR = ${ssr}$. What is the SER?`, tr: 'SER kaçtır?', opts: nopts(ser, [Math.sqrt(ssr / n), ssr / (n - 2), Math.sqrt(ssr / (n - 1)) + 0.2, Math.sqrt(ssr) / (n - 2)], 3, { min: 0 }), ex: steps(
+      ['Serbestlik derecesi', `İki katsayı ($\\hat\\beta_0$ ve $\\hat\\beta_1$) tahmin edildiği için $n - 2 = ${n} - 2 = ${n - 2}$`],
+      ["SSR'yi serbestlik derecesine böl", `$\\dfrac{SSR}{n-2} = \\dfrac{${ssr}}{${n - 2}} = ${f(ssr / (n - 2), 3)}$`],
+      ['Karekök al', `$SER = \\sqrt{${f(ssr / (n - 2), 3)}} = ${f(ser, 3)}$`]) + '\n\nSER, kalıntıların tipik büyüklüğüdür; $Y$ ile aynı birimdedir.' };
   };
   G.sdYfromR2 = () => {
     const n = pick([50, 100, 200, 420]), r2 = RF(0.02, 0.6, 0.01), ser = RF(2, 40, 0.5);
     const sy = Math.sqrt((n - 2) / (n - 1) * ser * ser / (1 - r2));
-    return { en: `A regression with $n=${n}$ has $R^2=${r2}$ and $SER=${ser}$. What is the sample standard deviation of $Y$?`, tr: '$s_Y$ kaçtır?', opts: nopts(sy, [ser, ser / (1 - r2), Math.sqrt(ser * ser * (1 - r2)), (n - 2) / (n - 1) * ser * ser / (1 - r2)], 3, { min: 0 }), ex: `$SSR = (n-2)SER^2$, $TSS = SSR/(1-R^2)$, $s_Y = \\sqrt{TSS/(n-1)}$. Birleştirince $s_Y = \\sqrt{\\frac{${n - 2}}{${n - 1}}\\cdot\\frac{${ser}^2}{1-${r2}}} = ${f(sy, 3)}$ (PS5 Soru 2d).` };
+    return { en: `A regression with $n=${n}$ has $R^2=${r2}$ and $SER=${ser}$. What is the sample standard deviation of $Y$?`, tr: '$s_Y$ kaçtır?', opts: nopts(sy, [ser, ser / (1 - r2), Math.sqrt(ser * ser * (1 - r2)), (n - 2) / (n - 1) * ser * ser / (1 - r2)], 3, { min: 0 }), ex: (() => { const ssr = (n - 2) * ser * ser, tss = ssr / (1 - r2), s2 = tss / (n - 1); return steps(
+      ["SSR'yi SER'den geri bul", `$SER^2 = SSR/(n-2)$ olduğundan $SSR = (n-2)\\,SER^2$:\n$SSR = ${n - 2}\\times${ser}^2 = ${f(ssr, 2)}$`],
+      ["TSS'yi $R^2$'den bul", `$R^2 = 1 - SSR/TSS$ olduğundan $TSS = SSR/(1 - R^2)$:\n$TSS = \\dfrac{${f(ssr, 2)}}{1 - ${r2}} = ${f(tss, 2)}$`],
+      ["$Y$'nin örneklem varyansı", `$s_Y^2 = \\dfrac{TSS}{n-1} = \\dfrac{${f(tss, 2)}}{${n - 1}} = ${f(s2, 3)}$`],
+      ['Karekök al', `$s_Y = \\sqrt{${f(s2, 3)}} = ${f(sy, 3)}$`]) + '\n\nPS5 Soru 2d ile aynı yöntem.'; })() };
   };
   G.seScale = () => {
     const k = pick([4, 9, 16, 100]), se = RF(0.2, 3, 0.05), n = pick([100, 200, 500]);
-    return { en: `With $n=${n}$, $SE(\\hat\\beta_1) = ${se}$. Holding everything else fixed, approximately what would $SE(\\hat\\beta_1)$ be with $n=${n * k}$?`, tr: `Örneklem ${k} katına çıkarsa SE ne olur?`, opts: nopts(se / Math.sqrt(k), [se / k, se, se * Math.sqrt(k)], 3, { min: 0 }), ex: `Varyans $1/n$ ile orantılı, SE ise $1/\\sqrt n$ ile. $n$ ${k} katına çıkınca SE $1/\\sqrt{${k}} = 1/${Math.sqrt(k)}$ katına iner: $${se}/${Math.sqrt(k)} = ${f(se / Math.sqrt(k), 3)}$.` };
+    return { en: `With $n=${n}$, $SE(\\hat\\beta_1) = ${se}$. Holding everything else fixed, approximately what would $SE(\\hat\\beta_1)$ be with $n=${n * k}$?`, tr: `Örneklem ${k} katına çıkarsa SE ne olur?`, opts: nopts(se / Math.sqrt(k), [se / k, se, se * Math.sqrt(k)], 3, { min: 0 }), ex: steps(
+      ['SE örneklemle nasıl değişir?', 'Varyans $1/n$ ile, SE (varyansın karekökü) $1/\\sqrt n$ ile orantılıdır.'],
+      ['Kaç katına çıktı?', `$n$: ${n} → ${n * k}, yani ${k} katı. SE ise $\\sqrt{${k}} = ${Math.sqrt(k)}$ kat küçülür.`],
+      ['Böl', `$${se}/${Math.sqrt(k)} = ${f(se / Math.sqrt(k), 3)}$`]) };
   };
 
   /* ---------- Ünite 6 ---------- */
   G.regT = () => {
     const se = RF(0.1, 2.5, 0.01), c = pick([0, 0, 0, 1, -1]), tt = pick([-3.2, -2.5, -2.05, -1.8, -1.2, 0.9, 1.4, 1.75, 2.2, 2.9, 4.1]);
     const b = +(c + tt * se).toFixed(2), t = (b - c) / se, k = R(0, 2);
-    if (k === 0) return { en: `$\\hat\\beta_1 = ${b}$ with $SE(\\hat\\beta_1) = ${se}$. What is the $t$-statistic for $H_0:\\beta_1 = ${c}$?`, tr: `$H_0:\\beta_1=${c}$ için t?`, opts: nopts(t, [b / se, (b - c) / (se * se), (c - b) / se, b - c], 2), ex: `$t = (\\hat\\beta_1 - ${c})/SE = (${b} ${c < 0 ? '+ 1' : c > 0 ? '- 1' : '- 0'})/${se} = ${f(t, 2)}$.` };
-    if (k === 1) { const a = pick([0.10, 0.05, 0.01]), cv = { 0.1: 1.645, 0.05: 1.96, 0.01: 2.576 }[a], rej = Math.abs(t) > cv; return { en: `$\\hat\\beta_1 = ${b}$, $SE(\\hat\\beta_1) = ${se}$. Test $H_0:\\beta_1 = ${c}$ vs. $H_1:\\beta_1\\ne${c}$ at the ${a * 100}% level.`, tr: `%${a * 100} düzeyinde iki yönlü test kararı?`, opts: rej ? [`Reject $H_0$ ($|t| = ${f(Math.abs(t), 2)} > ${cv}$)`, `Do not reject $H_0$ ($|t| = ${f(Math.abs(t), 2)} < ${cv}$)`, `Reject $H_0$ because $\\hat\\beta_1\\ne0$`, `Do not reject $H_0$ because $t$ is ${t < 0 ? 'negative' : 'positive'}`] : [`Do not reject $H_0$ ($|t| = ${f(Math.abs(t), 2)} < ${cv}$)`, `Reject $H_0$ ($|t| = ${f(Math.abs(t), 2)} > ${cv}$)`, `Reject $H_0$ because $\\hat\\beta_1\\ne${c}$`, `Accept $H_1$ because $SE<1$`], ex: `$t = (${b}-(${c}))/${se} = ${f(t, 2)}$. Kritik değer ${cv}. ${rej ? 'Reddet.' : 'Reddedemeyiz.'}` }; }
+    const s1 = ['Payı bul: tahmin − $H_0$ değeri', `$\\hat\\beta_1 - ${par(c)} = ${b} - ${par(c)} = ${f(b - c, 2)}$` + (c === 0 ? '\n$H_0$ değeri 0 olduğu için pay tahminin kendisi.' : '')];
+    const s2 = ['Standart hataya böl', `$t = \\dfrac{${f(b - c, 2)}}{${se}} = ${f(t, 2)}$\nYani tahmin, $H_0$ değerinin ${f(Math.abs(t), 2)} standart hata ${t < 0 ? 'altında' : 'üstünde'}.`];
+    if (k === 0) return { en: `$\\hat\\beta_1 = ${b}$ with $SE(\\hat\\beta_1) = ${se}$. What is the $t$-statistic for $H_0:\\beta_1 = ${c}$?`, tr: `$H_0:\\beta_1=${c}$ için t?`, opts: nopts(t, [b / se, (b - c) / (se * se), (c - b) / se, b - c], 2), ex: steps(s1, s2) };
+    if (k === 1) { const a = pick([0.10, 0.05, 0.01]), cv = { 0.1: 1.645, 0.05: 1.96, 0.01: 2.576 }[a], rej = Math.abs(t) > cv; return { en: `$\\hat\\beta_1 = ${b}$, $SE(\\hat\\beta_1) = ${se}$. Test $H_0:\\beta_1 = ${c}$ vs. $H_1:\\beta_1\\ne${c}$ at the ${a * 100}% level.`, tr: `%${a * 100} düzeyinde iki yönlü test kararı?`, opts: rej ? [`Reject $H_0$ ($|t| = ${f(Math.abs(t), 2)} > ${cv}$)`, `Do not reject $H_0$ ($|t| = ${f(Math.abs(t), 2)} < ${cv}$)`, `Reject $H_0$ because $\\hat\\beta_1\\ne0$`, `Do not reject $H_0$ because $t$ is ${t < 0 ? 'negative' : 'positive'}`] : [`Do not reject $H_0$ ($|t| = ${f(Math.abs(t), 2)} < ${cv}$)`, `Reject $H_0$ ($|t| = ${f(Math.abs(t), 2)} > ${cv}$)`, `Reject $H_0$ because $\\hat\\beta_1\\ne${c}$`, `Accept $H_1$ because $SE<1$`], ex: steps(s1, s2,
+      ['Kritik değeri bul', `İki yönlü %${a * 100} testte kritik değer ${cv}. (%10 → 1.645, %5 → 1.96, %1 → 2.576)`],
+      ['Karşılaştır', `$|t| = ${f(Math.abs(t), 2)} ${rej ? '>' : '<'} ${cv}$, yani $H_0$ ${rej ? '**reddedilir**' : '**reddedilemez**'}. İşarete değil, mutlak değere bakılır.`]) }; }
     const p = 2 * Phi(-Math.abs(t));
-    return { en: `$\\hat\\beta_1 = ${b}$, $SE(\\hat\\beta_1) = ${se}$. The two-sided p-value for $H_0:\\beta_1=${c}$ is approximately:`, tr: 'İki yönlü p-değeri?', opts: popts(p, [p / 2, 1 - p, Phi(Math.abs(t))], 4), ex: `$t = ${f(t, 2)}$, $p = 2\\Phi(-${f(Math.abs(t), 2)}) = ${f(p, 4)}$.` };
+    return { en: `$\\hat\\beta_1 = ${b}$, $SE(\\hat\\beta_1) = ${se}$. The two-sided p-value for $H_0:\\beta_1=${c}$ is approximately:`, tr: 'İki yönlü p-değeri?', opts: popts(p, [p / 2, 1 - p, Phi(Math.abs(t))], 4), ex: steps(s1, s2,
+      ['İki yönlü p-değeri', `İki kuyruğun alanı toplanır:\n$p = 2\\Phi(-|t|) = 2\\times\\Phi(-${f(Math.abs(t), 2)}) = 2\\times${f(Phi(-Math.abs(t)), 4)} = ${f(p, 4)}$`]) };
   };
 
   G.regOutput = () => {
@@ -579,34 +837,61 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
     const pad = (s, w) => (s + '').padStart(w);
     const out = `\n~~~\n            Estimate Std. Error t value Pr(>|t|)\n(Intercept) ${pad(f(o.b0, 3), 8)} ${pad(f(sb0, 3), 10)} ${pad(f(t0, 3), 7)} ${pad(fp(2 * Phi(-Math.abs(t0))), 9)}\n${o.c.x.toLowerCase().padEnd(11)} ${pad(f(o.b1, 3), 8)} ${pad(f(sb1, 3), 10)} ${pad(f(t1, 3), 7)} ${pad(fp(p1), 9)}\nResidual standard error: ${f(ser, 2)} on ${n - 2} degrees of freedom\nMultiple R-squared: ${f(r2, 4)}\n~~~\n`;
     const k = R(0, 2), h = `R output for the regression of ${o.c.y} on ${o.c.x}:` + out;
-    if (k === 0) { const lo = o.b1 - 1.96 * sb1, hi = o.b1 + 1.96 * sb1; return { en: h + `The 95% confidence interval for the slope is:`, tr: 'Eğim için %95 GA?', opts: [ivm(lo, hi, 3), ivm(o.b1 - 1.645 * sb1, o.b1 + 1.645 * sb1, 3), ivm(o.b1 - 1.96 * sb0, o.b1 + 1.96 * sb0, 3), ivm(o.b1 - sb1, o.b1 + sb1, 3)], ex: `$${f(o.b1, 3)}\\pm1.96\\times${f(sb1, 3)} = ${iv(lo, hi, 3)}$. Eğimin SE'sini kullan, sabitinkini değil.` }; }
-    if (k === 1) { const sig = p1 < 0.05; return { en: h + `At the 5% level, is the slope coefficient statistically significant?`, tr: 'Eğim %5\'te anlamlı mı?', opts: sig ? [`Yes, $|t| = ${f(Math.abs(t1), 2)} > 1.96$ (p $< 0.05$)`, `No, $|t| < 1.96$`, `No, because $R^2$ is small`, `Yes, because the intercept is significant`] : [`No, $|t| = ${f(Math.abs(t1), 2)} < 1.96$ (p $> 0.05$)`, `Yes, $|t| > 1.96$`, `Yes, because the intercept is significant`, `Yes, because $n$ is large`], ex: `Eğim satırında $t = ${f(t1, 3)}$, $p = ${fp(p1)}$. ${sig ? 'p < 0.05, yani anlamlı.' : 'p > 0.05, yani %5\'te anlamlı değil.'} $R^2$'nin küçük olması anlamlılığı belirlemez.` }; }
-    return { en: h + `What fraction of the sample variance of ${o.c.y} is explained by ${o.c.x}?`, tr: 'Açıklanan varyans oranı?', opts: [`${f(r2 * 100, 2)}%`, `${f(Math.sqrt(r2) * 100, 2)}%`, `${f(ser, 2)}%`, `${f((1 - r2) * 100, 2)}%`], ex: `Bunu $R^2$ gösterir: ${f(r2, 4)}, yani %${f(r2 * 100, 2)}. Residual standard error SER'dir, oran değil.` };
+    const row = o.c.x.toLowerCase();
+    if (k === 0) { const lo = o.b1 - 1.96 * sb1, hi = o.b1 + 1.96 * sb1; return { en: h + `The 95% confidence interval for the slope is:`, tr: 'Eğim için %95 GA?', opts: [ivm(lo, hi, 3), ivm(o.b1 - 1.645 * sb1, o.b1 + 1.645 * sb1, 3), ivm(o.b1 - 1.96 * sb0, o.b1 + 1.96 * sb0, 3), ivm(o.b1 - sb1, o.b1 + sb1, 3)], ex: steps(
+      ['Eğim satırını bul', `Eğim "${row}" satırında: Estimate = ${f(o.b1, 3)}, Std. Error = ${f(sb1, 3)}. (Intercept satırı sabit içindir, onu kullanma.)`],
+      ['Hata payı', `%95 için 1.96: $1.96\\times${f(sb1, 3)} = ${f(1.96 * sb1, 3)}$`],
+      ['Uçlar', `Alt uç: $${f(o.b1, 3)} - ${f(1.96 * sb1, 3)} = ${f(lo, 3)}$\nÜst uç: $${f(o.b1, 3)} + ${f(1.96 * sb1, 3)} = ${f(hi, 3)}$`]) }; }
+    if (k === 1) { const sig = p1 < 0.05; return { en: h + `At the 5% level, is the slope coefficient statistically significant?`, tr: 'Eğim %5\'te anlamlı mı?', opts: sig ? [`Yes, $|t| = ${f(Math.abs(t1), 2)} > 1.96$ (p $< 0.05$)`, `No, $|t| < 1.96$`, `No, because $R^2$ is small`, `Yes, because the intercept is significant`] : [`No, $|t| = ${f(Math.abs(t1), 2)} < 1.96$ (p $> 0.05$)`, `Yes, $|t| > 1.96$`, `Yes, because the intercept is significant`, `Yes, because $n$ is large`], ex: steps(
+      ['Eğim satırını bul', `"${row}" satırında t value = ${f(t1, 3)}, Pr(>|t|) = ${fp(p1)}.` + (p1 < 0.001 ? ` (R çok küçük sayıları böyle yazar; "e-5" gibi bir son, sayının 0.001'den bile küçük olduğunu gösterir.)` : '')],
+      ['t value nereden geliyor?', `t value = Estimate ÷ Std. Error: $${f(o.b1, 3)}/${f(sb1, 3)} = ${f(t1, 3)}$`],
+      ['Karar', sig ? `$|t| = ${f(Math.abs(t1), 2)} > 1.96$ ve p $< 0.05$: eğim %5 düzeyinde **anlamlı**.` : `$|t| = ${f(Math.abs(t1), 2)} < 1.96$ ve p $> 0.05$: eğim %5 düzeyinde **anlamlı değil**.`]) + "\n\n$R^2$'nin küçük olması anlamlılığı belirlemez; sabitin satırına da bakılmaz." }; }
+    return { en: h + `What fraction of the sample variance of ${o.c.y} is explained by ${o.c.x}?`, tr: 'Açıklanan varyans oranı?', opts: [`${f(r2 * 100, 2)}%`, `${f(Math.sqrt(r2) * 100, 2)}%`, `${f(ser, 2)}%`, `${f((1 - r2) * 100, 2)}%`], ex: steps(
+      ['Doğru satırı bul', `"Açıklanan varyans oranı" = Multiple R-squared = ${f(r2, 4)}.`],
+      ['Yüzdeye çevir', `$${f(r2, 4)}\\times100 = ${f(r2 * 100, 2)}$, yani %${f(r2 * 100, 2)}.`]) + "\n\nResidual standard error SER'dir (kalıntıların tipik büyüklüğü), oran değildir." };
   };
 
   G.regCI = () => {
     const se = RF(0.1, 2, 0.01), b = +RF(-5, 5, 0.01).toFixed(2), L = pick([[90, 1.645], [95, 1.96], [99, 2.576]]);
     const oth = [[90, 1.645], [95, 1.96], [99, 2.576]].filter(x => x[0] !== L[0]);
-    return { en: `$\\hat\\beta_1 = ${b}$ and $SE(\\hat\\beta_1) = ${se}$. The ${L[0]}% confidence interval for $\\beta_1$ is:`, tr: `%${L[0]} GA?`, opts: [ivm(b - L[1] * se, b + L[1] * se, 3), ivm(b - oth[0][1] * se, b + oth[0][1] * se, 3), ivm(b - oth[1][1] * se, b + oth[1][1] * se, 3), ivm(b - L[1] * se * se, b + L[1] * se * se, 3)], ex: `$${b}\\pm${L[1]}\\times${se} = ${b}\\pm${f(L[1] * se, 3)}$, yani $${iv(b - L[1] * se, b + L[1] * se, 3)}$.${(b - L[1] * se) * (b + L[1] * se) > 0 ? ' 0 aralıkta değil, yani bu düzeyde anlamlı.' : ' 0 aralıkta, yani bu düzeyde anlamlı değil.'}` };
+    return { en: `$\\hat\\beta_1 = ${b}$ and $SE(\\hat\\beta_1) = ${se}$. The ${L[0]}% confidence interval for $\\beta_1$ is:`, tr: `%${L[0]} GA?`, opts: [ivm(b - L[1] * se, b + L[1] * se, 3), ivm(b - oth[0][1] * se, b + oth[0][1] * se, 3), ivm(b - oth[1][1] * se, b + oth[1][1] * se, 3), ivm(b - L[1] * se * se, b + L[1] * se * se, 3)], ex: steps(
+      ['Kritik değeri seç', `%${L[0]} güven için ${L[1]}. (Ezber: %90 → 1.645, %95 → 1.96, %99 → 2.576)`],
+      ['Hata payı', `$${L[1]}\\times${se} = ${f(L[1] * se, 3)}$`],
+      ['Tahminden çıkar ve ekle', `Alt uç: $${b} - ${f(L[1] * se, 3)} = ${f(b - L[1] * se, 3)}$\nÜst uç: $${b} + ${f(L[1] * se, 3)} = ${f(b + L[1] * se, 3)}$`]) + ((b - L[1] * se) * (b + L[1] * se) > 0 ? '\n\n0 aralıkta değil, yani katsayı bu düzeyde anlamlı.' : '\n\n0 aralıkta, yani katsayı bu düzeyde anlamlı değil.') };
   };
   G.regCIdx = () => {
     const se = RF(0.2, 1.5, 0.01), b = +RF(-4, 4, 0.01).toFixed(2) || -2.28, dx = pick([-3, -2, 2, 3, 5, -5]);
     const lo = (b - 1.96 * se) * dx, hi = (b + 1.96 * se) * dx, A = Math.min(lo, hi), B = Math.max(lo, hi);
-    return { en: `$\\hat\\beta_1 = ${b}$, $SE(\\hat\\beta_1) = ${se}$. What is the 95% confidence interval for the effect on $Y$ of changing $X$ by $\\Delta x = ${dx}$?`, tr: `$\\Delta x = ${dx}$ etkisi için %95 GA?`, opts: [ivm(A, B, 3), ivm(b - 1.96 * se, b + 1.96 * se, 3), ivm(b * dx - 1.96 * se, b * dx + 1.96 * se, 3), ivm(-B, -A, 3)], ex: `$\\beta_1$ için GA: $${iv(b - 1.96 * se, b + 1.96 * se, 3)}$. Uçları $${dx}$ ile çarp: $(${b}-1.96\\times${se})\\times(${dx}) = ${f(lo, 3)}$ ve $(${b}+1.96\\times${se})\\times(${dx}) = ${f(hi, 3)}$.${dx < 0 ? ' Negatif sayıyla çarpınca uçlar yer değiştirir: ' : ' '}$${iv(A, B, 3)}$.` };
+    return { en: `$\\hat\\beta_1 = ${b}$, $SE(\\hat\\beta_1) = ${se}$. What is the 95% confidence interval for the effect on $Y$ of changing $X$ by $\\Delta x = ${dx}$?`, tr: `$\\Delta x = ${dx}$ etkisi için %95 GA?`, opts: [ivm(A, B, 3), ivm(b - 1.96 * se, b + 1.96 * se, 3), ivm(b * dx - 1.96 * se, b * dx + 1.96 * se, 3), ivm(-B, -A, 3)], ex: steps(
+      ['Önce $\\beta_1$ için %95 GA', `Hata payı: $1.96\\times${se} = ${f(1.96 * se, 3)}$\nAlt uç: $${b} - ${f(1.96 * se, 3)} = ${f(b - 1.96 * se, 3)}$, üst uç: $${b} + ${f(1.96 * se, 3)} = ${f(b + 1.96 * se, 3)}$`],
+      ['İki ucu da $\\Delta x$ ile çarp', `$X$ ${dx} birim değişince etki $${dx}\\times\\beta_1$ olur:\n$${f(b - 1.96 * se, 3)}\\times${par(dx)} = ${f(lo, 3)}$\n$${f(b + 1.96 * se, 3)}\\times${par(dx)} = ${f(hi, 3)}$`],
+      ['Küçüğü başa yaz', dx < 0 ? `Negatif sayıyla çarpınca uçlar yer değiştirir: $${iv(A, B, 3)}$` : `Sıra aynı kalır: $${iv(A, B, 3)}$`]) };
   };
   G.dummyReg = () => {
     const ctx = pick([['Earnings', 'Female', 'female', 'kadın'], ['TestScore', 'SmallClass', 'a small class', 'küçük sınıf'], ['Wage', 'Union', 'a union member', 'sendikalı'], ['Price', 'Garage', 'a house with a garage', 'garajlı ev']]);
     const b0 = +RF(10, 700, 0.01).toFixed(2), b1 = +RF(-15, 15, 0.01).toFixed(2), t = R(0, 2);
     const h = `$\\widehat{${ctx[0]}} = ${b0} ${b1 < 0 ? '-' : '+'} ${Math.abs(b1)}\\times ${ctx[1]}$, where ${ctx[1]} $=1$ for ${ctx[2]} and $0$ otherwise.`;
-    if (t === 0) return { en: h + ` The estimated mean of ${ctx[0]} when ${ctx[1]} $=1$ is:`, tr: `${ctx[3]} grubunun ortalaması?`, opts: nopts(b0 + b1, [b0, b1, b0 - b1], 2), ex: `$D=1$: $\\hat\\beta_0+\\hat\\beta_1 = ${b0} + (${b1}) = ${f(b0 + b1, 2)}$.` };
-    if (t === 1) return { en: h + ` The estimated mean of ${ctx[0]} when ${ctx[1]} $=0$ is:`, tr: `Diğer grubun (D=0) ortalaması?`, opts: nopts(b0, [b0 + b1, b1, b0 - b1], 2), ex: `$D=0$: sadece $\\hat\\beta_0 = ${b0}$.` };
-    return { en: h + ` The coefficient ${b1} is best interpreted as:`, tr: 'Katsayının yorumu?', opts: [`the difference in mean ${ctx[0]} between the ${ctx[1]}$=1$ and ${ctx[1]}$=0$ groups`, `the slope of ${ctx[0]} with respect to a continuous ${ctx[1]}`, `the mean of ${ctx[0]} in the ${ctx[1]}$=0$ group`, `the probability that ${ctx[1]}$=1$`], ex: `Kukla regresörde $\\beta_1 = E(Y\\mid D=1) - E(Y\\mid D=0)$, yani iki grubun ortalama farkı.` };
+    if (t === 0) return { en: h + ` The estimated mean of ${ctx[0]} when ${ctx[1]} $=1$ is:`, tr: `${ctx[3]} grubunun ortalaması?`, opts: nopts(b0 + b1, [b0, b1, b0 - b1], 2), ex: steps(
+      [`${ctx[1]} = 1 koy`, `$\\widehat{${ctx[0]}} = ${b0} + (${b1})\\times1$`],
+      ['Hesapla', `$${b0} ${pm(b1, 2)} = ${f(b0 + b1, 2)}$`]) + '\n\nKukla 1 olunca hem sabit hem katsayı devreye girer.' };
+    if (t === 1) return { en: h + ` The estimated mean of ${ctx[0]} when ${ctx[1]} $=0$ is:`, tr: `Diğer grubun (D=0) ortalaması?`, opts: nopts(b0, [b0 + b1, b1, b0 - b1], 2), ex: steps(
+      [`${ctx[1]} = 0 koy`, `$\\widehat{${ctx[0]}} = ${b0} + (${b1})\\times0$`],
+      ['Hesapla', `Katsayı 0 ile çarpılıp kaybolur, sadece sabit kalır: $${b0}$`]) };
+    return { en: h + ` The coefficient ${b1} is best interpreted as:`, tr: 'Katsayının yorumu?', opts: [`the difference in mean ${ctx[0]} between the ${ctx[1]}$=1$ and ${ctx[1]}$=0$ groups`, `the slope of ${ctx[0]} with respect to a continuous ${ctx[1]}`, `the mean of ${ctx[0]} in the ${ctx[1]}$=0$ group`, `the probability that ${ctx[1]}$=1$`], ex: steps(
+      ['$D=0$ grubunun ortalaması', `$D=0$ koyunca katsayı kaybolur: ortalama $= \\hat\\beta_0 = ${b0}$`],
+      ['$D=1$ grubunun ortalaması', `$D=1$ koyunca: ortalama $= \\hat\\beta_0 + \\hat\\beta_1 = ${b0} ${pm(b1, 2)} = ${f(b0 + b1, 2)}$`],
+      ['İkisinin farkı', `$(\\hat\\beta_0 + \\hat\\beta_1) - \\hat\\beta_0 = \\hat\\beta_1 = ${b1}$\nYani katsayı, iki grubun ortalamaları arasındaki fark. Kukla değişken sürekli olmadığı için "eğim" diye yorumlanmaz.`]) };
   };
   G.homoVar = () => {
     const su = pick([4, 9, 16, 25, 100]), sx = pick([1, 2, 4, 5, 10]), n = pick([100, 200, 400, 500]);
     const v = su / (n * sx), t = R(0, 1);
-    if (t === 0) return { en: `Under homoskedasticity, $\\sigma^2_u = ${su}$, $\\sigma^2_X = ${sx}$ and $n = ${n}$. What is $\\text{var}(\\hat\\beta_1)$?`, tr: 'Homoskedastisite altında $\\text{var}(\\hat\\beta_1)$?', opts: nopts(v, [sx / (n * su), su / sx, su / (n * sx * sx), Math.sqrt(v)], 5, { min: 0 }), ex: `$\\sigma^2_{\\hat\\beta_1} = \\sigma^2_u/(n\\sigma^2_X) = ${su}/(${n}\\times${sx}) = ${f(v, 5)}$.` };
-    return { en: `Under homoskedasticity, $\\sigma^2_u = ${su}$, $\\sigma^2_X = ${sx}$ and $n = ${n}$. What is the standard deviation of $\\hat\\beta_1$?`, tr: '$\\hat\\beta_1$\'in standart sapması?', opts: nopts(Math.sqrt(v), [v, Math.sqrt(su / sx), Math.sqrt(sx / (n * su))], 4, { min: 0 }), ex: `$\\text{var} = ${su}/(${n}\\times${sx}) = ${f(v, 5)}$, karekökü $\\sqrt{${su}/(${n}\\times${sx})} = ${f(Math.sqrt(v), 4)}$.` };
+    const hs = [
+      ['Formülü yaz', 'Homoskedastisite altında: $\\text{var}(\\hat\\beta_1) = \\dfrac{\\sigma_u^2}{n\\,\\sigma_X^2}$. Hata varyansı üstte, $n$ ve $X$\'in varyansı altta.'],
+      ['Paydayı hesapla', `$n\\,\\sigma_X^2 = ${n}\\times${sx} = ${n * sx}$`],
+      ['Böl', `$\\text{var}(\\hat\\beta_1) = \\dfrac{${su}}{${n * sx}} = ${f(v, 5)}$`]];
+    if (t === 0) return { en: `Under homoskedasticity, $\\sigma^2_u = ${su}$, $\\sigma^2_X = ${sx}$ and $n = ${n}$. What is $\\text{var}(\\hat\\beta_1)$?`, tr: 'Homoskedastisite altında $\\text{var}(\\hat\\beta_1)$?', opts: nopts(v, [sx / (n * su), su / sx, su / (n * sx * sx), Math.sqrt(v)], 5, { min: 0 }), ex: steps(...hs) };
+    return { en: `Under homoskedasticity, $\\sigma^2_u = ${su}$, $\\sigma^2_X = ${sx}$ and $n = ${n}$. What is the standard deviation of $\\hat\\beta_1$?`, tr: '$\\hat\\beta_1$\'in standart sapması?', opts: nopts(Math.sqrt(v), [v, Math.sqrt(su / sx), Math.sqrt(sx / (n * su))], 4, { min: 0 }), ex: steps(...hs,
+      ['Karekök al', `Standart sapma = varyansın karekökü: $\\sqrt{${f(v, 5)}} = ${f(Math.sqrt(v), 4)}$`]) };
   };
 
   root.GENS = G;
@@ -849,9 +1134,9 @@ Panel veride **aynı** birimler her dönem tekrar gözlenir. Her yıl farklı ki
   };
   function enrich(name, q) {
     const g = G[name], r = g ? g(q) : null;
-    let ex = /^\*\*Doğru cevap/.test(q.ex) ? q.ex : '**Doğru cevap: ' + q.opts[0] + '.**\n' + q.ex;
+    let ex = /^\*\*Doğru cevap/.test(q.ex) ? q.ex : '**Doğru cevap: ' + q.opts[0] + '.**\n\n' + q.ex;
     if (r) {
-      if (r.how) ex += '\n\n**Yöntem:** ' + r.how;
+      if (r.how) ex += '\n\n**Özet:** ' + r.how;
       if (r.traps && r.traps.length) ex += '\n\n**Sık hatalar:**\n' + r.traps.map(t => '• ' + t).join('\n');
       if (r.tip) ex += '\n\n:::ipucu Sınavda\n' + r.tip + '\n:::';
     }

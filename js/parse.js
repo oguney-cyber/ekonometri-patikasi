@@ -117,7 +117,7 @@
       if (/^\s*\$\$.*\$\$\s*$/.test(l)) { out.push('<div class="mathblock">' + esc(l.trim()) + '</div>'); i++; continue; }
       const buf = [];
       while (i < lines.length && lines[i].trim() !== '' && !special(lines[i])) buf.push(lines[i++]);
-      out.push('<p>' + buf.map(inline).join('<br>') + '</p>');
+      out.push((/^\*\*Adım \d+:/.test(buf[0]) ? '<p class="step">' : '<p>') + buf.map(inline).join('<br>') + '</p>');
     }
     return out.join('');
   }
