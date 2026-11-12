@@ -529,3 +529,7 @@ ol.steps, ul.steps { display: grid; gap: 8px; margin: 0; padding-left: 1.3em; co
   .q-split > .aids { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: 0; max-height: calc(100dvh - 230px); overflow-y: auto; overscroll-behavior: contain; }
   .q-split > .ink-pad { grid-column: 1; }
 }
+/* Telefonda geniş tablo ve uzun formüller sayfayı yana kaydırmasın; KaTeX'in gizli MathML katmanı kutunun içinde kalsın */
+.view > *, .panel > *, .prose > *, .p-inner > * { min-width: 0; }
+.tbl, .panel > p, .prose > p { position: relative; }
+.panel > p, .prose > p { overflow-x: auto; overflow-y: hidden; }
